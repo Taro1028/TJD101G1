@@ -1,0 +1,28 @@
+$bodyfont: 16px;
+
+// font sizes
+$font_h1: 3rem; // 48px
+$font_h2: 2.5rem; // 40px
+$font_h3: 2.25rem; // 36px
+$font_h4: 1.5rem; // 24px
+$font_h5: 1.25rem; // 20px
+$font_h6: 1rem; // 16px
+$font_p: 0.875rem; // 14px
+
+//map寫法
+$font: (
+  h1: 3rem,
+  // 48px
+  h2: 2.5rem,
+  // 40px
+  h3: 2.25rem,
+  // 36px
+  h4: 1.5rem,
+  // 24px
+  h5: 1.25rem,
+  // 20px
+  h6: 1rem,
+  // 16px
+  p: 0.875rem,
+  // 14px
+);

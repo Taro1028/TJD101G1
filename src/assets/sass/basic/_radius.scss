@@ -1,0 +1,22 @@
+$border_radius_1: 4px;
+$border_radius_2: 8px;
+$border_radius_3: 12px;
+$border_radius_4: 16px;
+$border_radius_5: 20px;
+$border_radius_6: 24px;
+$border_radius_7: 28px;
+$border_radius_8: 32px;
+$border_radius_10: 999px; // 圓形/膠囊形狀
+
+//map寫法
+$radius: (
+  border_radius_1: $border_radius_1,
+  border_radius_2: $border_radius_2,
+  border_radius_3: $border_radius_3,
+  border_radius_4: $border_radius_4,
+  border_radius_5: $border_radius_5,
+  border_radius_6: $border_radius_6,
+  border_radius_7: $border_radius_7,
+  border_radius_8: $border_radius_8,
+  border_radius_10: $border_radius_10,
+);

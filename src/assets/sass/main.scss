@@ -1,0 +1,10 @@
+@import "normalize.css";
+// basic
+@import "./basic/color";
+@import "./basic/font";
+@import "./basic/radius";
+@import "./basic/spacing";
+
+// @import './';
+
+//以此類推，這個檔案是sass/的入口檔，用來匯入所有我們設計的 scss 檔案

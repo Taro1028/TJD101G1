@@ -1,0 +1,40 @@
+// Primary Colors
+$primary_50: #f6f4ef;
+$primary_100: #fbedca;
+$primary_400: #f1b42e;
+$primary_600: #cf6610;
+$primary_950: #421606;
+
+// Alert Colors
+$point_700: #2567d9;
+$danger_500: #e54343;
+$success_400: #8cbb4a;
+
+// Neutral Colors
+$neutral_white: #ffffff;
+$neutral_100: #e7e7e7;
+$neutral_300: #b0b0b0;
+$neutral_700: #4f4f4f;
+$neutral_black: #262626;
+
+//map寫法
+$colors: (
+  // Primary Colors
+  primary_50: #f6f4ef,
+  primary_100: #fbedca,
+  primary_400: #f1b42e,
+  primary_600: #cf6610,
+  primary_950: #421606,
+
+  // Alert Colors
+  point_700: #2567d9,
+  danger_500: #e54343,
+  success_400: #8cbb4a,
+
+  // Neutral Colors
+  neutral_white: #ffffff,
+  neutral_100: #e7e7e7,
+  neutral_300: #b0b0b0,
+  neutral_700: #4f4f4f,
+  neutral_black: #262626
+);
