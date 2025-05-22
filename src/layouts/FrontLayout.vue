@@ -1,15 +1,11 @@
 <template>
-  <h1>Front Layout</h1>
-  
+  <Header></Header>
+
   <RouterView></RouterView>
 </template>
 
-<script>
-  export default {
-    
-  }
+<script setup>
+import Header from '../components/Header.vue'
 </script>
 
-<style lang="css" scoped>
-
-</style>
+<style lang="css" scoped></style>

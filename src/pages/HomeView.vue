@@ -1,21 +1,18 @@
 <template>
+  <Header> </Header>
   <div>
     <h2>Home 頁面</h2>
 
   </div>
 </template>
 
-<script>
+<script setup>
+import Header from '../components/Header.vue';
 
-  export default {
-    data(){
-      return {};
-    }
-  }
 </script>
 
 <style scoped>
-  h2{
-    color: purple;
-  }
+h2 {
+  color: purple;
+}
 </style>

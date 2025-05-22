@@ -1,14 +1,9 @@
 <template>
-  <h1>這是 Main 元件</h1>
-  <ul>
-    <li><RouterLink to="/">首頁(RouterLink)</RouterLink></li>
-    <li><RouterLink to="/about">關於我們(RouterLink)</RouterLink></li>
-    <li><RouterLink to="/admin">admin</RouterLink></li>
-    <li><RouterLink to="/admin/users">admin users</RouterLink></li>
-  </ul>
-  
   <template v-if="$route.path.includes('admin')">
     <AdminLayout></AdminLayout>
+  </template>
+  <template v-else-if="$route.path === '/'">
+    index
   </template>
   <template v-else>
     <FrontLayout></FrontLayout>
@@ -28,10 +23,11 @@
 -->
 
 <script setup>
-  import FrontLayout from "@/layouts/FrontLayout.vue";
-  import AdminLayout from "@/layouts/AdminLayout.vue";
+import FrontLayout from "@/layouts/FrontLayout.vue";
+import AdminLayout from "@/layouts/AdminLayout.vue";
+import { useRoute } from 'vue-router'
+const route = useRoute()
+console.log(route.path)
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

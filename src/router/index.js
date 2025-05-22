@@ -11,7 +11,7 @@ const routes = [
     }
   },
   {
-    path: '/about',
+    path: '/front',
     component: () => import('@/pages/AboutView.vue'),
     meta: {
       title: '關於我們',
@@ -23,8 +23,9 @@ const routes = [
     children: [
       { path: '', component: () => import('@/pages/admin/Dashboard.vue') },
       { path: 'users', component: () => import('@/pages/admin/User.vue') },
-    ], 
+    ],
   }
+
 ];
 
 // 建立 router
