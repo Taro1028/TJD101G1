@@ -6,6 +6,17 @@ import path from 'path'   // 載入 path
 export default defineConfig({
   base: "/tjd101/g1", // 設定相對路徑
   plugins: [vue()],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+          @use "@/assets/sass/basic/color.scss" as *;
+          @use "@/assets/sass/basic/font.scss" as *;
+          @use "@/assets/sass/basic/spacing.scss" as *;
+        `
+      }
+    }
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src") // @ 符號：直接指向到 src 資料夾
