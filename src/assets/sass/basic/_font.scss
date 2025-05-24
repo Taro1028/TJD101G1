@@ -1,3 +1,14 @@
+@font-face {
+  font-family: 'huninn';
+  src: url('../../font/jf-openhuninn-2.1.ttf')format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'huninn', 'Noto Sans TC', sans-serif;
+}
+
 $bodyfont: 16px;
 
 // font sizes

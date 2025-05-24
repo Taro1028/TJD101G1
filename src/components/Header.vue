@@ -1,27 +1,24 @@
+<script setup>
+
+</script>
+
 <template>
     <header>
-        <a href="#">
+        <router-link to="/front/Home">
             <img src="../assets/images/Logo_S.svg" alt="logo_s">
-        </a>
+        </router-link>
 
         <ul class="header_nav">
-            <li><a href="#">餐盒介紹</a></li>
-            <li><a href="#">預約訂餐</a></li>
-            <li><a href="#">關於我們</a></li>
-            <li><a href="#">登入/註冊</a></li>
+            <li><router-link to="/front/LuchBox">餐盒介紹</router-link></li>
+            <li><router-link to="/front/Order">預約訂餐</router-link></li>
+            <li><router-link to="/front/About">關於我們</router-link></li>
+            <li><router-link to="/front/Member">登入/註冊</router-link></li>
         </ul>
     </header>
 
 </template>
 
-<script setup>
-
-</script>
-
 <style scoped lang="scss">
-@use "@/assets/sass/basic/color.scss" as *;
-@use "@/assets/sass/basic/font.scss" as *;
-
 
 header {
     width: 1440px;

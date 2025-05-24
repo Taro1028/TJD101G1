@@ -4,18 +4,50 @@ import { createRouter, createWebHistory } from "vue-router";
 const routes = [
   {
     path: '/',
-    component: () => import('@/pages/HomeView.vue'),
+    component: () => import('@/pages/Entrance.vue'),
     meta: {
-      title: '首頁',
+      title: '入口頁',
       requiredLogin: false
     }
   },
   {
-    path: '/front',
-    component: () => import('@/pages/AboutView.vue'),
+    path: '/front/Home',
+    component: () => import('@/pages/Home.vue'),
     meta: {
-      title: '關於我們',
+      title: 'TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+  {
+    path: '/front/LuchBox',
+    component: () => import('@/pages/LunchBox.vue'),
+    meta: {
+      title: '餐盒介紹 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+  {
+    path: '/front/Order',
+    component: () => import('@/pages/Order.vue'),
+    meta: {
+      title: '預約訂餐',
       requiredLogin: true
+    }
+  },
+  {
+    path: '/front/About',
+    component: () => import('@/pages/LunchBox.vue'),
+    meta: {
+      title: '關於我們 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+  {
+    path: '/front/Member',
+    component: () => import('@/pages/LunchBox.vue'),
+    meta: {
+      title: '會員中心 - TibaEAT 提膳家',
+      requiredLogin: false
     }
   },
   {
@@ -32,6 +64,12 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes
+});
+
+// 依據 route 的 meta.title 更新網頁標題
+router.afterEach((to) => {
+  const defaultTitle = 'TibaEAT 提膳家';
+  document.title = to.meta.title || defaultTitle;
 });
 
 // 匯出 router

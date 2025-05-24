@@ -1,9 +1,9 @@
 @import "normalize.css";
 // basic
-@import "./basic/color";
-@import "./basic/font";
-@import "./basic/radius";
-@import "./basic/spacing";
+@use "./basic/color.scss" as *;
+@use "./basic/font.scss" as *;
+@use "./basic/fonts.scss";
+@use "./basic/spacing.scss" as *;
 
 // @import './';
 
