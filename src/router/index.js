@@ -36,7 +36,7 @@ const routes = [
   },
   {
     path: '/front/About',
-    component: () => import('@/pages/LunchBox.vue'),
+    component: () => import('@/pages/About.vue'),
     meta: {
       title: '關於我們 - TibaEAT 提膳家',
       requiredLogin: false
@@ -44,7 +44,7 @@ const routes = [
   },
   {
     path: '/front/Member',
-    component: () => import('@/pages/LunchBox.vue'),
+    component: () => import('@/pages/Member.vue'),
     meta: {
       title: '會員中心 - TibaEAT 提膳家',
       requiredLogin: false
