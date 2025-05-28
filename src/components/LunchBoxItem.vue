@@ -118,6 +118,7 @@ defineProps(['content','text']);
 
 .wrap{
     max-width: 1200px;
+    width: 100%;
     margin: 0 auto;
 }
 .s1{
@@ -129,7 +130,7 @@ defineProps(['content','text']);
 
 .s1 h3{
     width: 100%;
-    max-width: 1200px;
+    
     // border: 1px solid blue;
     display: flex;
     margin: 0 auto;
@@ -150,7 +151,7 @@ defineProps(['content','text']);
 
 
 
-.ss1 img {
+.ss1  img {
   width: 100%;
   height: auto;         
   max-width: 300px;     
@@ -192,8 +193,11 @@ defineProps(['content','text']);
 .box h5{
     font-size: $font_h5;
 }
-.box img{
-    padding-right: 20px;
+.box > img {
+  width: 200px;
+  height: auto;
+  padding-right: 20px;
+  object-fit: contain;
 }
 
 .inf{

@@ -21,7 +21,7 @@
 <style scoped lang="scss">
 
 header {
-    width: 1440px;
+    max-width: 1440px;
     height: 60px;
     display: flex;
     padding: 0;
