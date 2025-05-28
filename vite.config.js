@@ -12,6 +12,7 @@ export default defineConfig({
         additionalData: `
           @use "@/assets/sass/basic/color.scss" as *;
           @use "@/assets/sass/basic/font.scss" as *;
+          @use "@/assets/sass/basic/radius.scss" as *;
           @use "@/assets/sass/basic/spacing.scss" as *;
         `
       }

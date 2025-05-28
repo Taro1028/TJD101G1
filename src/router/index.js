@@ -30,7 +30,7 @@ const routes = [
     path: '/front/Order',
     component: () => import('@/pages/Order.vue'),
     meta: {
-      title: '預約訂餐',
+      title: '預約訂餐 - TibaEAT 提膳家',
       requiredLogin: true
     }
   },

@@ -3,9 +3,11 @@
     <img src="../assets/images/LunchBox/Frame1.png" alt="">
 
     <div class="allbutton">
-        <button v-for="(item, index) in buttonContent" :key="index" class="fbutton">{{ item }}</button>
-        
+        <button v-for="(item, index) in buttonContent" 
+        :key="index" class="fbutton"
+        >{{ item }}</button>
     </div>
+    <i class="bi bi-0-circle"></i>
 <LunchBoxItem 
 v-for="(item, index) in totalProduct"
       :key="index"
@@ -148,6 +150,10 @@ const totalProduct=ref([{
 </script>
 
 <style scoped lang="scss">
+
+img {
+    max-width: 100%;
+}
 
 .allbutton{
     display: flex;
