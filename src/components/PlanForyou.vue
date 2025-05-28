@@ -9,6 +9,8 @@ onMounted(() => {
 onUnmounted(() => {
   document.body.classList.remove('custom-bg')
 })
+
+
 </script>
 <template>
     <FrontLayout>

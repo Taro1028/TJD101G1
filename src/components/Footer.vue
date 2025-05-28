@@ -50,14 +50,12 @@ footer{
 }
 
 .infoContainer{
-    border: 1px solid blue;
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
 .info{
- border: 1px solid #ccc;
  display: flex;
  align-items: center;
  gap: 20px;
