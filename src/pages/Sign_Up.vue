@@ -7,7 +7,7 @@
         <p class="signup-subtitle">從每餐感受到連結</p>
 
         <!-- 建立帳號表單 -->
-        <form action="" method="post" class="signup_form">
+        <div class="signup_form">
           <div class="signup_form_component">
             <label for="name">姓名</label>
             <input
@@ -77,7 +77,7 @@
           </div>
 
           <button type="submit" class="signup_submit">建立</button>
-        </form>
+        </div>
         <!-- 註冊表單結束 -->
     </div>
     <div class="right-section">
