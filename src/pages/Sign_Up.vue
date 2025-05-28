@@ -2,7 +2,7 @@
 <div class="page-container">
   <div class="content-wrapper">
     <div class="left-section">
-       <a href="#"><img src="../assets/images//Logo_S.svg" alt="logo_s" /></a>
+       <RouterLink to="/front/Home"><img src="../assets/images//Logo_S.svg" alt="logo_s" /></RouterLink>
         <h1 class="signup-title">加入會員</h1>
         <p class="signup-subtitle">從每餐感受到連結</p>
 
@@ -62,6 +62,10 @@
               placeholder="請再次輸入密碼"
             />
           </div>
+          <div>
+           <RouterLink to="/front/Login" class="longin-link">已經有帳號？點我登入</RouterLink>
+          </div>
+
 
           <!-- 快速註冊區塊 -->
           <div class="fast_signup">
@@ -80,12 +84,9 @@
         </div>
         <!-- 註冊表單結束 -->
     </div>
+<!-- 右側圖片區塊 -->
     <div class="right-section">
-                    <!-- 右側圖片區塊 -->
-        <div class="right-section">
-          <img src="../assets/images/Member/login_pic.svg" alt="外送插圖" />
-        </div>
-
+        <img src="../assets/images/Member/login_pic.svg" alt="外送插圖" />
     </div>
   </div>
 </div>
@@ -128,7 +129,7 @@ img {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  align-items: center; 
+  align-items: stretch; 
   min-height: 100vh; 
 }
 
@@ -137,6 +138,7 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 3rem;
 }
 
 .signup-title{
@@ -202,7 +204,7 @@ img {
 
 /* 快速註冊區塊 */
 .fast_signup {
-  padding: 48px 28px;
+  padding: 48px 28px 16px 28px;
   margin: 0 auto;
   text-align: center;
 }
@@ -233,14 +235,15 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh; 
+  min-height: 100vh; 
   overflow: hidden; 
   
   img {
     width: 100%;
-    height: 100vh; 
+    height: 100%;  
+    min-height: 100vh; 
     object-fit: cover; 
-    object-position: center; 
+    object-position: center;
   }
 }
 // 響應式設計

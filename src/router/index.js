@@ -56,6 +56,22 @@ const routes = [
       { path: '', component: () => import('@/pages/admin/Dashboard.vue') },
       { path: 'users', component: () => import('@/pages/admin/User.vue') },
     ],
+  },
+  {
+    path: '/front/Login',
+    component: () => import('@/pages/Login.vue'),
+    meta: {
+      title: '會員登入 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+  {
+    path: '/front/Sign_Up',
+    component: () => import('@/pages/Sign_Up.vue'),
+    meta: {
+      title: '會員註冊 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
   }
 
 ];
