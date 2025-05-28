@@ -44,7 +44,7 @@ const routes = [
   },
   {
     path: '/front/Member',
-    component: () => import('@/pages/LunchBox.vue'),
+    component: () => import('@/pages/Member.vue'),
     meta: {
       title: '會員中心 - TibaEAT 提膳家',
       requiredLogin: false
