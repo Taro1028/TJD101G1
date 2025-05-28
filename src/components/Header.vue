@@ -24,7 +24,9 @@ header {
     width: 1440px;
     height: 60px;
     display: flex;
-    padding: 0 48px;
+    padding: 0;
+    padding-left: 48px;
+    padding-right: 48px;
     justify-content: space-between;
     align-items: center;
     background-color: $primary_100;
@@ -40,6 +42,8 @@ header a .img {
 }
 
 .header_nav {
+    padding: 0;
+    margin: 0;
     height: 100%;
     display: flex;
     list-style-type: none;
