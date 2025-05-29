@@ -100,16 +100,6 @@
 </script>
 
 <style scoped lang="scss">
-@font-face {
-  font-family: 'jf-openhuninn';
-  src: url('@/assets/font/jf-openhuninn-2.1.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-* {
-  font-family: 'jf-openhuninn', sans-serif;
-}
 
 img {
   display: block;
@@ -123,6 +113,10 @@ img {
   background-color: $primary_50; 
 }
 
+a {
+  text-decoration: none;
+  color: black;
+}
 // 主要內容容器
 .content-wrapper {
   max-width: 1200px;
@@ -200,6 +194,10 @@ img {
   outline: none;
   border-color: $primary_400; 
   box-shadow: 0 0 0 2px rgba(241, 180, 46, 0.2);
+}
+
+.longin-link{
+  color: $point_700;
 }
 
 /* 快速註冊區塊 */
