@@ -7,7 +7,7 @@
         <div class="infoContainer">
             <div class="info">
                 <div class="link">
-                    <router-link to="/front/Home">
+                    <router-link to="/Home">
                         <img src="../assets/images/Logo_S.svg" alt="logo_s">
                     </router-link>
                     <ul class="brandlink">

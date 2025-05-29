@@ -16,18 +16,18 @@ onUnmounted(() => {
         <h3>想選哪一種方案呢？</h3>
     
         <div class="plans">
-            <a href="#">
+            <router-link to="/Order/PlanForyou" class="link">
                 <div class="plan_foryou">
                     <h3>為你搭配</h3>
                     <h5>由專業營養師<br>調配的餐食</h5>
                 </div>
-            </a>
-            <a href="#">
+            </router-link>
+            <router-link to="/Order/PlanFreeMatching" class="link">
                 <div class="plan_free">
                     <h3>自由搭配</h3>
                     <h5>自己挑選菜色<br>組合餐盒</h5>
                 </div>
-            </a>
+            </router-link>
         </div>
 
         <div class="notice">
@@ -61,7 +61,7 @@ h3{
     font-size: $font_h3;
 }
 
-a{
+.link{
     text-decoration: none;
 }
 

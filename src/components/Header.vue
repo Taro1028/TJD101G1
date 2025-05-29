@@ -4,15 +4,15 @@
 
 <template>
     <header>
-        <router-link to="/front/Home">
+        <router-link to="/Home">
             <img src="../assets/images/Logo_S.svg" alt="logo_s">
         </router-link>
 
         <ul class="header_nav">
-            <li><router-link to="/front/LuchBox">餐盒介紹</router-link></li>
-            <li><router-link to="/front/Order">預約訂餐</router-link></li>
-            <li><router-link to="/front/About">關於我們</router-link></li>
-            <li><router-link to="/front/Member">登入/註冊</router-link></li>
+            <li><router-link to="/LuchBox">餐盒介紹</router-link></li>
+            <li><router-link to="/Order">預約訂餐</router-link></li>
+            <li><router-link to="/About">關於我們</router-link></li>
+            <li><router-link to="/Member">登入/註冊</router-link></li>
         </ul>
     </header>
 

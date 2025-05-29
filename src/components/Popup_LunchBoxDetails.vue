@@ -75,12 +75,23 @@
 
 <style scoped lang="scss">
 .overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     background-color:rgba(0, 0, 0, 0.4);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 1000;
 }
 
 .detailCard{
     width: 640px;
-    margin: 0 auto;
+    margin: auto;
     padding: 48px;
     display: flex;
     flex-direction: column;

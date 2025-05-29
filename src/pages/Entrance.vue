@@ -12,7 +12,7 @@ console.log(route.path)
         <h1>提膳家</h1>
       </div>
       <div class="entrance">
-        <router-link to="/front/Home" class="front">
+        <router-link to="/Home" class="front">
           <h1>前台</h1>
         </router-link>
         <router-link to="/admin" class="admin">

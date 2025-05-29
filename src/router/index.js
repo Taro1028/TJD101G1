@@ -10,8 +10,10 @@ const routes = [
       requiredLogin: false
     }
   },
+
+  // === 前台 ===
   {
-    path: '/front/Home',
+    path: '/Home',
     component: () => import('@/pages/Home.vue'),
     meta: {
       title: 'TibaEAT 提膳家',
@@ -19,7 +21,7 @@ const routes = [
     }
   },
   {
-    path: '/front/LuchBox',
+    path: '/LuchBox',
     component: () => import('@/pages/LunchBox.vue'),
     meta: {
       title: '餐盒介紹 - TibaEAT 提膳家',
@@ -27,7 +29,7 @@ const routes = [
     }
   },
   {
-    path: '/front/Order',
+    path: '/Order',
     component: () => import('@/pages/Order.vue'),
     meta: {
       title: '預約訂餐 - TibaEAT 提膳家',
@@ -35,7 +37,23 @@ const routes = [
     }
   },
   {
-    path: '/front/About',
+    path: '/Order/PlanForyou',
+    component: () => import('@/pages/PlanForyou.vue'),
+    meta: {
+      title: '為你搭配 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+  {
+    path: '/Order/PlanFreeMatching',
+    component: () => import('@/pages/PlanFreeMatching.vue'),
+    meta: {
+      title: '自由搭配 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+  {
+    path: '/About',
     component: () => import('@/pages/About.vue'),
     meta: {
       title: '關於我們 - TibaEAT 提膳家',
@@ -43,7 +61,7 @@ const routes = [
     }
   },
   {
-    path: '/front/Member',
+    path: '/Member',
     component: () => import('@/pages/Member.vue'),
     meta: {
       title: '會員中心 - TibaEAT 提膳家',
@@ -51,14 +69,7 @@ const routes = [
     }
   },
   {
-    path: '/admin',
-    children: [
-      { path: '', component: () => import('@/pages/admin/Dashboard.vue') },
-      { path: 'users', component: () => import('@/pages/admin/User.vue') },
-    ],
-  },
-  {
-    path: '/front/Login',
+    path: '/Login',
     component: () => import('@/pages/Login.vue'),
     meta: {
       title: '會員登入 - TibaEAT 提膳家',
@@ -66,13 +77,23 @@ const routes = [
     }
   },
   {
-    path: '/front/Sign_Up',
+    path: '/Sign_Up',
     component: () => import('@/pages/Sign_Up.vue'),
     meta: {
       title: '會員註冊 - TibaEAT 提膳家',
       requiredLogin: false
     }
-  }
+  },
+
+  // === 後台 ===
+  {
+    path: '/admin', // /admin      /admin/users
+    children: [
+      { path: '', component: () => import('@/pages/admin/Dashboard.vue') },
+      { path: 'users', component: () => import('@/pages/admin/User.vue') },
+    ],
+  },
+
 
 ];
 

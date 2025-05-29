@@ -451,7 +451,6 @@ p{
 
 .main-news{
   position: relative;
-  
 }
 
 .main-news img{
@@ -465,7 +464,7 @@ p{
   top: 0;
   left: 0;
   width: 100%;
-  height: 95%;
+  height: 100%;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.6));
   transition: opacity 0.3s ease;
   z-index: 1;
@@ -499,7 +498,7 @@ p{
 .news-list{
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 36px;
   
 }
 
