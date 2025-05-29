@@ -51,7 +51,7 @@
             </div>
           </div>
 
-          <button type="submit" class="signup_submit">建立</button>
+          <button type="submit" class="signup_submit"><RouterLink to="/front/MemberCenter">建立</RouterLink></button>
         </div>
         <!-- 註冊表單結束 -->
     </div>
@@ -71,24 +71,13 @@
 </script>
 
 <style scoped lang="scss">
-@font-face {
-  font-family: 'jf-openhuninn';
-  src: url('@/assets/font/jf-openhuninn-2.1.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-* {
-  font-family: 'jf-openhuninn', sans-serif;
-}
-
 img {
   display: block;
 }
 
 a {
   text-decoration: none;
-  color: black;
+  color: $neutral_white;
 }
 
 .page-container {
@@ -115,7 +104,7 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-margin-top: 3rem;
+  margin-top: 3rem;
 }
 
 .signup-title{
