@@ -23,7 +23,8 @@
                 <p>功效：</p>
                 <p class="inf">{{ item.description }}</p>
                 <article class="toggle">
-                    <img src="../assets/images/LunchBox/toggledown-button.png" alt="">
+                    <!-- <img src="../assets/images/LunchBox/toggledown-button.png" alt=""> -->
+                     <i class="bi bi-caret-down-fill down"></i>
                 </article>
             </article>
         </article>
@@ -120,6 +121,7 @@ defineProps(['content','text']);
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
+    overflow-x: hidden;
 }
 .s1{
     width: 100%;
@@ -130,11 +132,11 @@ defineProps(['content','text']);
 
 .s1 h3{
     width: 100%;
-    
+    font-size: $font_h3;
     // border: 1px solid blue;
     display: flex;
     margin: 0 auto;
-    padding: 20px 0px 20px 0px;
+    padding: 20px 20px 20px 20px;
 }
 
 .ss1 {
@@ -147,6 +149,7 @@ defineProps(['content','text']);
   /* gap: 20px; */
   margin: 0 auto;
   /* flex-wrap: wrap;    */
+  overflow-x: hidden;
 }
 
 
@@ -156,7 +159,7 @@ defineProps(['content','text']);
   height: auto;         
   max-width: 300px;     
   display: block;
-  
+  padding: 0px 20px 0px 20px;
 }
 
 .ss1 p{
@@ -167,7 +170,7 @@ defineProps(['content','text']);
     display: flex;
     // border: 1px solid red;
     flex-direction: column;
-    
+    padding-right: 20px;
 }
 
 .b button {
@@ -180,13 +183,14 @@ defineProps(['content','text']);
     color: $neutral_white;
     margin-left: auto;
     cursor: pointer;
+    
 }
 
 
 
 .box{
     display: flex;
-    padding: 20px 0px 20px 0px;
+    padding: 20px 20px 20px 20px;
     
 }
 
@@ -210,6 +214,37 @@ defineProps(['content','text']);
     cursor: pointer;
 }
 
+.down{
+    color: $primary_600;
+    font-size: 25px;
+}
+
+// ===================RWD=====================
+@media (max-width: 820px){
+    .s1 h3{
+      justify-content: center;
+      font-size: $font_h3;
+      padding: 20px 0 20px 0;
+    }
+
+    .ss1{
+        display: flex;
+  flex-direction: column;
+    }
+
+    .box{
+        display: flex;
+        flex-direction: column;
+    }
+    .box > img {
+       margin: 0 auto;
+    }
+    
+}
 
 
+@media (max-width: 650px){
+
+
+}
 </style>

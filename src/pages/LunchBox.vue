@@ -3,11 +3,14 @@
     <img src="../assets/images/LunchBox/Frame1.png" alt="">
 
     <div class="allbutton">
+    
         <button v-for="(item, index) in buttonContent" 
         :key="index" class="fbutton"
         >{{ item }}</button>
+       
     </div>
-    <i class="bi bi-0-circle"></i>
+   
+
 <LunchBoxItem 
 v-for="(item, index) in totalProduct"
       :key="index"
@@ -156,22 +159,50 @@ img {
 }
 
 .allbutton{
+    
+    // border: 1px solid red;
+     max-width: 1200px;
+    margin: 0 auto;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
+  padding: 20px;
+
 }
 
 .fbutton{
     
     
     display: block;
-    width: 100px;
+    width: 150px;
+    height: 50px;
     border-radius: 10px;
     border: none;
     padding: 10px;
     background-color: $primary_600;
     color: $neutral_white;
-   margin: 20px 0px 20px 0px;
+   
+   margin: 0 auto;
+   
     cursor: pointer;
+    
+   
+}
+// ===================RWD=====================
+@media (max-width: 650px){
+
+    .allbutton{
+        display: flex;
+        flex-direction: column;
+        
+       
+    }
+    
+
+    .fbutton{
+        display: block;
+        width: 100%;
+        margin-top: 20px;
+    }
 }
 
 </style>
