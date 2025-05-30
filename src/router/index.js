@@ -61,6 +61,22 @@ const routes = [
     }
   },
   {
+    path: '/About/News',
+    component: () => import('@/pages/News.vue'),
+    meta: {
+      title: '最新消息 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+    {
+    path: '/About/News/Newsitem',
+    component: () => import('@/pages/Newsitem.vue'),
+    meta: {
+      title: '最新消息 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+  {
     path: '/Member',
     component: () => import('@/pages/Member.vue'),
     meta: {

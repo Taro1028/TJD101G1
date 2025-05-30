@@ -23,7 +23,7 @@ console.log(route.path)
   </div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 
 .wrapper{
   width: 100%;

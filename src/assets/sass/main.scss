@@ -10,4 +10,12 @@ ol {
     /* optional: removes default margin */
 }
 
+h1,h2,h3,h4,h5,h6,p{
+    margin: 0;
+}
+
+body{
+    background-color: $primary_50;
+}
+
 //以此類推，這個檔案是sass/的入口檔，用來匯入所有我們設計的 scss 檔案

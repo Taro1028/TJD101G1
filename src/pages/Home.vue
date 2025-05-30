@@ -15,17 +15,10 @@
               </div>
           </div>
           <div class="intro-right">
-            <div class="background-layer"></div>
             <div class="animated-gradient"></div>
-            <div class="ellipse-bg">
-                <div class="inner">
-                    <div class="carousel-info">
-                      <h4>嚴選超過10年的有機栽種農地<br>取自最天然食材</h4>
-                    </div>
-                    <div class="carousel">
-                        <img src="../assets/images/Home/farmer_1.png" alt="farmer_1">
-                    </div>
-                </div>
+            <div class="carousel">
+              <h4>嚴選超過10年的<br>有機栽種農地<br>取自最天然食材</h4>
+              <img src="../assets/images/Home/farmer_1.png" alt="">
             </div>
           </div>
     </article>
@@ -120,7 +113,7 @@
         <div class="main-news">
           <a href="#">
           <div class="newstag">焦點</div>
-          <img src="../assets/images/Home/news1.png" alt="news1">
+          <img src="../assets/images/Home/news_1.png" alt="news_1">
           <div class="block-overlay"></div>
           <h4>緯藝基金會助力 攜手推動長者營養餐計畫</h4>
           </a>
@@ -150,7 +143,7 @@
         </div>
       </div>
       <div class="linkblock">
-        <a href="#" class="btn">瞭解更多</a>
+        <router-link to="/About/News" class="btn">瞭解更多</router-link>
       </div>
     </section>
   </FrontLayout>
@@ -169,15 +162,17 @@ body{
 
 // --- 主視覺 start ---
 .intro-section{
+  width: 1200px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  padding: 24px 0 48px 80px;
+  padding: 48px 80px;
   gap: 48px;
 }
 
 .intro-left{
-  width: 580px;
+  width: 100%;
   padding-top: 48px;
   display: flex;
   flex-direction: column;
@@ -213,18 +208,8 @@ h4{
 .intro-right {
   position: relative;
   overflow: hidden;
-  min-width: 700px;
-  min-height: 540px;
-}
-
-.background-layer {
-  position: absolute;
-  inset: 0;
-  background-image: url(../assets/images/Home/Subtract.svg);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-  z-index: 0;
+  height: 100%;
+  display: grid;
 }
 
 .animated-gradient {
@@ -235,9 +220,9 @@ h4{
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle, #F2AF3A 0%, #2626260a 70%);
+  background: radial-gradient(circle, #F2AF3A 12%, #2626260a 70%);
   animation: gradientPulse 8s ease-in-out infinite;
-  z-index: 1;
+  z-index: -1;
   pointer-events: none;
 }
 
@@ -246,28 +231,23 @@ h4{
     transform: translate(-50%, -50%) scale(.75);
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.2);
+    transform: translate(-50%, -50%) scale(1.15);
   }
 }
 
-.ellipse-bg {
+.carousel {
   position: relative;
   z-index: 2;
-  min-height: 540px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 48px;
   align-items: center;
+  justify-content: center;
 }
 
-.inner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-}
-
-.carousel-info h4 {
+.carousel h4 {
   max-width: 190px;
+  text-align: center;
 }
 
 .carousel img {
@@ -445,7 +425,7 @@ p{
 // --- 最新消息 start ---
 .news-container{
   display: flex;
-  justify-content: space-between;
+  align-items: center;
   gap: 48px;
 }
 
@@ -474,7 +454,6 @@ p{
   }
 }
 
-
 .newstag{
   padding: 4px 8px;
   background-color: $primary_100;
@@ -498,8 +477,7 @@ p{
 .news-list{
   display: flex;
   flex-direction: column;
-  gap: 36px;
-  
+  gap: 48px;
 }
 
 .news-list a{
@@ -556,7 +534,6 @@ a:hover .title{
   border-radius: 24px;
   transition: 0.3s ease;
 
-
   &:hover{
   color: $neutral_black;
   background-color: $neutral_white;
@@ -564,8 +541,6 @@ a:hover .title{
   }
 }
 
-
 // --- 最新消息 end ---
-
 
 </style>

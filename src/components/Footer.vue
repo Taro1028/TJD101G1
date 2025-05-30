@@ -44,7 +44,7 @@
 <style scoped lang="scss">
 
 footer{
-    max-width: 1440px;
+    max-width: 100%;
     padding: 32px 48px 16px;
     background-color: $primary_100;
 }

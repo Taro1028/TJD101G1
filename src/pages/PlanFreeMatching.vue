@@ -289,8 +289,19 @@ h1{
 
 // 單日項目
 .day-item{
+    position: relative;
     display: flex;
     justify-content: space-between;
+
+     &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: .5px;
+        background-color: $neutral_300;
+    }
 }
 
 .item{
