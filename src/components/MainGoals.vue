@@ -23,44 +23,44 @@ const goals = [
 
 <style scoped lang="scss">
 .main-goals {
-    margin: 40px 0;
+  margin-top: 160px;
 }
 .title {
-    font-size: $font_h3;
-    margin-top: 80px;
-    margin-bottom: 40px;
-
+  font-size: $font_h3;
+  color: $primary_950;
+  text-align: center;
+  margin-bottom: 20px;
 }
 .goal-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding: 0;
-    list-style: none;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 20px;
+  list-style: none;
 }
 .goal-item {
-    width: 1000px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background-color: $primary_600;
-    color: white;
-    padding: 20px;
-    margin: 20px auto;
-    border-radius: 8px;
+  width: 800px;
+  display: flex;
+  align-items: center;
+  background-color: $primary_600;
+  color: $neutral_white;
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 20px;
 }
 .goal-number {
-    font-size: $font_h4;
-    background-color: $primary_100;
-    color: $primary_950;
-    font-weight: bold;
-    padding: 6px 12px;
-    border-radius: 50%;
-    text-align: center;
+  font-size: $font_h4;
+  background-color: $primary_100;
+  color: $primary_950;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 50%;
+  text-align: center;
 }
 .goal-text {
-    flex: 1;
-    font-size: $font_h3;
-    text-align: center;
+  flex: 1;
+  font-size: $font_h4;
+  text-align: center;
+  letter-spacing: 4px;
 }
 </style>

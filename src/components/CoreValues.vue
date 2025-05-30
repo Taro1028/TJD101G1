@@ -1,8 +1,8 @@
 <script setup>
 const values = [
-  { label: '溫暖', icon: '🏠', color: '#cf6610' },
-  { label: '關懷', icon: '🤝', color: '#f1b42e' },
-  { label: '支持', icon: '🛠️', color: '#421606' }
+  { label: '溫暖', iconClass: 'bi bi-house-heart', color: '#cf6610' },
+  { label: '關懷', iconClass: 'bi bi-clipboard-heart', color: '#f1b42e' },
+  { label: '支持', iconClass: 'bi bi-person-hearts', color: '#421606' }
 ];
 </script>
 
@@ -16,8 +16,8 @@ const values = [
         class="circle"
         :style="{ borderColor: item.color }"
       >
-        <div class="icon">{{ item.icon }}</div>
-        <div class="label">{{ item.label }}</div>
+        <i :class="['icon', item.iconClass]" :style="{ color: item.color }"></i>
+        <div class="label" :style="{ color: item.color }">{{ item.label }}</div>
       </div>
     </div>
   </section>
@@ -27,43 +27,44 @@ const values = [
 
 <style scoped lang="scss">
 .core-values {
-    margin: 40px 0;
+  margin: 40px 0;
 }
 
 .title {
-    font-size: $font_h3;
-    margin-top: 80px;
-    margin-bottom: 20px;
-    color: $primary_950;
+  font-size: $font_h3;
+  color: $primary_950;
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: 20px;
 }
 
 .circle-container {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
 }
 
 .circle {
-    width: 320px;
-    height: 320px;
-    border: 20px solid;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 40px;
+  width: 240px;
+  height: 240px;
+  border: 12px solid;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
 }
 
 .icon {
-    font-size: $font_h1;
+  font-size: 60px;
 }
 
 .label {
-    margin-top: 8px;
-    font-weight: 500;
-    font-size: $font_h3;
-    color: $primary_950;
+  margin-top: 8px;
+  font-weight: 500;
+  font-size: $font_h3;
+  color: $primary_950;
 }
 </style>

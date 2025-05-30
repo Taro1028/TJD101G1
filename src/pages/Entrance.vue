@@ -19,6 +19,10 @@ console.log(route.path)
           <h1>後台</h1>
         </router-link>
       </div>
+      <div class="copyright">
+        <span>本網站為緯育TibaMe前端設計工程師班第 95 期學員專題成果作品，本平台僅供學習、展示之用。<br>
+              若有侵權疑慮，您可以私訊 TibaMe - 前端設計工程師養成班，後續會由專人協助處理。</span>
+      </div>
     </div>
   </div>
 </template>
@@ -39,7 +43,6 @@ console.log(route.path)
   transform: translate(-50%, -50%);
   text-align: center;
 }
-
 
 .logo img{
   display: block;
@@ -70,7 +73,6 @@ h1{
   align-items: center;
 }
 
-
 .front{
   background-color: $primary_400;
 }
@@ -87,4 +89,10 @@ h1{
   color: $neutral_white;
 }
 
+.copyright{
+  margin-top: 80px;
+  text-align: center;
+  font-size: 12px;
+  color: $primary_950;
+}
 </style>

@@ -56,7 +56,7 @@ const routes = [
     path: '/About',
     component: () => import('@/pages/About.vue'),
     meta: {
-      title: '關於我們 - TibaEAT 提膳家',
+      title: '理念及目標 - TibaEAT 提膳家',
       requiredLogin: false
     }
   },
@@ -68,11 +68,26 @@ const routes = [
       requiredLogin: false
     }
   },
-    {
+  {
     path: '/About/News/Newsitem',
     component: () => import('@/pages/Newsitem.vue'),
     meta: {
       title: '最新消息 - TibaEAT 提膳家',
+    }
+  },
+  {
+    path: '/About/SmallFarmer',
+    component: () => import('@/pages/SmallFarmer.vue'),
+    meta: {
+      title: '配合小農 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+  {
+    path: '/About/Cooperation',
+    component: () => import('@/pages/Cooperation.vue'),
+    meta: {
+      title: '合作夥伴 - TibaEAT 提膳家',
       requiredLogin: false
     }
   },

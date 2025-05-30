@@ -24,18 +24,20 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-        <div class="marquee-wrapper">
-            <transition name="slide-fade">
-                <p v-if="currentText" :key="currentIndex" class="marquee-text">
-                    {{ currentText }}
-                </p>
-            </transition>
-        </div>
+  <div class="marquee-wrapper">
+    <transition name="slide-fade" mode="out-in">
+      <div class="marquee-content" :key="currentIndex">
+          <i class="bi bi-egg-fried"></i>
+          <p class="marquee-text">{{ currentText }}</p>
+          <i class="bi bi-egg-fried"></i>
+      </div>
+    </transition>
+  </div>
 </template>
 
 <style scoped lang="scss">
 .marquee-wrapper {
-  height: 100px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,41 +46,38 @@ onBeforeUnmount(() => {
   color: $primary_600;
   font-weight: bold;
   position: relative;
-  margin-top: 80px;
+}
+
+.marquee-content {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .marquee-text {
   white-space: nowrap;
-  position: absolute;
-  left: 0;
-  right: 0;
   text-align: center;
+  letter-spacing: 2cqb;
+  text-shadow: 4px 4px 5px $neutral_300;
 }
 
 .slide-enter-active,
 .slide-leave-active {
-  transition: transform 0.6s ease, opacity 0.6s ease;
+  transition: opacity 1s ease;
   position: absolute;
   width: 100%;
 }
 
-.slide-enter-from {
-  transform: translateX(100%);
-  opacity: 0;
-}
-
-.slide-enter-to {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-.slide-leave-from {
-  transform: translateX(0);
-  opacity: 1;
-}
-
+.slide-enter-from,
 .slide-leave-to {
-  transform: translateX(-100%);
   opacity: 0;
 }
+
+.slide-enter-to,
+.slide-leave-from {
+  opacity: 1;
+}
+
+
 </style>

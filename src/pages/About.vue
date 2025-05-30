@@ -8,7 +8,7 @@ import MainGoals from '@/components/MainGoals.vue';
 
 <template>
     <FrontLayout>
-        <div>
+        <div class="about">
             <MarqueeText />
             <CoreValues />
             <MainGoals />
@@ -17,5 +17,9 @@ import MainGoals from '@/components/MainGoals.vue';
 </template>
 
 <style scoped lang="scss">
+.about{
+    width: 100%;
+    background-color: $primary_50;
+}
 
 </style>
