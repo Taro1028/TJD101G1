@@ -248,7 +248,7 @@ h1 {
     background-color: $primary_100;
     border: 1px solid $primary_100;
     padding: 12px 24px;
-    border-radius: 20px;
+    border-radius: 24px;
     transition: 0.3s ease;
 
 
@@ -303,8 +303,8 @@ h1 {
 }
 
 .dateItem {
-    width: 100px;
-    height: 60px;
+    width: 126px;
+    height: 88px;
     padding: 4px 12px;
     margin-right: 20px;
     border-radius: 8px;
@@ -491,8 +491,8 @@ h1 {
 }
 
 .total h5 {
+    font-weight: bold;
     font-size: $font_h5;
-    margin: 0;
 }
 
 .option-btn {
@@ -557,7 +557,7 @@ h1 {
     }
 
     .boxcard{
-        width: 128px;
+        width: 162px;
     }
 
 }

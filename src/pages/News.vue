@@ -20,14 +20,14 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
                         </router-link>
                     </div>
                     <div class="sec1-list">
-                        <a href="#">
+                        <router-link to="/About/News/Newsitem">
                             <div class="planitem">
                                 <h4>緯藝基金會助力 攜手推動長者營養餐計畫</h4>
                                 <h6>在緯藝基金會的溫暖支持下，提膳家得以擴大「長者營養餐計畫」服務範圍，幫助更多需要照護的長輩每日獲得均衡飲食。基金會的資助不僅讓服務持續穩定，也強化了在地照護網絡的連結，將營養、愛與陪伴送進每一位長者的生活中。公益結合專業，為高齡社會注入可長可久的照顧力量。
                                 </h6>
                                 <p>最後更新 2025.05.10</p>
                             </div>
-                        </a>
+                        </router-link>
                         <a href="#">
                             <div class="planitem">
                                 <h4>送餐到府服務 提膳家關懷長者健康飲食不打烊</h4>
@@ -275,7 +275,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
     position: absolute;
     top: 12px;
     left: 12px;
-    z-index: 1;
+    z-index: 2;
     font-size: $font_h6;
 }
 
@@ -354,6 +354,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
 }
 
 .planlink a {
+    text-decoration: none;
     display: block;
     text-align: right;
     transition: 0.3s ease;

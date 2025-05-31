@@ -6,7 +6,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
         <div class="wrapper">
             <div class="newsinfo">
                 <div class="link">
-                    <span><a href="#">最新消息</a></span>
+                    <span><router-link to="/About/News/">最新消息</router-link></span>
                     <span>&ensp;>&ensp;</span>
                     <span><a href="#">焦點計畫</a></span>
                 </div>
@@ -103,7 +103,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
 .newstag {
     display: inline-block;
     width: 97px;
-    font-size: $font_h4;
+    font-size: $font_h5;
     font-weight: normal;
     color: $primary_950;
     padding: 4px 8px;
@@ -177,7 +177,7 @@ h5 {
     }    
 
     .newstag{
-    width: 64px;
+    width: 80px;
     font-size: $font_h6;
     }
 
@@ -192,6 +192,7 @@ h5 {
 
     .newscontent h3{
         font-size: $font_h5;
+        margin-bottom: 16px;
     }
 
     .newscontent h4{

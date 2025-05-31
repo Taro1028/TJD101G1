@@ -240,7 +240,7 @@ h1 {
     background-color: $primary_100;
     border: 1px solid $primary_100;
     padding: 12px 24px;
-    border-radius: 20px;
+    border-radius: 24px;
     transition: 0.3s ease;
 
 

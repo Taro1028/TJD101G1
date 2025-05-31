@@ -1,10 +1,9 @@
 <template>
   <Dailog v-model:visible="show"> </Dailog>
-  
 
   <section class="out">
     <div class="addbutton" @click="show = true">
-      <button>新增</button>
+      <button v-if="route.path === '/admin/web'">新增</button>
     </div>
     <section class="mid">
       <p>{{ formTitle }}</p>
@@ -49,7 +48,9 @@
                     <!-- <button class="btn btn-sm btn-danger">刪除</button> -->
                   </template>
                   <template v-else-if="header.key === 'actionsweb'">
-                    <button class="btn btn-sm webbutton" @click="show = true">修改</button>
+                    <button class="btn btn-sm webbutton" @click="show = true">
+                      修改
+                    </button>
                     <!-- <button class="btn btn-sm btn-danger">刪除</button> -->
                   </template>
                   <template v-else>
@@ -80,6 +81,9 @@
 <script setup>
 import { ref } from "vue";
 import Dailog from "./Dailog.vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 const show = ref(false);
 const props = defineProps([
   "tableBodys",
@@ -95,7 +99,7 @@ const props = defineProps([
   flex-direction: column;
   background-color: #fff;
   // margin: 0 auto;
-   width: 100vw;
+  width: 100vw;
   overflow-x: hidden;
 }
 .mid {
@@ -174,7 +178,5 @@ const props = defineProps([
   z-index: 999;
 }
 .out {
- 
 }
-
 </style>

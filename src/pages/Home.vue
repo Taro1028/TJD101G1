@@ -1,7 +1,6 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import Carousel from '../components/Carousel.vue'
-import Marquee from '../components/Marquee.vue'
 
 </script>
 
@@ -64,7 +63,7 @@ import Marquee from '../components/Marquee.vue'
         <h3>🍱 餐點料理</h3>
         <h5>—每口都帶來味蕾的滿足感—</h5>
       </div>
-      <Marquee />
+      
       <!-- <div class="marquee">
         <div class="upper">
           <img src="" alt="">
@@ -129,15 +128,15 @@ import Marquee from '../components/Marquee.vue'
       </div>
       <div class="news-container">
         <div class="main-news">
-          <a href="#">
+          <router-link to="/About/News/Newsitem">
             <div class="newstag">焦點</div>
             <img src="../assets/images/Home/news_1.png" alt="news_1">
             <div class="block-overlay"></div>
             <h4>緯藝基金會助力 攜手推動長者營養餐計畫</h4>
-          </a>
+          </router-link>
         </div>
         <div class="news-list">
-          <a href="#">
+          <router-link to="/About/News/Newsitem">
             <div class="news-item">
               <h4 class="title">緯藝基金會助力 攜手推動長者營養餐計畫</h4>
               <h6 class="contxt">
@@ -145,7 +144,7 @@ import Marquee from '../components/Marquee.vue'
               </h6>
               <p class="date">最後更新 2025.05.10</p>
             </div>
-          </a>
+          </router-link>
           <a href="#">
             <div class="news-item">
               <h4 class="title">送餐到府服務 提膳家關懷長者健康飲食不打烊</h4>
@@ -180,7 +179,7 @@ body {
 
 // --- 主視覺 start ---
 .intro-section {
-  width: 1200px;
+  width: 1400px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -264,7 +263,7 @@ h4 {
   height: 240px;
   filter: blur(30px);
   top: 30%;
-  left: 30%;
+  left: 40%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(circle, #f2a23a 20%, #5c5c5c0a 70%);
@@ -520,7 +519,7 @@ p {
   position: absolute;
   top: 12px;
   left: 12px;
-  z-index: 1;
+  z-index: 2;
   font-size: $font_h6;
 }
 
@@ -611,7 +610,7 @@ a:hover .title {
   }
 
   .bg-circle1 {
-    width: 400px;
+    width: 360px;
     height: 480px;
   }
 
@@ -646,7 +645,8 @@ a:hover .title {
   }
 
   .bg-circle1 {
-    width: 360px;
+    width: 300px;
+    height: 460px;
   }
 
   .s-card {
@@ -696,7 +696,7 @@ a:hover .title {
 
   .bg-circle1 {
     width: 500px;
-    height: 500px;
+    height: 400px;
   }
 
   .bg-circle2 {
@@ -719,6 +719,23 @@ a:hover .title {
 }
 
 @media screen and (max-width: 900px) {
+  .bg-circle1 {
+    width: 400px;
+    height: 380px;
+  }
+
+  .bg-circle2 {
+    top: 40%;
+    left: 35%;
+  }
+
+  .bg-circle3 {
+    width: 280px;
+    height: 180px;
+    bottom: 8%;
+    right: 0;
+  }
+  
   .feedback {
     flex-direction: column;
     align-items: center;
@@ -735,8 +752,12 @@ a:hover .title {
 .sec-1,
 .sec-3,
 .sec-4 {
-  padding: 48px 16px;
+  padding: 48px 8px;
 }
+
+.bg-circle3 {
+    bottom: 0;
+  }
 
 .s-card,
 .fd-card{
@@ -746,7 +767,6 @@ a:hover .title {
 .fd-card{
   width: 300px;
 }
-
 
 .main-news {
   min-width: 320px;

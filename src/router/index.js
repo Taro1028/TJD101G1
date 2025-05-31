@@ -21,7 +21,7 @@ const routes = [
     },
   },
   {
-    path: "/LuchBox",
+    path: "/LunchBox",
     component: () => import("@/pages/LunchBox.vue"),
     meta: {
       title: "餐盒介紹 - TibaEAT 提膳家",
@@ -123,7 +123,7 @@ const routes = [
       requiredLogin: false,
     },
   },
-    {
+  {
     path: '/MemberCenter',
     component: () => import('@/pages/MemberCenter.vue'),
     meta: {
