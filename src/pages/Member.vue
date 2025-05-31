@@ -2,7 +2,7 @@
 <div class="page-container">
   <div class="content-wrapper">
     <div class="left-section">
-       <RouterLink to="/front/Home"><img src="../assets/images//Logo_S.svg" alt="logo_s" /></RouterLink>
+       <RouterLink to="/Home"><img src="../assets/images//Logo_S.svg" alt="logo_s" /></RouterLink>
         <h1 class="signup-title">會員登入</h1>
         <p class="signup-subtitle">開始點餐吧</p>
 
@@ -35,7 +35,7 @@
           </div>
 
           <div>
-          <RouterLink to="/front/Sign_Up" class="signup_link">還沒有帳號？點我註冊</RouterLink>
+          <RouterLink to="/Sign_Up" class="signup_link">還沒有帳號？點我註冊</RouterLink>
           </div>
 
           <!-- 快速註冊區塊 -->
@@ -51,7 +51,7 @@
             </div>
           </div>
 
-          <button type="submit" class="signup_submit"><RouterLink to="/front/MemberCenter">建立</RouterLink></button>
+          <button type="submit" class="signup_submit"><RouterLink to="/MemberCenter">建立</RouterLink></button>
         </div>
         <!-- 註冊表單結束 -->
     </div>
@@ -202,6 +202,15 @@ a.signup_link{
   text-align: center;
   border: none;
 
+}
+
+.signup_submit a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  color: $neutral_white; 
 }
 
 .right-section {

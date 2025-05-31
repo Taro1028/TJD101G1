@@ -2,7 +2,7 @@
 <div class="page-container">
   <div class="content-wrapper">
     <div class="left-section">
-       <RouterLink to="/front/Home"><img src="../assets/images//Logo_S.svg" alt="logo_s" /></RouterLink>
+       <RouterLink to="/Home"><img src="../assets/images//Logo_S.svg" alt="logo_s" /></RouterLink>
         <h1 class="signup-title">加入會員</h1>
         <p class="signup-subtitle">從每餐感受到連結</p>
 
@@ -63,7 +63,7 @@
             />
           </div>
           <div>
-           <RouterLink to="/front/Login" class="longin-link">已經有帳號？點我登入</RouterLink>
+           <RouterLink to="/Login" class="longin-link">已經有帳號？點我登入</RouterLink>
           </div>
 
 

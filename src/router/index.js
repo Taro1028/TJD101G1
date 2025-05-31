@@ -115,6 +115,14 @@ const routes = [
       requiredLogin: false
     }
   },
+    {
+    path: '/MemberCenter',
+    component: () => import('@/pages/MemberCenter.vue'),
+    meta: {
+      title: '個人資料 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
 
   // === 後台 ===
   {
