@@ -51,12 +51,14 @@ console.log(route.path)
 }
 
 h1{
-  font-size: 48px;
+  font-size: $font_h1;
 }
 
 .entrance{
   width: 100%;
+  margin-top: 40px;
   display: flex;
+  justify-content: center;
   gap: 180px;
 }
 
@@ -75,10 +77,26 @@ h1{
 
 .front{
   background-color: $primary_400;
+  border: 6px solid $primary_400;
+
+  &:hover{
+  background-color: transparent;
+  border: 6px solid $primary_400;
+  }
 }
 
 .admin{
   background-color: $primary_600;
+  border: 6px solid $primary_600;
+
+  &:hover{
+  background-color: transparent;
+  border: 6px solid $primary_600;
+  }
+
+  &:hover h1{
+  color: $neutral_black;
+  }
 }
 
 .front h1{
@@ -94,5 +112,44 @@ h1{
   text-align: center;
   font-size: 12px;
   color: $primary_950;
+}
+
+// --- RWD ---
+@media screen and (max-width: 800px) {
+
+h1{
+  font-size: $font_h3;
+
+}
+
+.entrance{
+  gap: 48px;
+  align-items: center;
+}
+
+.front, .admin{
+  width: 160px;
+  height: 160px;
+}
+
+}
+
+@media screen and (max-width: 550px) {
+
+.entrance{
+  gap: 32px;
+  align-items: center;
+}
+
+.front, .admin{
+  width: 140px;
+  height: 140px;
+}
+
+.copyright{
+  margin: 80px auto 0;
+  width: 343px;
+}
+
 }
 </style>

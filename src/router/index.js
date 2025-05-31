@@ -38,23 +38,31 @@ const routes = [
   },
   {
     path: "/Order/PlanForyou",
-    component: () => import("@/pages/PlanForyou.vue"),
+    component: () => import("@/pages/Order_PlanForyou.vue"),
     meta: {
       title: "為你搭配 - TibaEAT 提膳家",
       requiredLogin: true,
     },
   },
   {
-    path: "/Order/PlanFreeMatching",
-    component: () => import("@/pages/PlanFreeMatching.vue"),
+    path: '/Order/PlanFree',
+    component: () => import('@/pages/Order_PlanFree.vue'),
     meta: {
-      title: "自由搭配 - TibaEAT 提膳家",
-      requiredLogin: true,
-    },
+      title: '自由搭配 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
   },
   {
-    path: "/About",
-    component: () => import("@/pages/About.vue"),
+    path: '/Order/AddCart',
+    component: () => import('@/pages/Order_AddCart.vue'),
+    meta: {
+      title: '自由搭配 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+  {
+    path: '/About',
+    component: () => import('@/pages/About.vue'),
     meta: {
       title: '理念及目標 - TibaEAT 提膳家',
       requiredLogin: false
@@ -126,13 +134,7 @@ const routes = [
 
   // === 後台 ===
   {
-    path: '/adminLogin', // /admin      /admin/users
-    component: () => import("@/pages/admin/AdminLogin.vue"),
-   
-  },
-  {
-    path: "/admin", // /admin      /admin/users
-    component: () => import("@/pages/admin/Member.vue"),
+    path: '/admin', // /admin      /admin/users
     children: [
       {
         path: "member",

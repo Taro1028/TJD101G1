@@ -4,18 +4,18 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 const showDropdown = ref(false)
 
 const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value
+    showDropdown.value = !showDropdown.value
 }
 
 const closeDropdown = () => {
-  showDropdown.value = false
+    showDropdown.value = false
 }
 
 onMounted(() => {
-  document.addEventListener('click', closeDropdown)
+    document.addEventListener('click', closeDropdown)
 })
 onBeforeUnmount(() => {
-  document.removeEventListener('click', closeDropdown)
+    document.removeEventListener('click', closeDropdown)
 })
 
 </script>
@@ -45,7 +45,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped lang="scss">
-
 header {
     max-width: 100%;
     height: 60px;
@@ -107,15 +106,21 @@ header a .img {
         white-space: nowrap;
 
         a {
-        display: block;
-        padding: 5px 10px;
-        color: $neutral_black;
+            display: block;
+            padding: 5px 10px;
+            color: $neutral_black;
 
-        &:hover {
-            background-color: $primary_50;
-            color: $primary_600;
+            &:hover {
+                background-color: $primary_50;
+                color: $primary_600;
+            }
         }
-        }
+    }
+}
+
+@media screen and (max-width: 660px) {
+    .header_nav {
+        display: none;
     }
 }
 </style>

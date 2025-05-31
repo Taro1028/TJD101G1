@@ -22,7 +22,7 @@ onUnmounted(() => {
                     <h5>由專業營養師<br>調配的餐食</h5>
                 </div>
             </router-link>
-            <router-link to="/Order/PlanFreeMatching" class="link">
+            <router-link to="/Order/PlanFree" class="link">
                 <div class="plan_free">
                     <h3>自由搭配</h3>
                     <h5>自己挑選菜色<br>組合餐盒</h5>
@@ -31,7 +31,7 @@ onUnmounted(() => {
         </div>
 
         <div class="notice">
-            <h5>為確保配送效率與長輩用餐方便，目前我們提供午間配送服務，如需安排晚餐，我們會在中午一併送達。餐點均以保鮮與加熱便利為考量，讓長輩午晚餐都能安心享用。</h5>
+            <span><i class="bi bi-info-circle-fill"></i></span><h5>為確保配送效率與長輩用餐方便，目前我們提供午間配送服務，如需安排晚餐，我們會在中午一併送達。餐點均以保鮮與加熱便利為考量，讓長輩午晚餐都能安心享用。</h5>
         </div>
 
         <div class="linkblock">
@@ -144,6 +144,12 @@ h5{
     margin: 0 auto;
     width: 560px;
     text-align: left;
+    display: flex;
+    gap: 8px;
+}
+
+.notice span{
+    padding-top: 4px;
 }
 
 .linkblock{
@@ -167,6 +173,48 @@ h5{
   transition: 0.3s ease;
 
   }
+}
+
+// --- RWD ---
+
+@media screen and (max-width: 700px) {
+    .plans{
+        gap: 64px;
+    }
+
+    .plan_foryou,
+    .plan_free{
+        width:200px;
+        height: 200px;
+    }
+
+    .notice{
+        width: 360px;
+    }
+
+    h5{
+        font-size: $font_h6;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .selectBox{
+        gap: 40px;
+    }
+
+    .plans{
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .notice{
+        width: 320px;
+    }
+
+    h5{
+        font-size: $font_h6;
+    }
 }
 
 </style>

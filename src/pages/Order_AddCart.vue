@@ -13,7 +13,6 @@ onUnmounted(() => {
 </script>
 <template>
 <FrontLayout>
-<div class="custom-bg">
     <div class="wrapper">
         <div class="messageCard">
             <img src="../assets/images/Order/cart_bag.svg" alt="">
@@ -25,7 +24,6 @@ onUnmounted(() => {
             </div>
         </div>
     </div>
-</div>
 </FrontLayout>
 </template>
 
@@ -37,6 +35,7 @@ background-image: url(../assets/images/Order/background.svg);
 <style scoped lang="scss">
 
 .wrapper{
+    min-height: calc(100vh - 60px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -55,12 +54,10 @@ background-image: url(../assets/images/Order/background.svg);
 }
 
 h3{
-    margin: 0;
     font-size: $font_h3;
 }
 
 h5{
-    margin: 0;
     font-size: $font_h5;
     font-weight: normal;
 }
