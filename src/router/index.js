@@ -3,58 +3,58 @@ import { createRouter, createWebHistory } from "vue-router";
 // path → component
 const routes = [
   {
-    path: '/',
-    component: () => import('@/pages/Entrance.vue'),
+    path: "/",
+    component: () => import("@/pages/Entrance.vue"),
     meta: {
-      title: '入口頁',
-      requiredLogin: false
-    }
+      title: "入口頁",
+      requiredLogin: false,
+    },
   },
 
   // === 前台 ===
   {
-    path: '/Home',
-    component: () => import('@/pages/Home.vue'),
+    path: "/Home",
+    component: () => import("@/pages/Home.vue"),
     meta: {
-      title: 'TibaEAT 提膳家',
-      requiredLogin: false
-    }
+      title: "TibaEAT 提膳家",
+      requiredLogin: false,
+    },
   },
   {
-    path: '/LuchBox',
-    component: () => import('@/pages/LunchBox.vue'),
+    path: "/LuchBox",
+    component: () => import("@/pages/LunchBox.vue"),
     meta: {
-      title: '餐盒介紹 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
+      title: "餐盒介紹 - TibaEAT 提膳家",
+      requiredLogin: false,
+    },
   },
   {
-    path: '/Order',
-    component: () => import('@/pages/Order.vue'),
+    path: "/Order",
+    component: () => import("@/pages/Order.vue"),
     meta: {
-      title: '預約訂餐 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "預約訂餐 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/Order/PlanForyou',
-    component: () => import('@/pages/PlanForyou.vue'),
+    path: "/Order/PlanForyou",
+    component: () => import("@/pages/PlanForyou.vue"),
     meta: {
-      title: '為你搭配 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "為你搭配 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/Order/PlanFreeMatching',
-    component: () => import('@/pages/PlanFreeMatching.vue'),
+    path: "/Order/PlanFreeMatching",
+    component: () => import("@/pages/PlanFreeMatching.vue"),
     meta: {
-      title: '自由搭配 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "自由搭配 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/About',
-    component: () => import('@/pages/About.vue'),
+    path: "/About",
+    component: () => import("@/pages/About.vue"),
     meta: {
       title: '理念及目標 - TibaEAT 提膳家',
       requiredLogin: false
@@ -92,28 +92,28 @@ const routes = [
     }
   },
   {
-    path: '/Member',
-    component: () => import('@/pages/Member.vue'),
+    path: "/Member",
+    component: () => import("@/pages/Member.vue"),
     meta: {
-      title: '會員中心 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
+      title: "會員中心 - TibaEAT 提膳家",
+      requiredLogin: false,
+    },
   },
   {
-    path: '/Login',
-    component: () => import('@/pages/Login.vue'),
+    path: "/Login",
+    component: () => import("@/pages/Login.vue"),
     meta: {
-      title: '會員登入 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
+      title: "會員登入 - TibaEAT 提膳家",
+      requiredLogin: false,
+    },
   },
   {
-    path: '/Sign_Up',
-    component: () => import('@/pages/Sign_Up.vue'),
+    path: "/Sign_Up",
+    component: () => import("@/pages/Sign_Up.vue"),
     meta: {
-      title: '會員註冊 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
+      title: "會員註冊 - TibaEAT 提膳家",
+      requiredLogin: false,
+    },
   },
     {
     path: '/MemberCenter',
@@ -126,25 +126,47 @@ const routes = [
 
   // === 後台 ===
   {
-    path: '/admin', // /admin      /admin/users
+    path: '/adminLogin', // /admin      /admin/users
+    component: () => import("@/pages/admin/AdminLogin.vue"),
+   
+  },
+  {
+    path: "/admin", // /admin      /admin/users
+    component: () => import("@/pages/admin/Member.vue"),
     children: [
-      { path: '', component: () => import('@/pages/admin/Dashboard.vue') },
-      { path: 'users', component: () => import('@/pages/admin/User.vue') },
+      {
+        path: "member",
+        component: () => import("@/components/Admin/DataForm.vue"),
+      },
+      {
+        path: "product",
+        component: () => import("@/components/Admin/DataForm.vue"),
+      },
+      {
+        path: "order",
+        component: () => import("@/components/Admin/DataForm.vue"),
+      },
+      {
+        path: "consignees",
+        component: () => import("@/components/Admin/DataForm.vue"),
+      },
+      {
+        path: "web",
+        component: () => import("@/components/Admin/DataForm.vue"),
+      },
     ],
   },
-
-
 ];
 
 // 建立 router
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: routes
+  routes: routes,
 });
 
 // 依據 route 的 meta.title 更新網頁標題
 router.afterEach((to) => {
-  const defaultTitle = 'TibaEAT 提膳家';
+  const defaultTitle = "TibaEAT 提膳家";
   document.title = to.meta.title || defaultTitle;
 });
 

@@ -1,35 +1,39 @@
 <template>
-    <section class="wrap">
-        <section class="s1">
-            <h3>
-                {{ content.title }}
-            </h3>
-            <article class="ss1">
-            
-            <img :src="content.picture" alt="">
-            <div class="b">
-            <p class="inf">{{ content.description }}</p>
-            <button>{{ text }}</button>
-            </div>
-            </article>
-        </section>
+  <section class="wrap">
+    <section class="s1">
+      <h3>
+        {{ content.title }}
+      </h3>
+      <article class="ss1">
+        <img :src="content.picture" alt="" />
+        <div class="b">
+          <p class="inf">{{ content.description }}</p>
+          <button>{{ text }}</button>
+        </div>
+      </article>
+    </section>
 
     <section>
-        <article v-for="(item, index) in content.item" :key="index" class="box">
-            <img :src="item.picture" alt="">
-            
-            <article>
-                <h5>{{ item.name }}</h5>
-                <p>功效：</p>
-                <p class="inf">{{ item.description }}</p>
-                <article class="toggle">
-                    <!-- <img src="../assets/images/LunchBox/toggledown-button.png" alt=""> -->
-                     <i class="bi bi-caret-down-fill down"></i>
-                </article>
-            </article>
-        </article>
+      <article v-for="(item, index) in content.item" :key="index" class="box">
+        <img :src="item.picture" alt="" />
 
-        <!-- <article class="box">
+        <article>
+          <h5>{{ item.name }}</h5>
+          <p>功效：</p>
+          <p class="inf">{{ item.description }}</p>
+          <article class="toggle" @click="toggleAccordion(index)">
+            <i
+              class="bi"
+              :class="
+                openIndex === index ? 'bi-caret-up-fill' : 'bi-caret-down-fill'
+              "
+            ></i>
+          </article>
+          <p v-show="openIndex === index" class="ingredients">{{ item.ingredients }}</p>
+        </article>
+      </article>
+
+      <!-- <article class="box">
             <img src="../assets/images/LunchBox/title1item2.png" alt="">
             <article>
                 <h5>南瓜豬肉燉豆腐</h5>
@@ -67,16 +71,19 @@
                 </article>
             </article>
         </article> -->
-
     </section>
-</section>
-
+  </section>
 </template>
 
-
 <script setup>
-import {ref} from 'vue';
-defineProps(['content','text']);
+import { ref } from "vue";
+defineProps(["content", "text"]);
+
+const openIndex = ref(null)
+function toggleAccordion(index) {
+  openIndex.value = openIndex.value === index ? null : index
+}
+
 
 // const product=ref({
 //     title: '樂活元氣餐',
@@ -107,95 +114,81 @@ defineProps(['content','text']);
 //     }
 // ]
 // })
-
-
-
-
-
-
 </script>
 
 <style scoped lang="scss">
-
-.wrap{
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
-    overflow-x: hidden;
+.wrap {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  overflow-x: hidden;
 }
-.s1{
-    width: 100%;
-
- 
-   
+.s1 {
+  width: 100%;
 }
 
-.s1 h3{
-    width: 100%;
-    font-size: $font_h3;
-    // border: 1px solid blue;
-    display: flex;
-    margin: 0 auto;
-    padding: 20px 20px 20px 20px;
+.s1 h3 {
+  width: 100%;
+  font-size: $font_h3;
+  // border: 1px solid blue;
+  display: flex;
+  margin: 0 auto;
+  padding: 20px 20px 20px 20px;
 }
 
 .ss1 {
-    // border: 1px solid red;
+  // border: 1px solid red;
   width: 100%;
   max-width: 1200px;
   display: flex;
-   justify-content: center;
-  align-items: center; 
+  justify-content: center;
+  align-items: center;
   /* gap: 20px; */
   margin: 0 auto;
   /* flex-wrap: wrap;    */
   overflow-x: hidden;
 }
 
-
-
-.ss1  img {
+.ss1 img {
   width: 100%;
-  height: auto;         
-  max-width: 300px;     
+  height: auto;
+  max-width: 400px;
   display: block;
   padding: 0px 20px 0px 20px;
 }
 
-.ss1 p{
-    padding: 0px 20px 0px 20px;
+.ss1 p {
+  padding: 0px 20px 0px 20px;
+  font-size: $font_h5;
 }
 
-.b{
-    display: flex;
-    // border: 1px solid red;
-    flex-direction: column;
-    padding-right: 20px;
+.b {
+  display: flex;
+  // border: 1px solid red;
+  flex-direction: column;
+  // padding-right: 20px;
 }
 
 .b button {
-    display: block;
-    width: 100px;
-    border-radius: 20px;
-    border: none;
-    padding: 10px;
-    background-color: $primary_600;
-    color: $neutral_white;
-    margin-left: auto;
-    cursor: pointer;
-    
+  display: block;
+  width: 100px;
+  border-radius: 20px;
+  border: none;
+  padding: 10px;
+  background-color: $primary_600;
+  color: $neutral_white;
+  margin-left: auto;
+  cursor: pointer;
+  margin-right: 20px;
 }
 
-
-
-.box{
-    display: flex;
-    padding: 20px 20px 20px 20px;
-    
+.box {
+  display: flex;
+  padding: 20px 20px 20px 20px;
 }
 
-.box h5{
-    font-size: $font_h5;
+.box h5 {
+  font-size: $font_h5;
 }
 .box > img {
   width: 200px;
@@ -204,47 +197,64 @@ defineProps(['content','text']);
   object-fit: contain;
 }
 
-.inf{
-    line-height: 150%;
+.inf {
+  line-height: 150%;
 }
 
-.toggle{
+.toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.ingredients{
     display: flex;
     justify-content: center;
-    cursor: pointer;
+    align-items: center;
 }
-
-.down{
-    color: $primary_600;
-    font-size: 25px;
+.bi {
+  color: $primary_600;
+  font-size: 25px;
 }
 
 // ===================RWD=====================
-@media (max-width: 820px){
-    .s1 h3{
-      justify-content: center;
-      font-size: $font_h3;
-      padding: 20px 0 20px 0;
-    }
+@media (max-width: 820px) {
+  .s1 h3 {
+    justify-content: center;
+    font-size: $font_h3;
+    padding: 20px 0 20px 0;
+  }
 
-    .ss1{
-        display: flex;
-  flex-direction: column;
-    }
+  .ss1 {
+    display: flex;
+    flex-direction: column;
+  }
 
-    .box{
-        display: flex;
-        flex-direction: column;
-    }
-    .box > img {
-       margin: 0 auto;
-    }
-    
+  .box {
+    display: flex;
+    flex-direction: column;
+  }
+  .box > img {
+    margin: 0 auto;
+  }
 }
 
+@media (max-width: 545px) {
+  .ss1 img {
+    width: 80%;
+  }
+}
 
-@media (max-width: 650px){
+@media (max-width: 415px) {
+  .b {
+    padding-right: 0;
+  }
+}
 
-
+@media (max-width: 375px) {
+  .ss1 p {
+    padding: 0px 10px 0px 20px;
+  }
 }
 </style>
