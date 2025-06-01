@@ -1,0 +1,572 @@
+<script setup>
+    import { ref } from 'vue';
+    import FrontLayout from '../layouts/FrontLayout.vue';
+
+    const showDefaultAvatar = ref(true);
+    const uploadedImageSrc = ref('');
+    const avatarInput = ref(null);
+    const activeTab = ref('Recipients1');
+
+    // 點擊大頭照區域觸發檔案選擇
+    const handleAvatarClick = () => {
+    console.log('Avatar clicked!');
+    console.log('avatarInput.value:', avatarInput.value);
+    
+    if (avatarInput.value) {
+        console.log('Triggering file input click');
+        avatarInput.value.click();
+    } else {
+        console.error('avatarInput ref is null');
+    }
+    };
+
+    // 處理檔案上傳
+    const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    
+      console.log('File selected:', file); // 調試用
+    
+    if (!file) {
+        console.log('No file selected');
+        return;
+    }
+    
+    // 檢查檔案類型
+    if (!file.type.startsWith('image/')) {
+        alert('請選擇圖片檔案');
+        console.log('Invalid file type:', file.type);
+        return;
+    }
+    
+    // 檢查檔案大小 (限制 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('檔案大小不能超過 5MB');
+        console.log('File too large:', file.size);
+        return;
+    }
+    
+    console.log('File validation passed, reading file...');
+    
+    // 使用 FileReader 讀取檔案
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+        console.log('File read successfully');
+        uploadedImageSrc.value = e.target.result;
+        showDefaultAvatar.value = false;
+        console.log('State updated - showDefaultAvatar:', showDefaultAvatar.value);
+    };
+    
+    reader.onerror = () => {
+        console.error('File read error');
+        alert('檔案讀取失敗，請重新選擇');
+    };
+    
+    reader.readAsDataURL(file);
+    };
+
+    // 重置大頭照
+    const resetAvatar = () => {
+    showDefaultAvatar.value = true;
+    uploadedImageSrc.value = '';
+    
+    if (avatarInput.value) {
+        avatarInput.value.value = '';
+    }
+    };
+    
+</script>
+
+    <template>
+        <FrontLayout>
+        <section class="memberCenter">
+            <div class="wrapper">
+                <h2>會員中心</h2>
+                <!-- 會員管理區 -->
+                <div class="memberArea">
+                    <!-- 左側導覽列 -->
+
+                    <div class="user_nav">
+                        <div class="head-area">
+                        <div class="default-avatar" id="defaultAvatar">
+                                <i class="bi bi-person-fill-gear"></i>
+                        </div>
+                            
+                        <!-- 上傳後的圖片顯示區（初始隱藏） -->
+                        <img id="uploadedAvatar" class="uploaded-avatar" alt="大頭照" style="display: none;" />
+                            
+                        <!-- 上傳按鈕覆蓋層 -->
+                        <div class="upload-overlay" id="uploadOverlay">
+                            <i class="bi bi-camera-fill"></i>
+                            <!-- <span>更換照片</span> -->
+                        </div>
+                            
+                        <!-- 隱藏的檔案輸入 -->
+                        <div class="avatar-container" @click="handleAvatarClick">
+                                <!-- 預設圖標顯示區 -->
+                                <div 
+                                    class="default-avatar" 
+                                    v-show="showDefaultAvatar"
+                                >
+                                    <i class="bi bi-person-fill-gear"></i>
+                                </div>
+                                
+                                <!-- 上傳後的圖片顯示區（初始隱藏） -->
+                                <img 
+                                    class="uploaded-avatar" 
+                                    alt="大頭照" 
+                                    v-show="!showDefaultAvatar"
+                                    :src="uploadedImageSrc"
+                                />
+                                
+                                <!-- 上傳按鈕覆蓋層 -->
+                                <div class="upload-overlay">
+                                    <i class="bi bi-camera-fill"></i>
+                                    <!-- <span>{{ showDefaultAvatar ? '上傳照片' : '更換照片' }}</span> -->
+                                </div>
+                    
+                                <!-- 隱藏的檔案輸入 -->
+                                <input 
+                                    ref="avatarInput"
+                                    type="file" 
+                                    accept="image/*" 
+                                    style="display: none;" 
+                                    @change="handleFileChange"
+                                />
+                            </div>
+                            <p class="nickName">阿官</p>
+                        </div>
+                        <ul class="quck_link">
+                            <li><RouterLink to="/MemberCenter">個人資料</RouterLink></li>
+                            <li><RouterLink to="/MemberCenter/MyOrders">訂單總覽</RouterLink></li>
+                            <li><RouterLink to="/MemberCenter/MyCards">我的小卡</RouterLink></li>
+                            <li class="active"><RouterLink to="/MemberCenter/Recipients">收件者管理</RouterLink></li>
+                            <li class="logout"><button class="btn2">登出</button></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 右側詳細內容區 -->
+                    <div class="user_content">
+                        <h3>收件者管理</h3>
+                        <div class="member-form">
+
+                            <!-- 切換收件人管理分頁 -->
+                            <ul class="recipients-btn-group">
+                                <li class="nav-item">
+                                     <button class="recipients-btn recipients-btn-active" type="button">常用收件人1</button>
+                                </li>
+                                <li class="nav-item">
+                                     <button class="recipients-btn" type="button">常用收件人2</button>
+                                </li>
+                                <li class="nav-item">
+                                     <button class="recipients-btn" type="button">常用收件人3</button>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div class="Recipients1-page" id="Recipients1-page">
+                                    <div class="form-group">
+                                        <label class="form-label">收件人姓名</label>
+                                        <input type="text" class="form-input" value="王曉明" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">收件人地址</label>
+                                        <input type="text" class="form-input" value="臺北市中山區南京東路三段" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">收件人市內電話</label>
+                                        <input type="text" class="form-input" value="02-2312-3456" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">收件人行動電話</label>
+                                        <input type="text" class="form-input" value="0987 078 587" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">送餐安全聯絡人－姓名</label>
+                                        <input type="text" class="form-input" value="林榮杰" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">送餐安全聯絡人－電話</label>
+                                        <input type="text" class="form-input" value="0987 078 875" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">備註</label>
+                                        <textarea class="form-textarea">罹有糖尿病、三高、重聽、牙口尚可、茹素、喜清淡</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 儲存/取消按鈕 -->
+                            <div class="btn-group">
+                                <button type="button" class="btn2 cancel">取消</button>
+                                <button type="button" class="btn2 save">儲存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        </FrontLayout>
+    </template>
+    <style scoped lang="scss">
+
+        @font-face {
+        font-family: 'JF Open Huninn';
+        src: url('@/assets/font/jf-openhuninn-2.1.ttf') format('truetype');
+          font-weight: normal;
+            font-style: normal;
+        }
+        .memberCenter {
+        font-family: 'JF Open Huninn', sans-serif;
+        }
+        img {
+            display: block;
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: $spacing_6;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .wrapper h2 {
+            text-align: center;
+            margin-bottom: $spacing_8;
+            font-size: $font_h2;
+            font-weight: bold;
+        }
+
+        .memberArea {
+            display: flex;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        // 大頭照區
+        .avatar-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .default-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: $neutral_700;
+            position: absolute;
+
+        }
+
+        .uploaded-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 1px solid black;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0
+        }
+
+        .upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .avatar-container:hover .upload-overlay {
+            opacity: 1;
+        }
+
+        .upload-overlay i {
+            font-size: 50px;
+            margin-bottom: 4px;
+        }
+
+        /* 左側導覽列 */
+        .user_nav {
+            width: 240px;
+            padding: 30px 20px 12px 20px;
+            // margin-right: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background-color: $primary_100;
+        }
+
+        // 大頭照及匿名區
+        .head-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .head-area img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 1px solid black;
+        }
+
+        .nickName {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* 快速連結選單 */
+        .quck_link{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: $spacing_4;
+            height: 100%;
+            padding-left: 0;
+        }
+
+        .quck_link li {
+            text-align: center;
+        }
+
+        .quck_link a {
+            display: block;
+            color: $neutral_black;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            padding: $spacing_3 $spacing_10;
+            font-weight: bold;
+        }
+
+        .quck_link .active a {
+            background-color: $primary_400;
+            color: white;
+        }
+
+        .quck_link a:hover {
+            background-color: $primary_600;
+            color: white;
+        }
+
+        .logout .btn2:hover {
+            background-color: $primary_950;
+        }
+
+        .quck_link li.logout {
+            margin-top: auto;
+        }
+
+        .logout .btn2{
+            background-color: $primary_600;
+            color: white;
+        }
+
+        /* 右側內容區域 */
+        .user_content {
+            flex: 1;
+            padding: 30px;
+            // margin-left: 1rem;
+            border-radius: 8px;
+            background-color: $primary_100;
+        }
+
+        .user_content h3 {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0 0 25px 0;
+        }
+
+        /* 表單版面配置 */
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: $spacing_5;
+            box-sizing: border-box;
+            padding-top: $spacing_6;
+            padding-left: $spacing_8;
+            border-radius: 8px;
+            background-color: #F6F4EF;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* 表單群組 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* 表單標籤 */
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 表單輸入框 */
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid $primary_400;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+
+            &:focus {
+                outline: none; 
+                border: 1px solid $primary_600; 
+            }
+        }
+
+        /* 表單文字顯示 */
+        .form-text {
+            display: block;
+            width: 100%;
+            padding-top: 12px;
+            font-size: 14px;
+            box-sizing: border-box;
+            min-height: $spacing_6;
+        }
+
+        /* 文字區域 */
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid $primary_400;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+
+            &:focus {
+            outline: none; 
+            border: 1px solid $primary_600; 
+            }
+        }
+
+        /* 不可改基本資料組 */
+        .radio-group {
+            display: flex;
+            gap: $spacing_4;
+            margin-top: $spacing_5;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        /* 密碼輸入框容器 */
+        .password-input-container {
+            position: relative;
+        }
+
+        /* 密碼顯示切換按鈕 */
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        /* 底部按鈕群組 */
+        .btn-group {
+            display: flex;
+            gap: $spacing_4;
+            margin-top: 30px;
+        }
+
+        /* 按鈕基本樣式 */
+        .btn2 {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn2.cancel {
+            color: $neutral_300;
+        }
+
+        .btn2.save {
+            color: $neutral_white;
+            background-color: $primary_400;
+        }
+
+        //管理收件人列表
+
+        .recipients-btn-group{
+            display: flex;
+            justify-content: flex-start;
+            gap: $spacing_4;
+            height: 100%;
+            padding-left: 0;
+            margin-top: $spacing_8;
+            margin-bottom: $spacing_6;
+        }
+
+        // 管理收件人按鈕樣式
+        .recipients-btn {
+        display: inline-block;
+        color: $neutral_black;
+        padding: 10px 20px;
+        border: 1px solid $neutral_black;
+        border-radius: 8px;
+        background-color: transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none; 
+        
+        &:hover {
+            background-color: $primary_400;
+            color: $neutral_white;
+            border-color: $primary_400;  
+        }
+        }
+
+        .recipients-btn-active{
+            background-color: $primary_400;
+            color: $neutral_white;
+            border-color: $primary_400;
+        }
+
+</style>
