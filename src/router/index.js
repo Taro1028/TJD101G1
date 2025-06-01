@@ -132,6 +132,30 @@ const routes = [
     }
   },
 
+      {
+    path: '/MemberCenter/Recipients',
+    component: () => import('@/pages/Recipients.vue'),
+    meta: {
+      title: '收件者管理 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+        {
+    path: '/MemberCenter/MyCards',
+    component: () => import('@/pages/MyCards.vue'),
+    meta: {
+      title: '我的小卡 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+        {
+    path: '/MemberCenter/MyOrders',
+    component: () => import('@/pages/MyOrders.vue'),
+    meta: {
+      title: '訂單總覽 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
   // === 後台 ===
   {
     path: '/admin', // /admin      /admin/users

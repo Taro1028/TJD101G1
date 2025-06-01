@@ -138,9 +138,9 @@
 
                         <ul class="quck_link">
                             <li class="active"><RouterLink to="/MemberCenter">個人資料</RouterLink></li>
-                            <li><RouterLink to="/#">訂單總覽</RouterLink></li>
-                            <li><RouterLink to="/#">我的小卡</RouterLink></li>
-                            <li><RouterLink to="/#">收件者管理</RouterLink></li>
+                            <li><RouterLink to="/MemberCenter/MyOrders">訂單總覽</RouterLink></li>
+                            <li><RouterLink to="/MemberCenter/MyCards">我的小卡</RouterLink></li>
+                            <li><RouterLink to="/MemberCenter/Recipients">收件者管理</RouterLink></li>
                             <li class="logout"><button class="btn">登出</button></li>
                         </ul>
                     </div>
