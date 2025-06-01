@@ -1,11 +1,9 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
-// import PopupOrderLeave from '@/components/Popup_OrderLeaveDialog.vue'
-// import PopupSelectConsignee from '@/components/Popup_SelectConsignee.vue'
-import PopupSelectConsignee from '@/components/TestPopup_LunchBoxDetails.vue'
-
-
+import Popup from '@/components/Popup_OrderLeaveDialog.vue'
+// import Popup from '@/components/Popup_SelectConsignee.vue'
+// import Popup from '@/components/Popup_LunchBoxDetails.vue'
 
 // 背景圖
 onMounted(() => {
@@ -41,7 +39,7 @@ function closePopup() {
     <FrontLayout>
         <div class="headline">
             <h1>為你搭配<span class="decorate"></span></h1>
-            <div><a @click="openPopup">回主選單</a><PopupSelectConsignee v-if="showPopup" @close="closePopup" /></div>
+            <div><a @click="openPopup">回主選單</a><Popup v-if="showPopup" @close="closePopup" /></div>
         </div>
         <div class="operate">
             <div class="order-container">
@@ -120,6 +118,7 @@ function closePopup() {
                                     </div>
                                 </div>
                                 <div class="detail-price">
+                                    <!-- <div class="detail"><a @click="openPopup">回主選單</a><Popup v-if="showPopup" @close="closePopup" /></div> -->
                                     <div class="detail"><a href="#">詳細內容</a></div>
                                     <div class="price">$320</div>
                                 </div>
@@ -185,7 +184,7 @@ function closePopup() {
                                     <img src="../assets/images/Order/box04.png" alt="">
                                     <div class="ingredients">
                                         <img src="../assets/images/Order/sesame.svg" alt="">
-                                        <img src="../assets/images/Order/vegatarianDiet.svg" alt="">
+                                        <img src="../assets/images/Order/vegetarianDiet.svg" alt="">
                                     </div>
                                 </div>
                                 <div class="detail-price">

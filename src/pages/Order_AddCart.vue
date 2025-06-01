@@ -79,7 +79,7 @@ h5{
     &:hover{
     background-color: transparent;
     transition: 0.3s ease;
-    color: $neutral_700;
+    color: $neutral_black;
     }
 }
 

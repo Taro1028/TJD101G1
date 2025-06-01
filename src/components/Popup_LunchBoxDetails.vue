@@ -1,80 +1,95 @@
 <script setup>
-import { ref } from 'vue'
-// import foodData from '@/data/foodList.json'
+import { ref, computed, nextTick, onMounted } from 'vue'
+import foodData from '@/data/LunchBoxItems.json'
 
-const activeIndex = ref(null)
+const menu = ref(foodData[0])  // 目前顯示第一組餐點 之後隨點擊該餐盒做移除
+const activeDishIndex = ref(0)  // 預設第一道配菜的介紹
 
-const toggleAccordion = (index) => {
-  activeIndex.value = activeIndex.value === index ? null : index
+// 要 new URL 圖片字串
+const getImageUrl = (fileName) => {
+  return new URL(`../assets/images/Order/${fileName}`, import.meta.url).href
+}
+
+function toggleDish(index) {
+  activeDishIndex.value = activeDishIndex.value === index ? null : index
+}
+
+// 手風琴效果
+function beforeEnter(el) {
+  el.style.height = '0'
+  el.style.opacity = '0'
+  el.style.transition = 'height 0.3s ease, opacity 0.3s ease'
+}
+
+function enter(el) {
+  const height = el.scrollHeight
+  el.style.height = height + 'px'
+  el.style.opacity = '1'
+}
+
+function afterEnter(el) {
+  el.style.height = 'auto' // 避免展開後被限制高度
+}
+
+function leave(el) {
+  el.style.height = el.scrollHeight + 'px' // 設定初始高度以開始過渡
+  el.offsetHeight // 觸發 reflow（必要）
+  el.style.height = '0'
+  el.style.opacity = '0'
+}
+
+// 關閉視窗
+const emit = defineEmits(['close'])
+
+function closePopup() {
+  emit('close')
 }
 </script>
 
 <template>
 <div class="overlay">
 <div class="detailCard">
-    <span class="btn">X</span>
+    <button class="closebtn"  @click="closePopup"><i class="bi bi-x-circle"></i></button>
     <div class="intro">
-        <h4>樂活元氣餐</h4>
-        <h6>隨著年齡增長，長輩的基礎代謝率逐漸下降，營養吸收效率也會變差，若攝取不足，很容易造成體力下滑、免疫力降低，甚至增加慢性病風險。樂活元氣餐專為健康長輩打造，以「高纖、優質蛋白、原型食材」為核心，調整適合銀髮族的營養比例，幫助補充能量、維持肌力、強化骨質與腸胃功能。每日一餐，讓長者吃得健康又開心，是延緩老化、活力樂齡的最佳選擇。</h6>
+        <h4>{{ menu.title }}</h4>
+        <h6>{{ menu.description }}</h6>
         <ul class="ingredients">
-            <li>
-                <img src="../assets/images/Order/sesame.svg" alt="">
-                <p>芝麻過敏原</p>
-            </li>
-            <li>
-                <img src="../assets/images/Order/seafood.svg" alt="">
-                <p>海鮮過敏原</p>
-            </li>
-            <li>
-                <img src="../assets/images/Order/aussieBeef.svg" alt="">
-                <p>使用澳洲牛</p>
-            </li>
+            <li v-for="(item, i) in menu.ingredients" :key="i">
+            <img :src="getImageUrl(item.icon)" :alt="item.label" />
+            <p>{{ item.label }}</p>
+          </li>
         </ul>
     </div>
     <div class="info">
         <div class="img_price">
-            <img src="../assets/images/Order/box01.png" alt="樂活元氣餐">
-            <h5>售價 $320</h5>
+            <img :src="getImageUrl(menu.boximage)" :alt="menu.title" />
+            <h5>售價 ${{ menu.price }}</h5>
         </div>
         <div class="infotxtblock">
-            <div class="infotxt">
-                <div class="foodtitle">
-                    <h5>紅棗枸杞燉雞</h5>
-                    <div class="accordion">
-                    <span><i class="bi bi-chevron-up"></i></span>
-                    <span><i class="bi bi-chevron-down"></i></span>
-                    </div>
+            <div 
+            class="infotxt"
+            v-for="(dish, index) in menu.dishes"
+            :key="index"
+            >
+                <div 
+                class="foodtitle"
+                @click="toggleDish(index)">
+                    <h5>{{ dish.name }}</h5>
+                    
+                    <i 
+                    :class="activeDishIndex === index ? 'bi-chevron-up' : 'bi-chevron-down'"
+                    ></i>
+                   
                 </div>
-                <div class="foodtxt">
-                    <h6>紅棗枸杞燉雞富含補氣養血功效，土雞腿提供優質蛋白，有助維持肌肉量與增強體力。黃耆與枸杞能提升免疫力、促進血液循環，薑片驅寒暖胃。整體湯品溫潤養身，是日常補元氣、增強抵抗力的首選。</h6>
+                <transition 
+                @before-enter="beforeEnter"
+                @enter="enter"
+                @after-enter="afterEnter"
+                @leave="leave">
+                <div class="foodtxt" v-show="activeDishIndex === index">
+                    <h6>{{ dish.description }}</h6>
                 </div>
-            </div>
-            <div class="infotxt">
-                <div class="foodtitle">
-                    <h5>南瓜豬肉燉豆腐</h5>
-                    <span>></span>
-                </div>
-                <div class="foodtxt hidden">
-                    <h6>使用低脂豬里肌與滑嫩豆腐搭配南瓜，兼具高蛋白與β-胡蘿蔔素，幫助增強免疫、保護眼睛與促進消化。豬肉先汆燙後清燉減少油脂負擔，適合平日養身、體力調理使用。</h6>
-                </div>
-            </div>
-            <div class="infotxt">
-                <div class="foodtitle">
-                    <h5>香煎鮭魚佐野菜</h5>
-                    <span>></span>
-                </div>
-                <div class="foodtxt hidden">
-                    <h6>鮭魚富含Omega-3脂肪酸，有助心血管保護與腦部活化，搭配富含植化素的蔬菜一起料理，不僅營養完整且色香味俱全。適合日常維持記憶力與提升身心活力的銀髮族食用。</h6>
-                </div>
-            </div>
-            <div class="infotxt">
-                <div class="foodtitle">
-                    <h5>蕃茄牛肉蔬菜</h5>
-                    <span>></span>
-                </div>
-                <div class="foodtxt hidden">
-                    <h6>此道料理富含鐵質與膠原蛋白，番茄中的茄紅素具抗氧化效果，能延緩細胞老化。牛肉提供補氣養血的營養來源，蔬菜燉煮入味、口感柔和，是銀髮族補鐵提神、強健身體的良方。</h6>
-                </div>
+                </transition>
             </div>
         </div>
     </div>
@@ -113,12 +128,24 @@ const toggleAccordion = (index) => {
     position: relative;
 }
 
-.btn{
+.closebtn{
     position: absolute;
-    top: 24px;
     right: 24px;
+    top: 20px;
+    background-color: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+
+    &:hover{
+        cursor: pointer;
+    }
 }
 
+.closebtn i{
+    font-size: 24px;
+}
 
 .intro{
     display: flex;
@@ -153,6 +180,7 @@ const toggleAccordion = (index) => {
 }
 
 .info{
+    width: 640px;
     display: flex;
     gap: 64px;
 }
@@ -175,6 +203,7 @@ const toggleAccordion = (index) => {
 }
 
 .infotxtblock{
+    width: 336px;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -192,12 +221,7 @@ const toggleAccordion = (index) => {
 }
 
 .foodtitle h5{
-    margin: 0;
     font-size: $font_h5;
-}
-
-.foodtitle span{
-    display: block;
 }
 
 .foodtxt h6{
@@ -227,9 +251,14 @@ const toggleAccordion = (index) => {
 }
 
 .info{
+    width: 300px;
     flex-direction: column;
     gap: 20px;
     text-align: center;
+}
+
+.infotxtblock{
+    width: 300px;
 }
 
 .img_price img{
@@ -243,5 +272,6 @@ const toggleAccordion = (index) => {
 }
 
 }
+
 
 </style>
