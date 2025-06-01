@@ -7,7 +7,7 @@
         <img src="../assets/images/Logo_L.svg" alt="">
         <h3>請先登入會員</h3>
         <h5>登入會員即可享受完整使用體驗</h5>
-        <button class="btn">前往登入</button>
+        <router-link to="/Member" class="btn">前往登入</router-link>
     </div>
 </div>
 </template>
@@ -42,12 +42,10 @@
 }
 
 h3{
-    margin: 0;
     font-size: $font_h3;
 }
 
 h5{
-    margin: 0;
     font-size: $font_h5;
     font-weight: normal;
 }
@@ -55,11 +53,11 @@ h5{
 .btn{
     background-color: $neutral_black;
     color: $neutral_white;
+    text-decoration: none;
     padding: 12px 24px;
     border-radius: 24px;
     border: 2px solid $neutral_black;
     transition: 0.3s ease;
-
 
     &:hover{
     background-color: transparent;

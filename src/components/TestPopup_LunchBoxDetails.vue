@@ -7,12 +7,19 @@ const activeIndex = ref(null)
 const toggleAccordion = (index) => {
   activeIndex.value = activeIndex.value === index ? null : index
 }
+
+// 關閉視窗
+const emit = defineEmits(['close'])
+
+function closePopup() {
+  emit('close')
+}
 </script>
 
 <template>
 <div class="overlay">
 <div class="detailCard">
-    <span class="btn">X</span>
+    <button class="closebtn"  @click="closePopup"><i class="bi bi-x-circle"></i></button>
     <div class="intro">
         <h4>樂活元氣餐</h4>
         <h6>隨著年齡增長，長輩的基礎代謝率逐漸下降，營養吸收效率也會變差，若攝取不足，很容易造成體力下滑、免疫力降低，甚至增加慢性病風險。樂活元氣餐專為健康長輩打造，以「高纖、優質蛋白、原型食材」為核心，調整適合銀髮族的營養比例，幫助補充能量、維持肌力、強化骨質與腸胃功能。每日一餐，讓長者吃得健康又開心，是延緩老化、活力樂齡的最佳選擇。</h6>
@@ -113,12 +120,24 @@ const toggleAccordion = (index) => {
     position: relative;
 }
 
-.btn{
+.closebtn{
     position: absolute;
-    top: 24px;
     right: 24px;
+    top: 20px;
+    background-color: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+
+    &:hover{
+        cursor: pointer;
+    }
 }
 
+.closebtn i{
+    font-size: 24px;
+}
 
 .intro{
     display: flex;
@@ -243,5 +262,6 @@ const toggleAccordion = (index) => {
 }
 
 }
+
 
 </style>

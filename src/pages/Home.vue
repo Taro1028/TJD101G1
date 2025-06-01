@@ -1,6 +1,7 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import Carousel from '../components/Carousel.vue'
+import Marquree from '../components/Marquee.vue'
 
 </script>
 
@@ -63,7 +64,7 @@ import Carousel from '../components/Carousel.vue'
         <h3>🍱 餐點料理</h3>
         <h5>—每口都帶來味蕾的滿足感—</h5>
       </div>
-      
+      <Marquree />
       <!-- <div class="marquee">
         <div class="upper">
           <img src="" alt="">
@@ -73,7 +74,7 @@ import Carousel from '../components/Carousel.vue'
         </div>
       </div> -->
       <div class="sec2-linkblock">
-        <a class="btn">瞭解更多</a>
+        <router-link to="/LunchBox" class="btn">瞭解更多</router-link>
       </div>
     </section>
 
@@ -179,7 +180,7 @@ body {
 
 // --- 主視覺 start ---
 .intro-section {
-  width: 1400px;
+  width: 1200px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -297,7 +298,7 @@ h4 {
 .sec-4 {
   width: 1200px;
   margin: 0 auto;
-  padding: 48px;
+  padding: 48px 80px;
   display: flex;
   flex-direction: column;
   gap: 48px;
@@ -606,7 +607,7 @@ a:hover .title {
 @media screen and (max-width: 1300px) {
   .intro-section {
     width: 90%;
-    padding: 48px 60px;
+    padding: 48px;
   }
 
   .bg-circle1 {
@@ -634,9 +635,35 @@ a:hover .title {
     width: 90%;
   }
 
+  .sec-1,
+  .sec-3,
+  .sec-4{
+    padding: 48px;
+  }
+
+  .serve{
+    gap: 24px;
+    padding: 0;
+  }
+
+  .s-card {
+    padding: 16px;
+  }
+
 }
 
 @media screen and (max-width: 1100px) {
+
+  .intro-section {
+    width: 90%;
+    padding: 48px 24px;
+  }
+  
+  .sec-1,
+  .sec-3,
+  .sec-4{
+    padding: 48px 24px;
+  }
 
   .serve {
     margin: 0 auto;
@@ -715,6 +742,7 @@ a:hover .title {
     flex-direction: column;
     gap: 48px;
   }
+  
 
 }
 

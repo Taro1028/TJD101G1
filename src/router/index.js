@@ -158,7 +158,13 @@ const routes = [
   },
   // === 後台 ===
   {
-    path: '/admin', // /admin      /admin/users
+    path: '/adminLogin', // /admin      /admin/users
+    component: () => import("@/pages/admin/AdminLogin.vue"),
+
+  },
+  {
+    path: "/admin", // /admin      /admin/users
+    component: () => import("@/pages/admin/Member.vue"),
     children: [
       {
         path: "member",

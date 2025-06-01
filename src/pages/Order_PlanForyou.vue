@@ -1,6 +1,11 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
+// import PopupOrderLeave from '@/components/Popup_OrderLeaveDialog.vue'
+// import PopupSelectConsignee from '@/components/Popup_SelectConsignee.vue'
+import PopupSelectConsignee from '@/components/TestPopup_LunchBoxDetails.vue'
+
+
 
 // 背景圖
 onMounted(() => {
@@ -20,12 +25,23 @@ const swiperOptions = {
     freeMode: true,
 }
 
+// Popup - OrderLeave
+const showPopup = ref(false)
+
+function openPopup() {
+  showPopup.value = true
+}
+
+function closePopup() {
+  showPopup.value = false
+}
+
 </script>
 <template>
     <FrontLayout>
         <div class="headline">
             <h1>為你搭配<span class="decorate"></span></h1>
-            <a href="#">回主選單</a>
+            <div><a @click="openPopup">回主選單</a><PopupSelectConsignee v-if="showPopup" @close="closePopup" /></div>
         </div>
         <div class="operate">
             <div class="order-container">
@@ -290,21 +306,24 @@ h1 {
 .dateblock{
     width: 100%;
     display: flex;
-    align-self: center;
+    justify-content: flex-start;
 }
 
 .swiper-slide {
     flex-shrink: 1;
 }
 
-.date-swiper,
+.date-swiper{
+    width: 100%;
+}
+
 .lunchbox-swiper {
     width: auto;
 }
 
 .dateItem {
-    width: 126px;
-    height: 88px;
+    width: 100px;
+    height: 64px;
     padding: 4px 12px;
     margin-right: 20px;
     border-radius: 8px;
