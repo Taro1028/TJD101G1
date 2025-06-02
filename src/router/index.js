@@ -37,16 +37,32 @@ const routes = [
     },
   },
   {
-    path: "/Order/PlanForyou",
-    component: () => import("@/pages/Order_PlanForyou.vue"),
+    path: '/Order/PlanForyou',
+    component: () => import('@/pages/Order_PlanForyou.vue'),
+    meta: {
+      title: '為你搭配 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+  {
+    path: "/Order/Select1_PlanFree",
+    component: () => import("@/pages/Order_Select1_PlanFree.vue"),
     meta: {
       title: "為你搭配 - TibaEAT 提膳家",
       requiredLogin: true,
     },
   },
   {
-    path: '/Order/PlanFree',
-    component: () => import('@/pages/Order_PlanFree.vue'),
+    path: '/Order/Select2_PlanFree',
+    component: () => import('@/pages/Order_Select2_PlanFree.vue'),
+    meta: {
+      title: '自由搭配 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+  {
+    path: '/Order/Select3_PlanFree',
+    component: () => import('@/pages/Order_Select3_PlanFree.vue'),
     meta: {
       title: '自由搭配 - TibaEAT 提膳家',
       requiredLogin: true
@@ -68,7 +84,7 @@ const routes = [
       requiredLogin: true
     }
   },
-    {
+  {
     path: '/Order/Check1_OrderInfo',
     component: () => import('@/pages/Order_Check1_OrderInfo.vue'),
     meta: {
@@ -76,7 +92,7 @@ const routes = [
       requiredLogin: true
     }
   },
-    {
+  {
     path: '/Order/Check2_PaymentInfo',
     component: () => import('@/pages/Order_Check2_PaymentInfo.vue'),
     meta: {
@@ -230,6 +246,10 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes,
+  scrollBehavior(to, from, savedPosition) {
+    // always scroll to top
+    return { top: 0 }
+  },
 });
 
 // 依據 route 的 meta.title 更新網頁標題

@@ -1,9 +1,8 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
-import Popup from '@/components/Popup_OrderLeaveDialog.vue'
-// import Popup from '@/components/Popup_SelectConsignee.vue'
-// import Popup from '@/components/Popup_LunchBoxDetails.vue'
+import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
+import LunchBox from '@/components/Popup_LunchBoxDetails.vue'
 
 // 背景圖
 onMounted(() => {
@@ -23,15 +22,15 @@ const swiperOptions = {
     freeMode: true,
 }
 
-// Popup - OrderLeave
-const showPopup = ref(false)
+// Popup
+const showPopup = ref(null)
 
-function openPopup() {
-  showPopup.value = true
+function openPopup(value) {
+    showPopup.value = value
 }
 
 function closePopup() {
-  showPopup.value = false
+    showPopup.value = null
 }
 
 </script>
@@ -39,16 +38,16 @@ function closePopup() {
     <FrontLayout>
         <div class="headline">
             <h1>為你搭配<span class="decorate"></span></h1>
-            <div><a @click="openPopup">回主選單</a><Popup v-if="showPopup" @close="closePopup" /></div>
+            <div><a @click="openPopup('leave')">回主選單</a>
+                <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" />
+            </div>
         </div>
         <div class="operate">
             <div class="order-container">
                 <div class="period-block">
                     <div class="period">2025.06.07 (六) - 06.13 (五)</div>
                     <div class="dateblock">
-                        <Swiper 
-                        v-bind="swiperOptions" 
-                        class="date-swiper">
+                        <Swiper v-bind="swiperOptions" class="date-swiper">
                             <SwiperSlide>
                                 <div class="dateItem current">
                                     <div class="date">06.07 (六)</div>
@@ -94,111 +93,109 @@ function closePopup() {
                         </Swiper>
                     </div>
                 </div>
+                <LunchBox v-if="showPopup && showPopup !== 'leave'" @close="closePopup" />
                 <div class="order">
                     <div class="orderarea">
                         <div class="day">
                             <h3>06.07 (六)</h3>
                         </div>
                         <div class="lunchboxlist">
-                        <Swiper 
-                        v-bind="swiperOptions" 
-                        class="lunchbox-swiper">
-                            <SwiperSlide>
-                            <div class="boxcard">
-                                <div class="boxname">
-                                    <h4>樂活元氣餐</h4>
-                                </div>
-                                <div class="imginfo">
-                                    <img src="../assets/images/Order/box01.png" alt="">
-                                    <div class="ingredients">
-                                        <img src="../assets/images/Order/sesame.svg" alt="">
-                                        <img src="../assets/images/Order/taiwanPork.svg" alt="">
-                                        <img src="../assets/images/Order/seafood.svg" alt="">
-                                        <img src="../assets/images/Order/aussieBeef.svg" alt="">
+                            <Swiper v-bind="swiperOptions" class="lunchbox-swiper">
+                                <SwiperSlide>
+                                    <div class="boxcard">
+                                        <div class="boxname">
+                                            <h4>樂活元氣餐</h4>
+                                        </div>
+                                        <div class="imginfo">
+                                            <img src="../assets/images/Order/box01.png" alt="">
+                                            <div class="ingredients">
+                                                <img src="../assets/images/Order/sesame.svg" alt="">
+                                                <img src="../assets/images/Order/taiwanPork.svg" alt="">
+                                                <img src="../assets/images/Order/seafood.svg" alt="">
+                                                <img src="../assets/images/Order/aussieBeef.svg" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="detail-price">
+                                            <div class="detail"><a @click="openPopup('test')">詳細內容</a></div>
+                                            <div class="price">$320</div>
+                                        </div>
+                                        <div class="quantity-selector">
+                                            <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
+                                            <div class="count">0</div>
+                                            <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-price">
-                                    <!-- <div class="detail"><a @click="openPopup">回主選單</a><Popup v-if="showPopup" @close="closePopup" /></div> -->
-                                    <div class="detail"><a href="#">詳細內容</a></div>
-                                    <div class="price">$320</div>
-                                </div>
-                                <div class="quantity-selector">
-                                    <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
-                                    <div class="count">0</div>
-                                    <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
-                                </div>
-                            </div>
-                            </SwiperSlide>
-                            <SwiperSlide>
-                            <div class="boxcard">
-                                <div class="boxname">
-                                    <h4>舒心控醣餐</h4>
-                                </div>
-                                <div class="imginfo">
-                                    <img src="../assets/images/Order/box02.png" alt="">
-                                    <div class="ingredients">
-                                        <img src="../assets/images/Order/taiwanPork.svg" alt="">
-                                        <img src="../assets/images/Order/seafood.svg" alt="">
-                                        <img src="../assets/images/Order/aussieBeef.svg" alt="">
+                                </SwiperSlide>
+                                <SwiperSlide>
+                                    <div class="boxcard">
+                                        <div class="boxname">
+                                            <h4>舒心控醣餐</h4>
+                                        </div>
+                                        <div class="imginfo">
+                                            <img src="../assets/images/Order/box02.png" alt="">
+                                            <div class="ingredients">
+                                                <img src="../assets/images/Order/taiwanPork.svg" alt="">
+                                                <img src="../assets/images/Order/seafood.svg" alt="">
+                                                <img src="../assets/images/Order/aussieBeef.svg" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="detail-price">
+                                            <div class="detail"><a href="#">詳細內容</a></div>
+                                            <div class="price">$320</div>
+                                        </div>
+                                        <div class="quantity-selector">
+                                            <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
+                                            <div class="count">0</div>
+                                            <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-price">
-                                    <div class="detail"><a href="#">詳細內容</a></div>
-                                    <div class="price">$320</div>
-                                </div>
-                                <div class="quantity-selector">
-                                    <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
-                                    <div class="count">0</div>
-                                    <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
-                                </div>
-                            </div>
-                            </SwiperSlide>
-                            <SwiperSlide>
-                            <div class="boxcard">
-                                <div class="boxname">
-                                    <h4>柔食樂活餐</h4>
-                                </div>
-                                <div class="imginfo">
-                                    <img src="../assets/images/Order/box03.png" alt="">
-                                    <div class="ingredients">
-                                        <img src="../assets/images/Order/taiwanpork.svg" alt="">
+                                </SwiperSlide>
+                                <SwiperSlide>
+                                    <div class="boxcard">
+                                        <div class="boxname">
+                                            <h4>柔食樂活餐</h4>
+                                        </div>
+                                        <div class="imginfo">
+                                            <img src="../assets/images/Order/box03.png" alt="">
+                                            <div class="ingredients">
+                                                <img src="../assets/images/Order/taiwanpork.svg" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="detail-price">
+                                            <div class="detail"><a href="#">詳細內容</a></div>
+                                            <div class="price">$320</div>
+                                        </div>
+                                        <div class="quantity-selector">
+                                            <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
+                                            <div class="count">0</div>
+                                            <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-price">
-                                    <div class="detail"><a href="#">詳細內容</a></div>
-                                    <div class="price">$320</div>
-                                </div>
-                                <div class="quantity-selector">
-                                    <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
-                                    <div class="count">0</div>
-                                    <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
-                                </div>
-                            </div>
-                            </SwiperSlide>
-                            <SwiperSlide>
-                            <div class="boxcard">
-                                <div class="boxname">
-                                    <h4>蔬食養生餐</h4>
-                                </div>
-                                <div class="imginfo">
-                                    <img src="../assets/images/Order/box04.png" alt="">
-                                    <div class="ingredients">
-                                        <img src="../assets/images/Order/sesame.svg" alt="">
-                                        <img src="../assets/images/Order/vegetarianDiet.svg" alt="">
+                                </SwiperSlide>
+                                <SwiperSlide>
+                                    <div class="boxcard">
+                                        <div class="boxname">
+                                            <h4>蔬食養生餐</h4>
+                                        </div>
+                                        <div class="imginfo">
+                                            <img src="../assets/images/Order/box04.png" alt="">
+                                            <div class="ingredients">
+                                                <img src="../assets/images/Order/sesame.svg" alt="">
+                                                <img src="../assets/images/Order/vegetarianDiet.svg" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="detail-price">
+                                            <div class="detail"><a href="#">詳細內容</a></div>
+                                            <div class="price">$360</div>
+                                        </div>
+                                        <div class="quantity-selector">
+                                            <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
+                                            <div class="count">0</div>
+                                            <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-price">
-                                    <div class="detail"><a href="#">詳細內容</a></div>
-                                    <div class="price">$360</div>
-                                </div>
-                                <div class="quantity-selector">
-                                    <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
-                                    <div class="count">0</div>
-                                    <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
-                                </div>
-                            </div>
-                            </SwiperSlide>
-                        </Swiper>
+                                </SwiperSlide>
+                            </Swiper>
                         </div>
                         <div class="notice">
                             <span><i class="bi bi-info-circle-fill"></i></span>
@@ -210,13 +207,13 @@ function closePopup() {
                         <h5 class="subtotal">小計： $-</h5>
                     </div>
                     <div class="total_option-btn">
-                    <div class="total">
-                        <h5>總計金額：<br>$-</h5>
-                    </div>
-                    <div class="option-btn">
-                        <button class="prevbtn" disabled>上一步</button>
-                        <button class="nextbtn" disabled>下一步</button>
-                    </div>
+                        <div class="total">
+                            <h5>總計金額：<br>$-</h5>
+                        </div>
+                        <div class="option-btn">
+                            <button class="prevbtn" disabled>上一步</button>
+                            <button class="nextbtn" disabled>下一步</button>
+                        </div>
                     </div>
                 </div>
 
@@ -302,7 +299,7 @@ h1 {
     padding: 8px 0;
 }
 
-.dateblock{
+.dateblock {
     width: 100%;
     display: flex;
     justify-content: flex-start;
@@ -312,7 +309,7 @@ h1 {
     flex-shrink: 1;
 }
 
-.date-swiper{
+.date-swiper {
     width: 100%;
 }
 
@@ -428,6 +425,9 @@ h1 {
 }
 
 .detail a {
+    text-decoration: underline;
+    display: block;
+    cursor: pointer;
     font-weight: bold;
     color: $primary_400;
 }
@@ -493,12 +493,11 @@ h1 {
 }
 
 .subtotal {
-    margin: 0;
     font-size: $font_h5;
     font-weight: normal;
 }
 
-.total_option-btn{
+.total_option-btn {
     display: flex;
     justify-content: space-between;
 }
@@ -550,13 +549,13 @@ h1 {
     }
 
     .boxcard {
-    padding: 16px;
-    margin: 0 18px;
+        padding: 16px;
+        margin: 0 18px;
     }
 
     .imginfo img {
-    width: 100px;
-    height: 100px;
+        width: 100px;
+        height: 100px;
     }
 
 }
@@ -570,11 +569,11 @@ h1 {
         width: 520px;
     }
 
-    .lunchboxlist{
+    .lunchboxlist {
         width: 100%;
     }
 
-    .boxcard{
+    .boxcard {
         width: 162px;
     }
 
@@ -589,11 +588,11 @@ h1 {
         width: 343px;
     }
 
-    h1{
-    font-size: $font_h3;
+    h1 {
+        font-size: $font_h3;
     }
 
-    .decorate{
+    .decorate {
         width: 60px;
         height: 60px;
     }

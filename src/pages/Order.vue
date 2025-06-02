@@ -22,7 +22,7 @@ onUnmounted(() => {
                     <h5>由專業營養師<br>調配的餐食</h5>
                 </div>
             </router-link>
-            <router-link to="/Order/PlanFree" class="link">
+            <router-link to="/Order/Select1_PlanFree" class="link">
                 <div class="plan_free">
                     <h3>自由搭配</h3>
                     <h5>自己挑選菜色<br>組合餐盒</h5>
