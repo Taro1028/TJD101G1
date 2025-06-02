@@ -5,6 +5,19 @@
     const showDefaultAvatar = ref(true);
     const uploadedImageSrc = ref('');
     const avatarInput = ref(null);
+    const cards = ref([
+        {
+            date: 'date',
+            imageUrl: '/tjd101/g1/images/Member/card_1.jpg',
+        },
+             {
+            date: 'date',
+            imageUrl: '/tjd101/g1/images/Member/card_1.jpg',
+        },     {
+            date: 'date',
+            imageUrl: '/tjd101/g1/images/Member/card_1.jpg',
+        }
+    ]);
 
     // 點擊大頭照區域觸發檔案選擇
     const handleAvatarClick = () => {
@@ -176,14 +189,16 @@
                                 <div class="card">
                                     <div class="inner-card">
                                         <div class="img-wrapper">
-                                        <img src="/src/assets/images/Member/card_1.jpg" alt="">
+                                        <img src="/tjd101/g1/images/Member/card_1.jpg" alt="">
                                         </div>
                                         <div class="content">
                                         <h4>2025/03/25</h4>
                                         </div>
                                         <div class="btn-wrapper">
-                                        <button class="view-btn" @click="openLightbox('../assets/images/Member/card_1.jpg')">View</button>
+                                        <button class="view-btn" @click="openLightbox('/tjd101/g1/images/Member/card_1.jpg')">View</button>
                                         </div>
+
+                                        
                                     </div>
                                 </div>
                                 <div class="card">
@@ -195,7 +210,7 @@
                                         <h4>2025/03/25</h4>
                                         </div>
                                         <div class="btn-wrapper">
-                                        <button class="view-btn" @click="openLightbox('../assets/images/Member/card_2.jpg')">View</button>
+                                        <button class="view-btn" @click="openLightbox('/tjd101/g1/images/Member/card_2.jpg')">View</button>
                                         </div>
                                     </div>
                                 </div>
@@ -208,7 +223,7 @@
                                         <h4>2025/03/25</h4>
                                         </div>
                                         <div class="btn-wrapper">
-                                         <button class="view-btn" @click="openLightbox('../assets/images/Member/card_3.jpg')">View</button>
+                                         <button class="view-btn" @click="openLightbox('/tjd101/g1/images/Member/card_3.jpg')">View</button>
                                         </div>
                                     </div>
                                 </div>
@@ -221,7 +236,7 @@
                                         <h4>2025/03/25</h4>
                                         </div>
                                         <div class="btn-wrapper">
-                                        <button class="view-btn" @click="openLightbox('../assets/images/Member/card_4.jpg')">View</button>
+                                        <button class="view-btn" @click="openLightbox('/tjd101/g1/images/Member/card_4.jpg')">View</button>
                                         </div>
                                     </div>
                                 </div>
@@ -234,7 +249,7 @@
                                         <h4>2025/03/25</h4>
                                         </div>
                                         <div class="btn-wrapper">
-                                        <button class="view-btn" @click="openLightbox('../assets/images/Member/card_5.jpg')">View</button>
+                                        <button class="view-btn" @click="openLightbox('/tjd101/g1/images/Member/card_5.jpg')">View</button>
                                         </div>
                                     </div>
                                 </div>
@@ -247,7 +262,7 @@
                                         <h4>2025/03/25</h4>
                                         </div>
                                         <div class="btn-wrapper">
-                                        <button class="view-btn" @click="openLightbox('../assets/images/Member/card_6.jpg')">View</button>
+                                        <button class="view-btn" @click="openLightbox('/tjd101/g1/images/Member/card_5.jpg')">View</button>
                                         </div>
                                     </div>
                                 </div>
@@ -357,10 +372,13 @@ img {
     font-size: 12px;
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 .avatar-container:hover .upload-overlay {
     opacity: 1;
+    pointer-events: auto;
+
 }
 
 .upload-overlay i {

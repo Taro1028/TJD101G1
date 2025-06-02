@@ -67,22 +67,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+// import { ref } from 'vue'
 
-const progress = ref(50)
+// const progress = ref(50)
 
-const setProgress = (num) => {
-  progress.value = num
-}
+// const setProgress = (num) => {
+//   progress.value = num
+// }
 
-const handleSvgClick = (evt) => {
-  const svg = evt.currentTarget
-  const pt = new DOMPoint()
-  pt.x = evt.clientX
-  pt.y = evt.clientY
-  const loc = pt.matrixTransform(svg.getScreenCTM().inverse())
-  setProgress(loc.x)
-}
+// const handleSvgClick = (evt) => {
+//   const svg = evt.currentTarget
+//   const pt = new DOMPoint()
+//   pt.x = evt.clientX
+//   pt.y = evt.clientY
+//   const loc = pt.matrixTransform(svg.getScreenCTM().inverse())
+//   setProgress(loc.x)
+// }
 </script>
 
 <style scoped>

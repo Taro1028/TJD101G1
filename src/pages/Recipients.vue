@@ -294,10 +294,12 @@
             font-size: 12px;
             opacity: 0;
             transition: opacity 0.3s ease;
+            pointer-events: none;
         }
 
         .avatar-container:hover .upload-overlay {
             opacity: 1;
+            pointer-events: auto;
         }
 
         .upload-overlay i {
