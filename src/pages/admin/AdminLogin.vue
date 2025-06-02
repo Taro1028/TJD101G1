@@ -1,47 +1,44 @@
 <template>
-    <div class="wrapper">
-        <img src="../../assets/images/Logo_S.svg" alt="">
-        <p>TibaEAT堤善加提膳家</p>
-        <section class="login-form">
-    
-    <form @submit.prevent="handleLogin">
-      <div class="form-group">
-        <label for="username">帳號：</label>
-        <input type="text" id="username" v-model="username" required />
-      </div>
+  <div class="wrapper">
+    <img src="../../assets/images/Logo_S.svg" alt="" />
+    <p>TibaEAT提膳家</p>
+    <section class="login-form">
+      <form @submit.prevent="handleLogin">
+        <div class="form-group">
+          <label for="username">帳號：</label>
+          <input type="text" id="username" v-model="username" required />
+        </div>
 
-      <div class="form-group">
-        <label for="password">密碼：</label>
-        <input type="password" id="password" v-model="password" required />
-      </div>
+        <div class="form-group">
+          <label for="password">密碼：</label>
+          <input type="password" id="password" v-model="password" required />
+        </div>
 
-      <button type="submit">登入</button>
-    </form>
-  </section>
-    </div>
+        <button type="submit">登入</button>
+      </form>
+    </section>
+  </div>
 </template>
 
-<script setup>
-
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
 .wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: center;  
-  align-items: center;      
-  height: 100vh;            
-  background-color: $primary_400; 
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: $primary_400;
 }
 
-.wrapper img{
-    width: 200px;
+.wrapper img {
+  width: 200px;
 }
-.wrapper p{
-    padding: 20px;
-    font-size: $font_h4;
-    color: $primary_100;
+.wrapper p {
+  padding: 20px;
+  font-size: $font_h4;
+  color: $primary_100;
 }
 
 .login-form {
@@ -69,7 +66,7 @@ label {
 }
 
 input {
-  width: 100%;
+  width: 95%;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #aaa;
@@ -90,5 +87,4 @@ button {
 button:hover {
   background-color: $primary_400;
 }
-
 </style>

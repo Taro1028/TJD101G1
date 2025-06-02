@@ -53,10 +53,42 @@ const routes = [
     }
   },
   {
+    path: '/Order/Loading',
+    component: () => import('@/pages/Order_PageLoading.vue'),
+    meta: {
+      title: '隨機產生 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+  {
     path: '/Order/AddCart',
     component: () => import('@/pages/Order_AddCart.vue'),
     meta: {
-      title: '自由搭配 - TibaEAT 提膳家',
+      title: '加入購物車 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+    {
+    path: '/Order/Check1_OrderInfo',
+    component: () => import('@/pages/Order_Check1_OrderInfo.vue'),
+    meta: {
+      title: '訂單資料 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+    {
+    path: '/Order/Check2_PaymentInfo',
+    component: () => import('@/pages/Order_Check2_PaymentInfo.vue'),
+    meta: {
+      title: '付款資料 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+  {
+    path: '/Order/Check3_Complete',
+    component: () => import('@/pages/Order_Check3_Complete.vue'),
+    meta: {
+      title: '完成訂單 - TibaEAT 提膳家',
       requiredLogin: true
     }
   },
@@ -132,7 +164,7 @@ const routes = [
     }
   },
 
-      {
+  {
     path: '/MemberCenter/Recipients',
     component: () => import('@/pages/Recipients.vue'),
     meta: {
@@ -140,22 +172,26 @@ const routes = [
       requiredLogin: false
     }
   },
-        {
-    path: '/MessageCards',
-    component: () => import('@/pages/MessageCards.vue'),
-    meta: {
-      title: '我的小卡 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
-  },
-        {
-    path: '/MemberCenter/MyOrders',
-    component: () => import('@/pages/MyOrders.vue'),
-    meta: {
-      title: '訂單總覽 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
-  },
+{
+  path: '/MessageCards',
+  component: () => import('@/pages/MessageCards.vue'),
+},
+{
+  path: '/MemberCenter/MyCards',
+  component: () => import('@/pages/MyCards.vue'),
+  meta: {
+    title: '我的小卡 - TibaEAT 提膳家',
+    requiredLogin: false
+  }
+},
+{
+  path: '/MemberCenter/MyOrders', 
+  component: () => import('@/pages/MyOrders.vue'),
+  meta: {
+    title: '訂單總覽 - TibaEAT 提膳家',
+    requiredLogin: false
+  }
+},
   // === 後台 ===
   {
     path: '/adminLogin', // /admin      /admin/users
