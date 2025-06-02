@@ -141,8 +141,8 @@ const routes = [
     }
   },
         {
-    path: '/MemberCenter/MyCards',
-    component: () => import('@/pages/MyCards.vue'),
+    path: '/MessageCards',
+    component: () => import('@/pages/MessageCards.vue'),
     meta: {
       title: '我的小卡 - TibaEAT 提膳家',
       requiredLogin: false
