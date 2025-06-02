@@ -27,9 +27,9 @@ onBeforeUnmount(() => {
   <div class="marquee-wrapper">
     <transition name="slide-fade" mode="out-in">
       <div class="marquee-content" :key="currentIndex">
-          <i class="bi bi-egg-fried"></i>
-          <p class="marquee-text">{{ currentText }}</p>
-          <i class="bi bi-egg-fried"></i>
+        <i class="bi bi-egg-fried"></i>
+        <p class="marquee-text">{{ currentText }}</p>
+        <i class="bi bi-egg-fried"></i>
       </div>
     </transition>
   </div>
@@ -52,13 +52,11 @@ onBeforeUnmount(() => {
   position: absolute;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
 }
 
 .marquee-text {
   white-space: nowrap;
-  text-align: center;
-  letter-spacing: 2cqb;
+  letter-spacing: 4px;
   text-shadow: 4px 4px 5px $neutral_300;
 }
 
@@ -79,5 +77,33 @@ onBeforeUnmount(() => {
   opacity: 1;
 }
 
+/* RWD 手機版 */
+@media (max-width: 940px) {
+  .marquee-wrapper{
+    font-size: $font_h2;
+  }
+}
 
+@media (max-width: 800px) {
+  .marquee-wrapper{
+    font-size: $font_h3;
+  }
+
+  .marquee-text {
+  letter-spacing: 0;
+}
+}
+
+@media (max-width: 660px) {
+  .marquee-wrapper{
+    height: 120px;
+    font-size: $font_h4;
+  }
+}
+
+@media (max-width: 430px) {
+  .marquee-wrapper{
+    font-size: $font_h5;
+  }
+}
 </style>

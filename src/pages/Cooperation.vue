@@ -74,10 +74,6 @@ const partners = [
   },
 ]
 
-// const logoModules = import.meta.glob('../assets/images/About/cooperation_*.{jpeg,png}', { eager: true });
-
-// const logos = Object.values(logoModules).map(module => module.default);
-
 </script>
 
 <template>
@@ -249,22 +245,6 @@ button {
     gap: 80px;
 }
 
-// .partner-logos {
-//     max-width: 1000px;
-//     display: flex;
-//     flex-wrap: wrap;
-//     justify-content: center;
-//     margin: 60px auto;
-//     gap: 60px;
-// }
-
-// .logo img {
-//     width: 240px;
-//     height: 240px;
-//     object-fit: contain;
-//     border-radius: 20px;
-// }
-
 /* RWD 手機版 */
 @media (max-width: 820px) {
     .hero-banner{
@@ -291,6 +271,10 @@ button {
 }
 
 @media (max-width: 620px) {
+    .doctor-carousel{
+        padding: 0;
+    }
+    
     h2{
         font-size: $font_h3;
     }
@@ -304,6 +288,10 @@ button {
         font-size: $font_h4;
     }
 
+    .doctor-info{
+        padding: 20px;
+    }
+
     .text-box h3 {
         font-size: $font_h4;
     }
@@ -315,49 +303,66 @@ button {
     .image-box img {
         width: 200px;
         height: 240px;
+    }
+
+    .partner-grid{
+        gap: 40px;
     }
 }
 
 @media (max-width: 420px) {
     .hero-banner{
-        height: 400px;
+        height: 280px;
+    }
+
+    .text-overlay{
+        width: 260px;
+        height: 80px;
+    }
+
+    .top_title{
+        font-size: $font_h6;
     }
 
     h2{
         font-size: $font_h4;
-        margin-top: 60px;
-        margin-bottom: 40px;
-    }
-
-    .text-overlay{
-        width: 320px;
-        height: 100px;
-    }
-
-    .top_title{
-        font-size: $font_h5;
+        margin-top: 40px;
+        margin-bottom: 20px;
     }
 
     .text-box h3 {
-        font-size: $font_h4;
+        font-size: $font_h6;
     }
 
     .text-box p {
-        font-size: $font_h5;
+        font-size: $font_p;
     }
     
     .image-box img {
-        width: 200px;
-        height: 240px;
+        width: 100px;
+        height: 100px;
+    }
+
+    .text-overlay{
+        width: 400px;
+        height: 140px;
+    }
+
+    .image-box img {
+        width: 160px;
+        height: 200px;
     }
 
     .btn-left {
-        margin-right: 5px;
+    margin-right: 6px;
     }
 
     .btn-right {
-        margin-left: 5px;
+        margin-left: 6px;
+    }
+
+    .partner-grid{
+        gap: 28px;
     }
 }
-
 </style>

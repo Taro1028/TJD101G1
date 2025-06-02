@@ -19,8 +19,6 @@ const goals = [
   </section>
 </template>
 
-
-
 <style scoped lang="scss">
 .main-goals {
   margin-top: 160px;
@@ -39,7 +37,7 @@ const goals = [
   list-style: none;
 }
 .goal-item {
-  width: 800px;
+  width: 740px;
   display: flex;
   align-items: center;
   background-color: $primary_600;
@@ -62,5 +60,64 @@ const goals = [
   font-size: $font_h4;
   text-align: center;
   letter-spacing: 4px;
+}
+
+/* RWD 手機版 */
+@media (max-width: 820px) {
+  .title{
+    margin-bottom: 0;
+  }
+
+  .goal-item{
+    width: 600px;
+  }
+
+  .goal-number{
+    font-weight: lighter;
+  }
+}
+
+@media (max-width: 660px) {
+  .main-goals {
+    margin-top: 100px;
+  }
+
+  .title{
+    font-size: $font_h5;
+  }
+
+  .goal-item {
+    width: 400px;
+    padding: 10px;
+    margin: 10px auto;
+  }
+  .goal-number {
+    font-size: $font_h5;
+    padding: 4px 10px;
+  }
+  .goal-text {
+    font-size: $font_h6;
+    letter-spacing: 2px;
+  }
+}
+
+@media (max-width: 430px) {
+  .title {
+    font-size: $font_h6;
+  }
+  
+  .goal-item {
+    width: 320px;
+    padding: 10px;
+    margin: 10px auto;
+  }
+  .goal-number {
+    font-size: $font_h6;
+    padding: 2px 8px;
+  }
+  .goal-text {
+    font-size: $font_p;
+    letter-spacing: 2px;
+  }
 }
 </style>
