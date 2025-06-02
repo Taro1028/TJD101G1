@@ -1,8 +1,8 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /tid103/test2/front
-    RewriteRule ^tid103/test2/front/index\.html$ - [L]
+    RewriteBase /tjd101/g1
+    RewriteRule ^tjd101/g1/index\.html$ - [L]
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . /tid103/test2/front/index.html [L]
+    RewriteRule . /tjd101/g1/index.html [L]
 </IfModule>
