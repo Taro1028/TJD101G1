@@ -1,18 +1,40 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
+import { useRouter } from 'vue-router';
 
 const showDropdown = ref(false)
+const isMobileMenuOpen = ref(false);
 const dropdownRef = ref(null)
 
 const toggleDropdown = () => {
     showDropdown.value = !showDropdown.value;
 };
 
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+  if (!isMobileMenuOpen.value) {
+    showDropdown.value = false; // 關閉下拉
+  }
+};
+
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false;
+  showDropdown.value = false;
+};
+
 const handleClickOutside = (event) => {
-    if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
+    if (dropdownRef.value && !dropdownRef.value.contains(event.target) && !event.target.closest('.hamburger')) {
         showDropdown.value = false
     }
 }
+
+if (
+    isMobileMenuOpen.value &&
+    !event.target.closest('.nav-wrapper') &&
+    !event.target.closest('.hamburger')
+  ) {
+    closeMobileMenu();
+  }
 
 onMounted(() => {
     document.addEventListener('click', handleClickOutside)
@@ -29,6 +51,17 @@ onBeforeUnmount(() => {
       <img src="../assets/images/Logo_S.svg" alt="logo_s" />
     </router-link>
 
+      <button class="hamburger" :class="{ active: isMobileMenuOpen }" @click="toggleMobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div
+        v-if="isMobileMenuOpen"
+        class="mobile-backdrop"
+        @click="closeMobileMenu"
+      ></div>
+
+      <nav :class="['nav-wrapper', { open: isMobileMenuOpen }]">
         <ul class="header_nav">
             <li><router-link to="/LunchBox">餐盒介紹</router-link></li>
             <li><router-link to="/Order">預約訂餐</router-link></li>
@@ -50,6 +83,7 @@ onBeforeUnmount(() => {
             </li>
             <li><router-link to="/Member">登入/註冊</router-link></li>
         </ul>
+      </nav>
       
   </header>
 </template>
@@ -66,6 +100,8 @@ header {
   justify-content: space-between;
   align-items: center;
   background-color: $primary_100;
+  position: relative;
+  z-index: 1000;
 }
 
 header a {
@@ -128,4 +164,103 @@ header a .img {
     }
   }
 }
+
+.hamburger {
+  width: 40px;
+  height: 24px;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1001;
+
+  span {
+    display: block;
+    height: 4px;
+    background: $neutral_black;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+
+  &.active span:nth-child(1) {
+    transform: rotate(-45deg) translate(-9px, 2px);
+  }
+  &.active span:nth-child(2) {
+    opacity: 0;
+  }
+  &.active span:nth-child(3) {
+    transform: rotate(45deg) translate(-9px, -3px);
+  }
+}
+
+.nav-wrapper {
+  display: flex;
+  z-index: 1000;
+
+  &.open {
+    display: block;
+  }
+}
+
+.mobile-backdrop {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 60px);
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+@media (max-width: 820px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .nav-wrapper {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 260px;
+    height: calc(100vh - 60px);
+    padding: 10px;
+    background-color: $primary_100;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1000;
+
+    transition: 
+      transform 0.4s ease-in-out,
+      opacity 0.4s ease-in-out,
+      visibility 0.4s ease-in-out;
+
+    &.open {
+      transform: translateX(0);
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .header_nav {
+    flex-direction: column;
+
+    .dropdown-menu {
+      position: static;
+      box-shadow: none;
+      padding-left: 10px;
+    }
+  }
+
+  .mobile-backdrop {
+    z-index: 999; 
+  }
+}
+
 </style>
