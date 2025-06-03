@@ -1,7 +1,8 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
-import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
+// import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
+import Cart from '@/components/Drawer_Cart.vue'
 import LunchBox from '@/components/Popup_LunchBoxDetails.vue'
 
 // 背景圖
@@ -38,9 +39,8 @@ function closePopup() {
     <FrontLayout>
         <div class="headline">
             <h1>為你搭配<span class="decorate"></span></h1>
-            <div><a @click="openPopup('leave')">回主選單</a>
-                <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" />
-            </div>
+            <a @click="openPopup('leave')">回主選單</a>
+            <Cart v-if="showPopup === 'leave'" @close="closePopup" />
         </div>
         <div class="operate">
             <div class="order-container">

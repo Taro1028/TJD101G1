@@ -1,4 +1,18 @@
 <script setup>
+// import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+function goNext() {
+//   if (!canProceed.value) return
+
+//   // 把資料存在 localStorage（或改用 pinia）
+//   localStorage.setItem('selectedDishes', JSON.stringify(selectedDishes.value))
+
+  // 導向下一頁
+  router.push('/Order/AddCart')
+}
 
 </script>
 <template>
@@ -8,7 +22,7 @@
         <h3>需要留言小卡嗎?</h3>
         <h5>會與配送餐點一併送達</h5>
         <div class="btnblock">
-        <button class="btn-1">不用，謝謝</button>
+        <button class="btn-1" @click="goNext">不用，謝謝</button>
         <button class="btn-2">我要留言</button>
         </div>
     </div>

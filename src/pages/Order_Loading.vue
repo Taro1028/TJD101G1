@@ -1,6 +1,7 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 onMounted(() => {
   document.body.classList.add('custom-bg')
@@ -8,6 +9,14 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.body.classList.remove('custom-bg')
+})
+
+const router = useRouter()
+
+onMounted(() => {
+  setTimeout(() => {
+    router.push('/Order/Select3_PlanFree') // 自動跳下一頁
+  }, 1800) // 1.8 秒過場
 })
 
 </script>
