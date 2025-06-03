@@ -6,19 +6,19 @@
     const showDefaultAvatar = ref(true);
     const uploadedImageSrc = ref('');
     const avatarInput = ref(null);
-    const cards = ref([
-        {
-            date: 'date',
-            imageUrl: '/tjd101/g1/images/Member/card_1.jpg',
-        },
-             {
-            date: 'date',
-            imageUrl: '/tjd101/g1/images/Member/card_1.jpg',
-        },     {
-            date: 'date',
-            imageUrl: '/tjd101/g1/images/Member/card_1.jpg',
-        }
-    ]);
+    // const cards = ref([
+    //     {
+    //         date: 'date',
+    //         imageUrl: '/tjd101/g1/images/Member/card_1.jpg',
+    //     },
+    //          {
+    //         date: 'date',
+    //         imageUrl: '/tjd101/g1/images/Member/card_1.jpg',
+    //     },     {
+    //         date: 'date',
+    //         imageUrl: '/tjd101/g1/images/Member/card_1.jpg',
+    //     }
+    // ]);
 
     // 點擊大頭照區域觸發檔案選擇
     const handleAvatarClick = () => {
@@ -192,7 +192,7 @@
                                 <div class="card">
                                     <div class="inner-card">
                                         <div class="img-wrapper">
-                                        <img src="/tjd101/g1/images/Member/card_1.jpg" alt="">
+                                        <img src="/src/assets/images/Member/card_1.jpg" alt="">
                                         </div>
                                         <div class="content">
                                         <h4>2025/03/25</h4>
