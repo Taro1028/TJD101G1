@@ -1,6 +1,7 @@
  <script setup>
     import { ref } from 'vue';
     import FrontLayout from '../layouts/FrontLayout.vue';
+    import Gotop from "../components/Gotop.vue"
 
     const showDefaultAvatar = ref(true);
     const uploadedImageSrc = ref('');
@@ -169,6 +170,8 @@
                             </div>
 
                             <p class="nickName">阿官</p>
+                            <!-- 一開始隱藏的登出鈕 -->
+                            <button class="logout btn">登出</button> 
                         </div>
 
                         <!-- 頁面導覽列 -->
@@ -294,7 +297,7 @@
                 </div>
             </div>
         </section>
-
+    <Gotop></Gotop>
         </FrontLayout>
     </template>
 <style scoped lang="scss">
@@ -459,11 +462,18 @@ img {
     background-color: $primary_950;
 }
 
+// 登出鈕
+
 .quck_link li.logout {
     margin-top: auto;
 }
 
 .logout .btn {
+    background-color: $primary_600;
+    color: white;
+}
+
+.logout.btn{
     background-color: $primary_600;
     color: white;
 }
@@ -638,6 +648,215 @@ h4 {
     border-radius: 5px;
     padding: 5px 10px;
     cursor: pointer;
+}
+
+// 響應式設定
+
+@media (max-width: 1000px) {
+    .img-wrapper img{
+        object-fit: contain;
+    }
+}
+
+@media (max-width: 900px) {
+    .img-wrapper {
+        height: 200px;
+    }
+}
+
+@media (min-width: 800px) {
+    .logout.btn {
+        display: none;
+    }
+}
+
+@media (max-width: 800px) {
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing_4;
+    }
+    
+    .memberArea {
+        flex-direction: column;
+        gap: $spacing_4;
+    }
+    
+    .user_nav {
+        width: 90%;
+        margin-right: 0;
+        margin-bottom: $spacing_4;
+    }
+    
+    /* head-area 橫向排列 */
+    .head-area {
+        flex-direction: row;
+        align-items: center;
+        gap: $spacing_10;
+        margin-bottom: $spacing_4;
+    }
+    
+    .avatar-container {
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+    
+    .nickName {
+        font-size: 1.6rem;
+        margin-left: auto;
+    }
+    
+    .quck_link {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: $spacing_2;
+        justify-content: center;
+    }
+    
+    .quck_link a {
+        padding: $spacing_2 $spacing_4;
+        font-size: 0.9rem;
+    }
+    
+    .user_content {
+        margin-left: 0;
+        padding: $spacing_4;
+    }
+    
+    .logout .btn {
+        display: none;
+    }
+
+    /* 卡片調整為 1 欄 */
+    .card {
+        flex-basis: 100%;
+    }
+    
+    .inner-wrapper {
+        width: 100%;
+    }
+}
+
+/* 650px 以下 - 隱藏 view-btn */
+@media (max-width: 650px) {
+    .view-btn {
+        display: none;
+    }
+    
+    .btn-wrapper {
+        display: none;
+    }
+}
+
+/* 480px 以下 - 導覽橫排不換行 */
+@media (max-width: 480px) {
+    .quck_link {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        justify-content: flex-start;
+        padding: $spacing_2 0;
+        gap: $spacing_2;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: $primary_400 $primary_100;
+    }
+    
+    .quck_link::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .quck_link::-webkit-scrollbar-track {
+        background: $primary_100;
+        border-radius: 3px;
+    }
+    
+    .quck_link::-webkit-scrollbar-thumb {
+        background: $primary_400;
+        border-radius: 3px;
+    }
+    
+    .quck_link::-webkit-scrollbar-thumb:hover {
+        background: $primary_600;
+    }
+    
+    .quck_link li {
+        flex-shrink: 0;
+    }
+    
+    .quck_link a {
+        white-space: nowrap;
+        min-width: max-content;
+    }
+}
+
+/* 400px 以下 - 手機螢幕 */
+@media (max-width: 400px) {
+    .wrapper {
+        padding: $spacing_4;
+    }
+    
+    .wrapper h2 {
+        font-size: 1.8rem;
+        margin-bottom: $spacing_4;
+    }
+    
+    .user_nav {
+        padding: $spacing_4;
+    }
+    
+    .head-area {
+        gap: $spacing_8;
+    }
+    
+    .avatar-container {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .default-avatar,
+    .uploaded-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 30px;
+    }
+    
+    .nickName {
+        font-size: 1.4rem;
+    }
+    
+    .quck_link {
+        gap: $spacing_1;
+    }
+    
+    .quck_link a {
+        padding: 10px $spacing_2;
+        font-size: 0.8rem;
+    }
+    
+    .user_content {
+        padding: $spacing_3;
+    }
+    
+    .user_content h3 {
+        font-size: 1.8rem;
+        margin-bottom: $spacing_3;
+    }
+    
+    .img-wrapper {
+        height: 200px;
+    }
+    
+    .inner-card {
+        padding: $spacing_2;
+    }
+    
+    /* 燈箱在小螢幕調整 */
+    .box {
+        width: 90%;
+        height: 70%;
+        max-width: 350px;
+    }
 }
 
 

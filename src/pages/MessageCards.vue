@@ -1,5 +1,7 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
+import Gotop from "../components/Gotop.vue"
+
 </script>
 
 <template>
@@ -61,6 +63,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
             </div>
 
         </div>
+        <Gotop></Gotop>
     </FrontLayout>
 </template>
 
@@ -73,13 +76,14 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
         background-color: $primary_50;
         background-image: url('../assets/images/Order/background.svg');
         background-repeat: repeat;
+        overflow-x: hidden;
     }
     .contenter{
         max-width: 1200px;
         margin: 40px auto;
         display: flex;
         justify-content: center;
-        gap: 40px;
+        gap: 20px;
     }
 
     h1{
@@ -95,7 +99,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
     .left-layout{
         display: flex;
         flex-direction: column;
-        width: 40%;
+        width: 35%;
         gap: 20px;
         box-sizing: border-box;
         padding: 8px;
@@ -104,6 +108,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
     .left-layout h4{
         font-weight: normal;
         font-size: 1.5rem;
+        margin-bottom: 1.5rem;
     }
     .color_list{
         display: flex;
@@ -132,7 +137,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
     }
 
     .right-layout{
-        width: 50%;
+        width: 45%;
         box-sizing: border-box;
         padding: 8px;
         gap: 20px;
@@ -142,7 +147,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
     }
     .preview{
         width: 100%;
-        height: 40%;
+        height: 250px;
         padding: 1.5rem;
         background-color: #FFE299;
         border-radius: 8px;
@@ -209,5 +214,154 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
     .finish_message:hover {
         background-color: #6f6f6f; 
     }
+
+
+// 1024px-1439px 桌機/大平板
+@media (max-width: 1439px) {
+    .contenter {
+        max-width: 1000px;
+        gap: 30px;
+        margin: 30px auto;
+    }
+    
+    h1 {
+        font-size: 42px;
+        margin-left: 8%;
+    }
+}
+
+// 768px-1023px 平板直立
+@media (max-width: 1023px) {
+    .contenter {
+        flex-direction: column;
+        max-width: 700px;
+        gap: 30px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+    
+    h1 {
+        font-size: 36px;
+        margin-left: 0;
+        text-align: center;
+    }
+    
+    .left-layout, .right-layout {
+        width: 100%;
+    }
+    
+    .left-layout {
+        order: 1;
+    }
+    
+    .right-layout {
+        order: 2;
+    }
+    
+    .color_list, .sticker_list {
+        justify-content: center;
+    }
+}
+
+// 480px-767px 手機橫向
+@media (max-width: 767px) {
+    .wrapper {
+        padding: 0 15px;
+    }
+    
+    .contenter {
+        margin: 15px auto;
+        padding: 0 10px;
+    }
+    
+    h1 {
+        font-size: 28px;
+        margin-left: 0;
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .left-layout h4 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .color_list, .sticker_list {
+        gap: 8px;
+    }
+    
+    .sticker_list img {
+        width: calc(35px * 1.5);
+    }
+    
+    .preview {
+        height: 200px;
+        padding: 1rem;
+    }
+    
+    .preview p {
+        font-size: 1rem;
+    }
+    
+    textarea {
+        font-size: 1rem;
+        padding: 12px;
+    }
+    
+    .button-area {
+        flex-direction: column;
+        align-self: stretch;
+        gap: 12px;
+    }
+    
+    .btn {
+        padding: 14px 20px;
+        width: 100%;
+    }
+}
+
+// 320px-479px 手機直立
+@media (max-width: 479px) {
+    h1 {
+        font-size: 24px;
+        margin-top: 15px;
+    }
+    
+    .contenter {
+        gap: 20px;
+        margin: 10px auto;
+    }
+    
+    .left-layout h4 {
+        font-size: 1.2rem;
+    }
+    
+    .color_list, .sticker_list {
+        gap: 6px;
+    }
+    
+    .sticker_list img {
+        width: calc(30px * 1.5);
+    }
+    
+    .statement p {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+    
+    .preview {
+        height: 150px;
+        padding: 0.8rem;
+    }
+    
+    .preview p {
+        font-size: 0.9rem;
+    }
+    
+    textarea {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+}
 
 </style>

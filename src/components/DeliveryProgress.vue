@@ -174,4 +174,19 @@ import DeliveryStatusLine from '../components/DeliveryStatusLine.vue';
   }
 }
  
+  @media (max-width: 600px) {
+    .tab__label i {
+      font-size: 16px;
+    }
+
+  }
+
+   @media (max-width: 460px) {
+    .tab__content p {
+      line-height: 1.2;
+    }
+   }
+
+
+
 </style>
