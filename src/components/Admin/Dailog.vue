@@ -138,8 +138,8 @@ select {
 }
 .form-button-group {
   display: flex;
-  justify-content: center; /* 讓按鈕們整體置中 */
-  gap: 20px; /* 按鈕之間間距 */
+  justify-content: center; 
+  gap: 20px; 
   margin-top: 30px;
 }
 .form-button-group button {
