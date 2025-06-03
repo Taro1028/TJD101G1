@@ -30,9 +30,9 @@ const meats = [
 
 // 本地選取資料
 const localSelected = ref([...props.modelValue])
-
 const router = useRouter()
-// 計算是否可下一步
+
+// 判斷符合 下一步 條件
 const canProceed = computed(() => localSelected.value.length === 2)
 
 // 雙向綁定 v-model
@@ -91,14 +91,14 @@ function goNext() {
         <div class="headline">
             <div class="title-btn">
                 <h1>自由搭配<span class="decorate"></span></h1>
-                <a class="mobile" href="#">回主選單</a>
+                <router-link to="/Order" class="mobile">回主選單</router-link>
             </div>
             <ul class="step">
                 <li class="finish"><span class="finishspan">1</span>選擇主菜</li>
                 <li><span>2</span>選擇副菜</li>
                 <li><span>3</span>確認菜單</li>
             </ul>
-            <a class="desktop" href="#">回主選單</a>
+            <router-link to="/Order" class="desktop">回主選單</router-link>
         </div>
         <div class="operate">
             <h3>主菜 4 選 2</h3>
@@ -120,11 +120,13 @@ function goNext() {
                         </button>
                     </div>
                 </div>
-                <img class="mainbox" src="../assets/images/Order/mainbox1.png" alt="mainbox">
+                <img class="mainbox" src="../assets/images/Order/mainbox1.png" alt="mainbox1">
             </div>
             <div class="btnblock">
                 <button class="btn-1">上一步</button>
-                <button class="btn-2" :disabled="!canProceed" @click="goNext">下一步
+                <button class="btn-2" 
+                        :disabled="!canProceed" 
+                        @click="goNext">下一步
                 </button>
             </div>
         </div>
@@ -177,7 +179,7 @@ h1 {
 }
 
 .step .finish {
-    color: $neutral_700;
+    color: $neutral_black;
 }
 
 .step span {
@@ -194,7 +196,7 @@ h1 {
 }
 
 .step .finishspan {
-    background-color: $neutral_700;
+    background-color: $neutral_black;
 }
 
 .headline a {

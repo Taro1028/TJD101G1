@@ -1,6 +1,7 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 onMounted(() => {
   document.body.classList.add('custom-bg')
@@ -10,17 +11,29 @@ onUnmounted(() => {
   document.body.classList.remove('custom-bg')
 })
 
+const router = useRouter()
+
+function goNext() {
+//   if (!canProceed.value) return
+
+//   // 把資料存在 localStorage（或改用 pinia）
+//   localStorage.setItem('selectedDishes', JSON.stringify(selectedDishes.value))
+
+  // 導向下一頁
+  router.push('/Check_OrderInfo')
+}
+
 </script>
 <template>
 <FrontLayout>
     <div class="wrapper">
         <div class="messageCard">
             <img src="../assets/images/Order/cart_bag.svg" alt="">
-            <h3>已加入購物車</h3>
-            <h5>您訂購的餐點已添加至購物車</h5>
+            <h3>預約訂餐成功</h3>
+            <h5>您預約的餐點已添加至購物車</h5>
             <div class="btnblock">
-            <button class="btn-1">繼續訂餐</button>
-            <button class="btn-2">前往結帳</button>
+            <router-link to="/Order" class="btn-1">繼續訂餐</router-link>
+            <button class="btn-2" @click="goNext">前往結帳</button>
             </div>
         </div>
     </div>
@@ -74,7 +87,7 @@ h5{
     border-radius: 24px;
     border: 2px solid $neutral_300;
     transition: 0.3s ease;
-
+    text-decoration: none;
 
     &:hover{
     background-color: transparent;

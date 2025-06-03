@@ -16,7 +16,7 @@ onUnmounted(() => {
     <div class="wrapper">
         <div class="shop">
             <img src="../assets/images/Order/cart_bag.svg" alt="">
-            <h2>TibaEAT | 購物車</h2>
+            <h2>Tiba<span class="eat">EAT</span> | 購物車</h2>
         </div>
     <ul class="step">
         <li class="finish"><span class="finishspan">1</span>訂單資料</li>
@@ -40,7 +40,7 @@ onUnmounted(() => {
             </div>
             <div class="btnblock">
             <button class="btn-1">查看訂單</button>
-            <button class="btn-2">繼續購物</button>
+            <router-link to="/Order" class="btn-2">繼續訂餐</router-link>
             </div>
         </div>
         <div class="slogan">
@@ -83,6 +83,10 @@ background-image: url(../assets/images/Order/background.svg);
     font-weight: bold;
 }
 
+.eat{
+  color: $primary_600;
+}
+
 .step {
     margin-top: 20px;
     display: flex;
@@ -115,14 +119,14 @@ background-image: url(../assets/images/Order/background.svg);
 }
 
 .step .finishspan {
-    background-color: $neutral_black;
+    background-color: $success_400;
 }
 
 .orderpaper{
     margin: 40px auto;
     width: 520px;
     padding: 32px 40px;
-    background-color: $primary_50;
+    background-color: $neutral_white;
     display: flex;
     flex-direction: column;
     gap: 64px;
@@ -149,7 +153,7 @@ background-image: url(../assets/images/Order/background.svg);
 
 .title i{
     font-size: $font_h1;
-    color: $success_400;
+    color: $primary_400;
 }
 
 h4{
@@ -197,11 +201,10 @@ h4{
     border-radius: 24px;
     border: 2px solid $neutral_black;
     transition: 0.3s ease;
-
+    text-decoration: none;
 
     &:hover{
     background-color: transparent;
-    transition: 0.3s ease;
     color: $neutral_black;
     }
 }
@@ -274,9 +277,8 @@ h4{
 }
 
 .orderpaper{
-    width: 320px;
-    margin: 20px;
-    padding: 20px;
+    width: 310px;
+    padding: 16px;
     gap: 20px;
 }
 

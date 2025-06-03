@@ -2,6 +2,7 @@
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
 import Popup from '@/components/Popup_SelectConsignee.vue'
+import { useRouter } from 'vue-router'
 
 onMounted(() => {
   document.body.classList.add('custom-bg')
@@ -11,7 +12,7 @@ onUnmounted(() => {
   document.body.classList.remove('custom-bg')
 })
 
-// Popup - OrderLeave
+// Popup - SelectConsignee
 const showPopup = ref(false)
 
 function openPopup() {
@@ -22,13 +23,28 @@ function closePopup() {
   showPopup.value = false
 }
 
+const router = useRouter()
+
+// 上一步--訂單資料
+function goPrev(){
+    router.push('/Check_OrderInfo')
+}
+
+// 下一步--結帳
+function goNext() {
+    // if (!canProceed.value) return
+    // localStorage.setItem('selectedSideDishes', JSON.stringify(selectedDishes.value))
+    router.push('/Check_Complete')
+
+}
+
 </script>
 <template>
 <FrontLayout>
     <div class="wrapper">
         <div class="shop">
             <img src="../assets/images/Order/cart_bag.svg" alt="">
-            <h2>TibaEAT | 購物車</h2>
+            <h2>Tiba<span class="eat">EAT</span> | 購物車</h2>
         </div>
         <ul class="step">
             <li class="finish"><span class="finishspan">1</span>訂單資料</li>
@@ -115,6 +131,10 @@ function closePopup() {
                     <h5 class="title">結帳明細</h5>
                     <div class="paymentblock">
                         <div class="payItem">
+                            <h6>訂單項目</h6>
+                            <h6>自由搭配 + 小卡</h6>
+                        </div>
+                        <div class="payItem">
                             <h6>餐盒數總計</h6>
                             <h6>50 份餐盒</h6>
                         </div>
@@ -142,8 +162,8 @@ function closePopup() {
                 </div>
                 </div>
                 <div class="btnblock">
-                    <button class="btn-1">上一步</button>
-                    <button class="btn-2">結帳</button>
+                    <button class="btn-1" @click="goPrev">上一步</button>
+                    <button class="btn-2" @click="goNext">結帳</button>
                 </div>
             </div>
         </div>
@@ -182,6 +202,10 @@ background-image: url(../assets/images/Order/background.svg);
     font-weight: bold;
 }
 
+.eat{
+  color: $primary_600;
+}
+
 .step {
     margin-top: 20px;
     display: flex;
@@ -214,7 +238,7 @@ background-image: url(../assets/images/Order/background.svg);
 }
 
 .step .finishspan {
-    background-color: $neutral_black;
+    background-color: $success_400;
 }
 
 // 資訊區塊
@@ -268,11 +292,16 @@ background-image: url(../assets/images/Order/background.svg);
 
 .checkedItem{
     display: flex;
-    gap: 20px;
+    gap: 12px;
 
     &:hover{
         cursor: pointer;
     }
+}
+
+input[type="checkbox"],
+input[type="radio"]{
+    cursor: pointer;
 }
 
 .txtItem h6,
@@ -357,7 +386,6 @@ background-image: url(../assets/images/Order/background.svg);
 
 }
 
-
 .total span{
     display: block;
     font-size: $font_h5;
@@ -365,12 +393,13 @@ background-image: url(../assets/images/Order/background.svg);
     color: $primary_600;
 }
 
-
-
-
 .paymentnotice a{
     text-decoration: none;
     color: $point_700;
+
+    &:hover{
+        text-decoration: underline;
+    }
 }
 
 .btnblock{
@@ -390,7 +419,6 @@ background-image: url(../assets/images/Order/background.svg);
 
     &:hover{
     background-color: transparent;
-    transition: 0.3s ease;
     color: $neutral_black;
     }
 }
@@ -404,7 +432,6 @@ background-image: url(../assets/images/Order/background.svg);
     border: 2px solid $neutral_black;
     transition: 0.3s ease;
 
-
     &:hover{
     background-color: transparent;
     transition: 0.3s ease;
@@ -412,7 +439,7 @@ background-image: url(../assets/images/Order/background.svg);
     }
 }
 
-
+//  ---RWD---
 @media screen and (max-width: 950px){
 .wrapper{
     width: 780px;

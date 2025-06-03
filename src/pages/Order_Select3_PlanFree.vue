@@ -1,6 +1,10 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
+import Message from '@/components/Popup_MessageCard.vue'
+
 
 // 背景圖
 onMounted(() => {
@@ -10,17 +14,37 @@ onMounted(() => {
 onUnmounted(() => {
     document.body.classList.remove('custom-bg')
 })
+
+const router = useRouter()
+
+
+// Popup
+const showPopup = ref(null)
+
+function openPopup(value) {
+    showPopup.value = value
+}
+
+function closePopup() {
+    showPopup.value = null
+}
 </script>
 <template>
     <FrontLayout>
         <div class="headline">
-            <h1>自由搭配<span class="decorate"></span></h1>
+            <div class="title-btn">
+                <h1>自由搭配<span class="decorate"></span></h1>
+                <div><a class="mobile" @click="openPopup('leave')">回主選單</a>
+                <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" />
+                </div>
+            </div>
             <ul class="step">
                 <li class="finish"><span class="finishspan">1</span>選擇主菜</li>
                 <li class="finish"><span class="finishspan">2</span>選擇副菜</li>
                 <li class="finish"><span class="finishspan">3</span>確認菜單</li>
             </ul>
-            <a href="#">回主選單</a>
+            <a class="desktop" @click="openPopup('leave')">回主選單</a>
+            <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" />
         </div>
         <div class="operate">
             <div class="menubox">
@@ -161,7 +185,10 @@ onUnmounted(() => {
                 <img src="../assets/images/Order/box-complete.png" alt="">
                 <div class="btnblock">
                     <button class="btn-1">上一步</button>
-                    <button class="btn-2">訂購餐點</button>
+                    <div>
+                        <button class="btn-2" @click="openPopup('message')">訂購餐點</button>
+                        <Message v-if="showPopup === 'message'" @close="closePopup" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -249,6 +276,14 @@ h1 {
         border: 1px solid $neutral_700;
         transition: 0.3s ease;
     }
+}
+
+.desktop {
+    display: block;
+}
+
+.headline .mobile {
+    display: none;
 }
 
 // 操作區
@@ -426,6 +461,134 @@ h1 {
 
 // --- RWD ---
 @media screen and (max-width: 1200px) {
+.headline {
+    width: 800px;
+    flex-direction: column;
+    align-items: start;
+    gap: 40px;
+}
+
+.title-btn {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.headline .mobile {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
 
 }
+
+.headline .desktop {
+    display: none;
+}
+
+.step {
+    align-self: center;
+    gap: 16px;
+}
+
+.operate {
+    width: 800px;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+}
+
+.image-btn{
+    gap: 40px;
+    align-items: center;
+}
+
+}
+
+@media screen and (max-width: 850px) {
+.headline {
+    width: 520px;
+}
+
+.step li {
+    font-size: $font_h4;
+}
+
+.step span {
+    font-size: $font_h6;
+    margin-right: 8px;
+    line-height: 16px;
+    width: 20px;
+    height: 20px;
+}
+
+.operate{
+    width: 520px;
+}
+
+.menubox{
+    width: 460px;
+}
+
+}
+
+@media screen and (max-width: 550px){
+.headline,
+.operate{
+    width: 340px;
+}
+
+h1 {
+    font-size: $font_h3;
+}
+
+.decorate {
+    width: 60px;
+    height: 60px;
+}
+
+.step {
+    gap: 8px;
+}
+
+.step li {
+    font-size: $font_h5;
+}
+
+.step span {
+    font-size: $font_h6;
+    margin-right: 8px;
+    line-height: 16px;
+    width: 20px;
+    height: 20px;
+}
+
+h3 {
+    font-size: $font_h4;
+}
+
+.operate {
+    width: 340px;
+}
+
+.menubox{
+    width: 312px;
+    padding: 16px;
+}
+
+.title h5{
+    font-size: $font_h6;
+}
+
+.item{
+    flex-direction: column;
+    align-items: start;
+}
+
+.image-btn img{
+    width: 160px;
+    height: 160px;
+}
+
+}
+
 </style>

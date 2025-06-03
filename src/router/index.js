@@ -48,7 +48,7 @@ const routes = [
     path: "/Order/Select1_PlanFree",
     component: () => import("@/pages/Order_Select1_PlanFree.vue"),
     meta: {
-      title: "為你搭配 - TibaEAT 提膳家",
+      title: "自由搭配 - TibaEAT 提膳家",
       requiredLogin: true,
     },
   },
@@ -70,7 +70,7 @@ const routes = [
   },
   {
     path: '/Order/Loading',
-    component: () => import('@/pages/Order_PageLoading.vue'),
+    component: () => import('@/pages/Order_Loading.vue'),
     meta: {
       title: '隨機產生 - TibaEAT 提膳家',
       requiredLogin: true
@@ -85,24 +85,24 @@ const routes = [
     }
   },
   {
-    path: '/Order/Check1_OrderInfo',
-    component: () => import('@/pages/Order_Check1_OrderInfo.vue'),
+    path: '/Check_OrderInfo',
+    component: () => import('@/pages/Check1_OrderInfo.vue'),
     meta: {
       title: '訂單資料 - TibaEAT 提膳家',
       requiredLogin: true
     }
   },
   {
-    path: '/Order/Check2_PaymentInfo',
-    component: () => import('@/pages/Order_Check2_PaymentInfo.vue'),
+    path: '/Check_PaymentInfo',
+    component: () => import('@/pages/Check2_PaymentInfo.vue'),
     meta: {
       title: '付款資料 - TibaEAT 提膳家',
       requiredLogin: true
     }
   },
   {
-    path: '/Order/Check3_Complete',
-    component: () => import('@/pages/Order_Check3_Complete.vue'),
+    path: '/Check_Complete',
+    component: () => import('@/pages/Check3_Complete.vue'),
     meta: {
       title: '完成訂單 - TibaEAT 提膳家',
       requiredLogin: true
