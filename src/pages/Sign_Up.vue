@@ -63,7 +63,7 @@
             />
           </div>
           <div>
-           <RouterLink to="/Login" class="longin-link">已經有帳號？點我登入</RouterLink>
+           <RouterLink to="/Member" class="longin-link">已經有帳號？點我登入</RouterLink>
           </div>
 
 
