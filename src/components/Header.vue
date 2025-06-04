@@ -89,6 +89,13 @@ onBeforeUnmount(() => {
 </template>
 
 
+<style>
+html, body{
+  overflow-x: hidden;
+}
+
+</style>
+
 <style scoped lang="scss">
 header {
   max-width: 100%;
@@ -185,13 +192,13 @@ header a .img {
   }
 
   &.active span:nth-child(1) {
-    transform: rotate(-45deg) translate(-9px, 2px);
+    transform: rotate(-45deg) translate(-9px, 3px);
   }
   &.active span:nth-child(2) {
     opacity: 0;
   }
   &.active span:nth-child(3) {
-    transform: rotate(45deg) translate(-9px, -3px);
+    transform: rotate(45deg) translate(-9px, -4px);
   }
 }
 
@@ -220,7 +227,7 @@ header a .img {
   }
 
   .nav-wrapper {
-    position: absolute;
+    position: fixed;
     top: 60px;
     right: 0;
     width: 260px;
