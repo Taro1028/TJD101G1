@@ -152,6 +152,10 @@ function toggleAccordion(index) {
   justify-content: space-between;
   margin: 40px 0px;
 }
+.box {//[data-v-5aae0fb5]
+  width: 45%; 
+  margin-bottom: 30px; 
+}
 
 .ss1 {
   // border: 1px solid red;
@@ -210,18 +214,14 @@ function toggleAccordion(index) {
 }
 
 .ingredients.open {
-  max-height: 100px; // 根據你內容長度調整
+  max-height: 100px; 
   opacity: 1;
 }
 
 .box {
   // border: 1px solid blue;
-  width: 40%;
+  width: 45%;
   display: flex;
-  // padding: 20px 20px 20px 20px;
-  // margin: 0 auto;
-  // margin-left: 10px;
-  // flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-bottom: 24px;
@@ -268,20 +268,36 @@ function toggleAccordion(index) {
 }
 // ===================RWD=====================
 @media (max-width: 1220px) {
-  .s1{
+  .s1 {
     padding: 0px 30px;
   }
-  .b{
+  .b {
     padding: 0px 30px;
   }
-  
-.box{
-  padding: 0px 30px;
-}
-}
 
+  .box {
+    padding: 0px 30px;
+  }
+}
+@media (max-width: 1200px) {
+  .s1 {
+    padding: 0px 30px;
+  }
+  .b {
+    padding: 0px 30px;
+  }
+
+  .box {//[data-v-5aae0fb5][data-v-5aae0fb5]
+    display: flex;
+    width: 42%;
+    margin-bottom: 30px;
+  }
+}
 
 @media (max-width: 1100px) {
+  .s1 {
+    padding: 0;
+  }
   .s1 h3 {
     justify-content: center;
     font-size: $font_h3;
@@ -296,6 +312,8 @@ function toggleAccordion(index) {
   .box {
     display: flex;
     // flex-direction: column;
+    width: 43%;
+    margin-bottom: 30px;
   }
   .box > img {
     margin: 0 auto;
@@ -303,46 +321,62 @@ function toggleAccordion(index) {
     margin-right: 30px;
   }
 }
-@media (max-width: 933px) {
-  .s1{
-    padding: 0px 30px;
-  }
-  .b{
-    padding: 0px 30px;
-    margin-right: 50px;
-  }
-  
-.box{
-  padding: 0px 30px;
-  
-}
-.ss1 p{
-  padding:0;
-}
 
-}
-@media (max-width: 933px) {
-  .box-wrap {
-    flex-direction: column;
-    align-items: center;
+
+
+// @media (max-width: 933px) {
+//   .box-wrap {
+//     // flex-direction: column;
+//     align-items: center;
+//   }
+
+//   .box{//[data-v-5aae0fb5][data-v-5aae0fb5] 
+//     width: 43%;
+//     margin-bottom: 30px;
+//   }
+
+//   .box > img {
+//     margin-right: 20px;
+//   }
+
+//   .box h5{//[data-v-5aae0fb5] 
+//     font-size: 1.25rem;
+//     margin: 10px 0px 20px 0px;
+//     text-align: center;
+//   }
+// }
+
+@media (max-width: 860px) {
+  .box { //[data-v-5aae0fb5][data-v-5aae0fb5]
+    width: 42%;
+    margin-bottom: 30px;
+  }
+  // .inf {
+  //   width: 100%;
+  // }
+  .ss1 img {
+    width: 80%;
   }
 
+  .ss1 p[data-v-5aae0fb5] {
+    padding: 0px 20px 0px 20px;
+  }
+}
+@media (max-width: 857px) {
+  .box >img{
+    width:40%;
+  }
+}
+@media (max-width: 810px) {
   .box {
-    width: 50%;
-    margin: 0 auto 20px;
     flex-direction: column;
   }
   .box > img {
     margin: 0;
   }
-  .inf {
-    width: 100%;
-  }
-  .ss1 img {
-    width: 80%;
-  }
 }
-@media (max-width: 500px) {
+
+@media (max-width: 750px) {
   .box {
     width: 90%;
     margin: 0 auto 20px;
@@ -350,7 +384,19 @@ function toggleAccordion(index) {
   }
 }
 
+// @media (max-width: 500px) {
+//   .box {
+//     width: 90%;
+//     margin: 0 auto 20px;
+//     flex-direction: column;
+//   }
+// }
+
 @media (max-width: 415px) {
+  .box {
+    width: 70%;
+    margin-bottom: 30px;
+  }
   .b {
     padding-right: 0;
   }
