@@ -2,47 +2,68 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from 'vue-router';
 
-const showDropdown = ref(false)
+const showDropdown = ref(false);
 const isMobileMenuOpen = ref(false);
-const dropdownRef = ref(null)
+const isMounted = ref(false);
+const isMobile = ref(false);
+const dropdownRef = ref(null);
 
+// 切換關於我們下拉選單
 const toggleDropdown = () => {
-    showDropdown.value = !showDropdown.value;
+  showDropdown.value = !showDropdown.value;
 };
 
+// 切換手機側邊選單
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
   if (!isMobileMenuOpen.value) {
-    showDropdown.value = false; // 關閉下拉
+    showDropdown.value = false;
   }
 };
 
+// 點擊遮罩或外部時收合選單
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false;
   showDropdown.value = false;
 };
 
+// 偵測點擊外部關閉 dropdown & 側邊選單
 const handleClickOutside = (event) => {
-    if (dropdownRef.value && !dropdownRef.value.contains(event.target) && !event.target.closest('.hamburger')) {
-        showDropdown.value = false
-    }
-}
+  const clickedOutsideDropdown =
+    dropdownRef.value &&
+    !dropdownRef.value.contains(event.target) &&
+    !event.target.closest(".hamburger");
 
-if (
+  const clickedOutsideNav =
     isMobileMenuOpen.value &&
-    !event.target.closest('.nav-wrapper') &&
-    !event.target.closest('.hamburger')
-  ) {
-    closeMobileMenu();
+    !event.target.closest(".nav-wrapper") &&
+    !event.target.closest(".hamburger");
+
+  if (clickedOutsideDropdown) {
+    showDropdown.value = false;
   }
 
-onMounted(() => {
-    document.addEventListener('click', handleClickOutside)
-})
-onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside)
-})
+  if (clickedOutsideNav) {
+    closeMobileMenu();
+  }
+};
 
+// 偵測是否為手機寬度
+const checkIsMobile = () => {
+  isMobile.value = window.innerWidth <= 820;
+};
+
+onMounted(() => {
+  isMounted.value = true;
+  checkIsMobile();
+  window.addEventListener("resize", checkIsMobile);
+  document.addEventListener("click", handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", checkIsMobile);
+  document.removeEventListener("click", handleClickOutside);
+});
 </script>
 
 <template>
@@ -61,7 +82,7 @@ onBeforeUnmount(() => {
         @click="closeMobileMenu"
       ></div>
 
-      <nav :class="['nav-wrapper', { open: isMobileMenuOpen }]">
+      <nav class="nav-wrapper" :class="{ open: isMobileMenuOpen }" v-show="!isMobile || isMobileMenuOpen">
         <ul class="header_nav">
             <li><router-link to="/LunchBox">餐盒介紹</router-link></li>
             <li><router-link to="/Order">預約訂餐</router-link></li>
@@ -185,6 +206,7 @@ header a .img {
 
   span {
     display: block;
+    width: 100%;
     height: 4px;
     background: $neutral_black;
     border-radius: 2px;
