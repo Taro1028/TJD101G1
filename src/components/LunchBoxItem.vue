@@ -13,24 +13,30 @@
       </article>
     </section>
 
-    <section>
+    <section class="box-wrap">
       <article v-for="(item, index) in content.item" :key="index" class="box">
         <img :src="item.picture" alt="" />
+        <section class="test">
+          <article>
+            <h5>{{ item.name }}</h5>
+            <!-- <p>功效：</p> -->
+            <p class="inf">{{ item.description }}</p>
 
-        <article>
-          <h5>{{ item.name }}</h5>
-          <p>功效：</p>
-          <p class="inf">{{ item.description }}</p>
-          <article class="toggle" @click="toggleAccordion(index)">
-            <i
-              class="bi"
-              :class="
-                openIndex === index ? 'bi-caret-up-fill' : 'bi-caret-down-fill'
-              "
-            ></i>
+            <!-- <article class="toggle" @click="toggleAccordion(index)">
+              <i
+                class="bi"
+                :class="
+                  openIndex === index
+                    ? 'bi-caret-up-fill'
+                    : 'bi-caret-down-fill'
+                "
+              ></i>
+            </article>
+            <p class="ingredients" :class="{ open: openIndex === index }">
+              {{ item.ingredients }}
+            </p> -->
           </article>
-          <p v-show="openIndex === index" class="ingredients">{{ item.ingredients }}</p>
-        </article>
+        </section>
       </article>
 
       <!-- <article class="box">
@@ -79,11 +85,10 @@
 import { ref } from "vue";
 defineProps(["content", "text"]);
 
-const openIndex = ref(null)
+const openIndex = ref(null);
 function toggleAccordion(index) {
-  openIndex.value = openIndex.value === index ? null : index
+  openIndex.value = openIndex.value === index ? null : index;
 }
-
 
 // const product=ref({
 //     title: '樂活元氣餐',
@@ -122,7 +127,9 @@ function toggleAccordion(index) {
   width: 100%;
   margin: 0 auto;
   overflow-x: hidden;
+  // margin-bottom: 80px;
 }
+
 .s1 {
   width: 100%;
 }
@@ -133,7 +140,17 @@ function toggleAccordion(index) {
   // border: 1px solid blue;
   display: flex;
   margin: 0 auto;
-  padding: 20px 20px 20px 20px;
+  padding: 20px 0px;
+  margin-top: 50px;
+}
+
+.box-wrap {
+  // border: 1px solid red;
+  display: flex;
+  flex-wrap: wrap;
+  // gap: 160px;
+  justify-content: space-between;
+  margin: 40px 0px;
 }
 
 .ss1 {
@@ -154,12 +171,14 @@ function toggleAccordion(index) {
   height: auto;
   max-width: 400px;
   display: block;
-  padding: 0px 20px 0px 20px;
+  // padding: 0px 20px 0px 20px;
+  margin-bottom: 20px;
 }
 
 .ss1 p {
   padding: 0px 20px 0px 20px;
   font-size: $font_h5;
+  margin-bottom: 10px;
 }
 
 .b {
@@ -182,19 +201,45 @@ function toggleAccordion(index) {
   margin-right: 20px;
 }
 
+//
+.ingredients {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+.ingredients.open {
+  max-height: 100px; // 根據你內容長度調整
+  opacity: 1;
+}
+
 .box {
+  // border: 1px solid blue;
+  width: 40%;
   display: flex;
-  padding: 20px 20px 20px 20px;
+  // padding: 20px 20px 20px 20px;
+  // margin: 0 auto;
+  // margin-left: 10px;
+  // flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
 .box h5 {
   font-size: $font_h5;
+  margin: 20px 0px 20px 0px;
+  text-align: center;
 }
 .box > img {
   width: 200px;
   height: auto;
-  padding-right: 20px;
+  margin-right: 50px;
+  // margin-right: 20px;
+
   object-fit: contain;
+  border-radius: 8px;
 }
 
 .inf {
@@ -208,18 +253,35 @@ function toggleAccordion(index) {
   align-items: center;
   cursor: pointer;
 }
-.ingredients{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.ingredients {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .bi {
   color: $primary_600;
   font-size: 25px;
 }
 
+.test {
+  display: flex;
+}
 // ===================RWD=====================
-@media (max-width: 820px) {
+@media (max-width: 1220px) {
+  .s1{
+    padding: 0px 30px;
+  }
+  .b{
+    padding: 0px 30px;
+  }
+  
+.box{
+  padding: 0px 30px;
+}
+}
+
+
+@media (max-width: 1100px) {
   .s1 h3 {
     justify-content: center;
     font-size: $font_h3;
@@ -233,16 +295,58 @@ function toggleAccordion(index) {
 
   .box {
     display: flex;
-    flex-direction: column;
+    // flex-direction: column;
   }
   .box > img {
     margin: 0 auto;
+    margin-bottom: 20px;
+    margin-right: 30px;
   }
 }
+@media (max-width: 933px) {
+  .s1{
+    padding: 0px 30px;
+  }
+  .b{
+    padding: 0px 30px;
+    margin-right: 50px;
+  }
+  
+.box{
+  padding: 0px 30px;
+  
+}
+.ss1 p{
+  padding:0;
+}
 
-@media (max-width: 545px) {
+}
+@media (max-width: 933px) {
+  .box-wrap {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .box {
+    width: 50%;
+    margin: 0 auto 20px;
+    flex-direction: column;
+  }
+  .box > img {
+    margin: 0;
+  }
+  .inf {
+    width: 100%;
+  }
   .ss1 img {
     width: 80%;
+  }
+}
+@media (max-width: 500px) {
+  .box {
+    width: 90%;
+    margin: 0 auto 20px;
+    flex-direction: column;
   }
 }
 

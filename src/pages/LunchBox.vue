@@ -11,14 +11,15 @@
         {{ item }}
       </button>
     </div>
-
-    <LunchBoxItem
-      v-for="(item, index) in totalProduct"
-      :key="index"
-      :content="item"
-      :text="btext"
-    >
-    </LunchBoxItem>
+    <div class="outwrap">
+      <LunchBoxItem
+        v-for="(item, index) in totalProduct"
+        :key="index"
+        :content="item"
+        :text="btext"
+      >
+      </LunchBoxItem>
+    </div>
     <Gotop></Gotop>
   </FrontLayout>
 </template>
@@ -265,6 +266,10 @@ const totalProduct = ref([
 </script>
 
 <style scoped lang="scss">
+
+.outwrap{
+  margin-bottom: 80px;
+}
 img {
   width: 100%;
 }
