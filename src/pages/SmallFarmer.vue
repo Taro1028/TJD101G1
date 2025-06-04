@@ -61,13 +61,13 @@ onMounted(() => {
   const defaultStyle = {
     color: '#fbedca',
     weight: 1,
-    fillOpacity: 0.4
+    fillOpacity: 0.5
   };
 
   const hoverStyle = {
     color: '#cf6610',
     weight: 2,
-    fillOpacity: 0.7
+    fillOpacity: 1
   };
 
   function onEachFeature(feature, layer) {
@@ -77,8 +77,8 @@ onMounted(() => {
     if (data) {
       const popupHTML = `
         <div style="width: 220px; text-align: center;">
-          <h4 style="margin: 0 0 6px; font-size: 16px; color: #cf6610;">${data.title}</h4>
-          <img src="${data.image}" alt="${data.title}" style="width: 140px; height: 140px; border-radius: 4px;" />
+          <h4 style="margin: 0 0 6px; font-size: 16px;">${data.title}</h4>
+          <img src="${data.image}" alt="${data.title}" style="width: 160px; height: 160px; border-radius: 4px;" />
           <p style="font-size: 14px; margin: 10px 0;">${data.content}</p>
           <a class="go-to-lunchbox" href="${data.link}" style="
             padding: 6px 12px;
