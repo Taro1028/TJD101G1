@@ -76,6 +76,14 @@ const routes = [
       requiredLogin: true
     }
   },
+   {
+    path: '/Order/MessageCards',
+    component: () => import('@/pages/MessageCards.vue'),
+    meta: {
+      title: '編輯留言小卡 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
   {
     path: '/Order/AddCart',
     component: () => import('@/pages/Order_AddCart.vue'),
@@ -188,10 +196,6 @@ const routes = [
       requiredLogin: false
     }
   },
-{
-  path: '/MessageCards',
-  component: () => import('@/pages/MessageCards.vue'),
-},
 {
   path: '/MemberCenter/MyCards',
   component: () => import('@/pages/MyCards.vue'),

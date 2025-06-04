@@ -265,7 +265,7 @@
                                         <h4>2025/03/25</h4>
                                         </div>
                                         <div class="btn-wrapper">
-                                        <button class="view-btn" @click="openLightbox('/tjd101/g1/images/Member/card_5.jpg')">View</button>
+                                        <button class="view-btn" @click="openLightbox('/tjd101/g1/images/Member/card_6.jpg')">View</button>
                                         </div>
                                     </div>
                                 </div>
