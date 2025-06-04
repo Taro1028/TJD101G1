@@ -262,7 +262,7 @@ h1 {
     padding: 12px 24px;
     border-radius: 24px;
     transition: 0.3s ease;
-
+    cursor: pointer;
 
     &:hover {
         background-color: transparent;
@@ -325,6 +325,7 @@ h1 {
     border-radius: 8px;
     border: 1px solid $neutral_300;
     background-color: $primary_50;
+    cursor: pointer;
 }
 
 .current {
@@ -595,6 +596,15 @@ h1 {
     .decorate {
         width: 60px;
         height: 60px;
+    }
+
+    .total_option-btn{
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .option-btn{
+        justify-content: center;
     }
 }
 </style>

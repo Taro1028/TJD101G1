@@ -102,7 +102,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
 
 .newstag {
     display: inline-block;
-    width: 97px;
+    width:fit-content;
     font-size: $font_h5;
     font-weight: normal;
     color: $primary_950;
@@ -177,7 +177,6 @@ h5 {
     }    
 
     .newstag{
-    width: 80px;
     font-size: $font_h6;
     }
 

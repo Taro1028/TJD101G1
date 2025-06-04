@@ -1,6 +1,7 @@
 <script setup>
-// import { computed } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+
 
 const router = useRouter()
 
@@ -21,10 +22,19 @@ function goNext() {
   router.push('/Check_OrderInfo')
 }
 
+// 防止背景滾動
+onMounted(() => {
+  document.body.style.overflow = 'hidden'
+})
+
+onUnmounted(() => {
+  document.body.style.overflow = ''
+})
+
 </script>
 <template>
-<div class="overlay">
-    <div class="shopCart">
+<div class="overlay" @click="closePopup">
+    <div class="shopCart" @click.stop>
         <button class="closebtn"  @click="closePopup"><i class="bi bi-x-circle"></i></button>
         <div class="orderitem">
             <div class="title"><h3>購物車</h3></div>
@@ -53,9 +63,10 @@ function goNext() {
 </template>
 
 <style scoped lang="scss">
+
 .overlay{
     position: fixed;
-    top: 60px;
+    top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
@@ -78,7 +89,7 @@ function goNext() {
     gap: 64px;
     align-items: center;
     position: fixed;
-    top: 60px;
+    top: 0;
     right: 0;
 }
 

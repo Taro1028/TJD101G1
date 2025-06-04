@@ -14,6 +14,16 @@ function goNext() {
   router.push('/Order/AddCart')
 }
 
+function goMessage() {
+//   if (!canProceed.value) return
+
+//   // 把資料存在 localStorage（或改用 pinia）
+//   localStorage.setItem('selectedDishes', JSON.stringify(selectedDishes.value))
+
+  // 導向下一頁
+  router.push('/Order/MessageCards')
+}
+
 </script>
 <template>
 <div class="overlay">
@@ -23,7 +33,7 @@ function goNext() {
         <h5>會與配送餐點一併送達</h5>
         <div class="btnblock">
         <button class="btn-1" @click="goNext">不用，謝謝</button>
-        <button class="btn-2">我要留言</button>
+        <button class="btn-2" @click="goMessage">我要留言</button>
         </div>
     </div>
 </div>

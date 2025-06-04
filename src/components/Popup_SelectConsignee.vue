@@ -13,43 +13,43 @@ function closePopup() {
             <button class="closebtn" @click="closePopup"><i class="bi bi-x-circle"></i></button>
             <div class="consigneelist">
                 <div class="item">
-                    <div class="itemblock">
-                        <input class="radio" type="radio" checked>
+                    <label class="itemblock">
+                        <input class="radio" type="radio" checked name="select">
                         <div class="iteminfo">
                             <div class="name">林榮傑</div>
                             <div class="phone">(+886) 0987-078-587</div>
                             <div class="addr">104 臺北市中山區南京東路三段</div>
                         </div>
-                    </div>
+                    </label>
                     <button class="del"><i class="bi bi-trash3"></i></button>
                 </div>
                 <div class="item">
-                    <div class="itemblock">
-                        <input class="radio" type="radio">
+                    <label class="itemblock">
+                        <input class="radio" type="radio" name="select">
                         <div class="iteminfo">
                             <div class="name">王淑華</div>
                             <div class="phone">(+886) 0987-123-456</div>
                             <div class="addr">104 臺北市中山區南京東路三段</div>
                         </div>
-                    </div>
+                    </label>
                     <button class="del"><i class="bi bi-trash3"></i></button>
                 </div>
                 <div class="item">
-                    <div class="itemblock">
-                        <input class="radio" type="radio">
+                    <label class="itemblock">
+                        <input class="radio" type="radio" name="select">
                         <div class="iteminfo">
                             <div class="name">陳冠傑</div>
                             <div class="phone">(+886) 0987-888-997</div>
                             <div class="addr">104 臺北市中山區南京東路三段</div>
                         </div>
-                    </div>
+                    </label>
                     <button class="del"><i class="bi bi-trash3"></i></button>
                 </div>
                 <div class="item">
-                    <div class="addinfo">
-                        <button><i class="bi bi-plus-circle"></i></button>
-                        <button><p>新增常用收貨人</p></button>
-                    </div>
+                    <button class="addinfo">
+                        <i class="bi bi-plus-circle"></i>
+                        <p>新增常用收貨人</p>
+                    </button>
                 </div>
             </div>
         </div>
@@ -138,14 +138,13 @@ function closePopup() {
     display: flex;
     gap: 12px;
     align-items: center;
+    cursor: pointer;
 }
 
 .radio{
     width: 20px;
     height: 20px;
 }
-
-
 
 .iteminfo{
     display: flex;
@@ -165,6 +164,7 @@ function closePopup() {
 .del{
     background-color: transparent;
     border: none;
+    cursor: pointer;
 }
 
 .del i{
@@ -176,14 +176,13 @@ function closePopup() {
     padding: 8px 0;
     display: flex;
     gap: 12px;
-}
-
-.addinfo button{
+    align-items: center;
     background-color: transparent;
     height: 40px;
     border: none;
     padding: 0;
     color:$primary_600;
+    cursor: pointer;
 }
 
 .addinfo i{

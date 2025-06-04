@@ -2,6 +2,8 @@
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import Carousel from '../components/Carousel.vue'
 import Marquree from '../components/Marquee.vue'
+// import Marquree from '../components/TestMarquee.vue'
+
 
 </script>
 
