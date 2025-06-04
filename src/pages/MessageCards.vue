@@ -2,6 +2,21 @@
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import Gotop from "../components/Gotop.vue"
 
+// import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+function goNext() {
+//   if (!canProceed.value) return
+
+//   // 把資料存在 localStorage（或改用 pinia）
+//   localStorage.setItem('selectedDishes', JSON.stringify(selectedDishes.value))
+
+  // 導向下一頁
+  router.push('/Order/AddCart')
+}
+
+
 </script>
 
 <template>
@@ -56,8 +71,8 @@ import Gotop from "../components/Gotop.vue"
                         <textarea name="text" id="text" cols="30" rows="10" placeholder="請輸入卡片內容"></textarea>
                     </div>
                     <div class="button-area">
-                        <button class="btn no_message">不留言，繼續結帳</button>
-                        <button class="btn finish_message">完成留言</button>
+                        <button class="btn no_message" @click="goNext">不留言，繼續結帳</button>
+                        <button class="btn finish_message" @click="goNext">完成留言</button>
                     </div>
                 </div>
             </div>
