@@ -1,92 +1,87 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
-import { onMounted, onUnmounted, ref } from 'vue'
-// import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
-import Cart from '@/components/Drawer_Cart.vue'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import 'swiper/css'
+import { onMounted, onUnmounted, computed, ref } from 'vue'
+import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
 import LunchBox from '@/components/Popup_LunchBoxDetails.vue'
+import { useOrderStore } from '@/stores/orderStore.js';
+import dayjs from 'dayjs';
+import 'dayjs/locale/zh-tw';
+dayjs.locale('zh-tw');
 
 // 背景圖
 onMounted(() => {
     document.body.classList.add('custom-bg')
 })
-
 onUnmounted(() => {
     document.body.classList.remove('custom-bg')
 })
 
 // swiper 套件
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import 'swiper/css'
-
 const swiperOptions = {
     slidesPerView: 'auto',
     freeMode: true,
 }
 
+// Pinia 資料
+const orderStore = useOrderStore();
+const deliveryDates = computed(() => orderStore.deliveryDates);
+
+// 日期格式化（統一處理）
+const formatDateWithOptions = (dateStr, { showYear = false, showWeekday = false } = {}) => {
+    const d = dayjs(dateStr);
+    const weekday = ['日', '一', '二', '三', '四', '五', '六'][d.day()];
+    const formatStr = showYear ? 'YYYY.MM.DD' : 'MM.DD';
+    const base = d.format(formatStr);
+    return showWeekday ? `${base}（${weekday}）` : base;
+};
+
+const formatDate = (dateStr) => formatDateWithOptions(dateStr, { showWeekday: true });
+const formatPeriod = (dateStr) => formatDateWithOptions(dateStr, { showYear: true });
+
+// 日期按鈕預設第一天
+const selectedIndex = ref(0)
+
+
 // Popup
 const showPopup = ref(null)
-
 function openPopup(value) {
     showPopup.value = value
 }
-
 function closePopup() {
     showPopup.value = null
 }
-
 </script>
+
 <template>
     <FrontLayout>
         <div class="headline">
             <h1>為你搭配<span class="decorate"></span></h1>
             <a @click="openPopup('leave')">回主選單</a>
-            <Cart v-if="showPopup === 'leave'" @close="closePopup" />
+            <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" />
         </div>
         <div class="operate">
             <div class="order-container">
                 <div class="period-block">
-                    <div class="period">2025.06.07 (六) - 06.13 (五)</div>
+                    <div class="period" v-if="deliveryDates.length">
+                        <template v-if="deliveryDates.length === 1">
+                            {{ formatDateWithOptions(deliveryDates[0], { showYear: true, showWeekday: true }) }}
+                        </template>
+                        <template v-else>
+                            {{ formatDateWithOptions(deliveryDates[0], { showYear: true, showWeekday: true }) }} –
+                            {{ formatDateWithOptions(deliveryDates.at(-1), { showYear: false, showWeekday: true }) }}
+                        </template>
+                    </div>
                     <div class="dateblock">
                         <Swiper v-bind="swiperOptions" class="date-swiper">
-                            <SwiperSlide>
-                                <div class="dateItem current">
-                                    <div class="date">06.07 (六)</div>
-                                    <div class="lunchboxtxt">訂 3 份餐盒<br>$1,070</div>
-                                </div>
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div class="dateItem">
-                                    <div class="date">06.08 (日)</div>
-                                    <div class="lunchboxtxt">請選擇餐點</div>
-                                </div>
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div class="dateItem">
-                                    <div class="date">06.09 (一)</div>
-                                    <div class="lunchboxtxt">請選擇餐點</div>
-                                </div>
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div class="dateItem">
-                                    <div class="date">06.10 (二)</div>
-                                    <div class="lunchboxtxt">請選擇餐點</div>
-                                </div>
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div class="dateItem">
-                                    <div class="date">06.11 (三)</div>
-                                    <div class="lunchboxtxt">請選擇餐點</div>
-                                </div>
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div class="dateItem">
-                                    <div class="date">06.12 (四)</div>
-                                    <div class="lunchboxtxt">請選擇餐點</div>
-                                </div>
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div class="dateItem">
-                                    <div class="date">06.13 (五)</div>
+                            <SwiperSlide 
+                                v-for="(date, index) in deliveryDates" 
+                                :key="index">
+                                <div class="dateItem"
+                                    @click="selectedIndex = index"
+                                    :class="{ active: selectedIndex === index }">
+                                    <div class="date">{{ formatDate(date) }}</div>
                                     <div class="lunchboxtxt">請選擇餐點</div>
                                 </div>
                             </SwiperSlide>
@@ -97,7 +92,7 @@ function closePopup() {
                 <div class="order">
                     <div class="orderarea">
                         <div class="day">
-                            <h3>06.07 (六)</h3>
+                            <h3 v-if="deliveryDates.length">{{ formatDate(deliveryDates[selectedIndex]) }}</h3>
                         </div>
                         <div class="lunchboxlist">
                             <Swiper v-bind="swiperOptions" class="lunchbox-swiper">
@@ -307,6 +302,7 @@ h1 {
 
 .swiper-slide {
     flex-shrink: 1;
+    width: fit-content;
 }
 
 .date-swiper {
@@ -328,7 +324,7 @@ h1 {
     cursor: pointer;
 }
 
-.current {
+.dateItem.active {
     background-color: $primary_100;
 }
 
@@ -598,12 +594,12 @@ h1 {
         height: 60px;
     }
 
-    .total_option-btn{
+    .total_option-btn {
         flex-direction: column;
         gap: 20px;
     }
 
-    .option-btn{
+    .option-btn {
         justify-content: center;
     }
 }

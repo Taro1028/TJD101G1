@@ -29,10 +29,18 @@ const routes = [
     },
   },
   {
+    path: "/Order/Select",
+    component: () => import("@/pages/Select.vue"),
+    meta: {
+      title: "選擇期間 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
+  },
+  {
     path: "/Order",
     component: () => import("@/pages/Order.vue"),
     meta: {
-      title: "預約訂餐 - TibaEAT 提膳家",
+      title: "選擇方案 - TibaEAT 提膳家",
       requiredLogin: true,
     },
   },
@@ -76,7 +84,7 @@ const routes = [
       requiredLogin: true
     }
   },
-   {
+  {
     path: '/Order/MessageCards',
     component: () => import('@/pages/MessageCards.vue'),
     meta: {
@@ -196,22 +204,22 @@ const routes = [
       requiredLogin: false
     }
   },
-{
-  path: '/MemberCenter/MyCards',
-  component: () => import('@/pages/MyCards.vue'),
-  meta: {
-    title: '我的小卡 - TibaEAT 提膳家',
-    requiredLogin: false
-  }
-},
-{
-  path: '/MemberCenter/MyOrders', 
-  component: () => import('@/pages/MyOrders.vue'),
-  meta: {
-    title: '訂單總覽 - TibaEAT 提膳家',
-    requiredLogin: false
-  }
-},
+  {
+    path: '/MemberCenter/MyCards',
+    component: () => import('@/pages/MyCards.vue'),
+    meta: {
+      title: '我的小卡 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
+  {
+    path: '/MemberCenter/MyOrders',
+    component: () => import('@/pages/MyOrders.vue'),
+    meta: {
+      title: '訂單總覽 - TibaEAT 提膳家',
+      requiredLogin: false
+    }
+  },
   // === 後台 ===
   {
     path: '/adminLogin', // /admin      /admin/users

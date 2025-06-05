@@ -1,6 +1,12 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
+const startDate = route.query.start
+const endDate = route.query.end
 
 onMounted(() => {
   document.body.classList.add('custom-bg')
@@ -9,6 +15,33 @@ onMounted(() => {
 onUnmounted(() => {
   document.body.classList.remove('custom-bg')
 })
+
+// 上一步
+function goPrev() {
+ router.push('/Order/Select')
+}
+
+function goPlanForyou() {
+    router.push({
+    path: '/Order/PlanForyou',
+    query: {
+        start: startDate,
+        end: endDate
+    }
+})
+}
+
+function goPlanFree(){
+    router.push({
+    path: '/Order/Select1_PlanFree',
+    query: {
+        start: startDate,
+        end: endDate
+    }
+})
+
+}
+
 </script>
 <template>
     <FrontLayout>
@@ -16,18 +49,18 @@ onUnmounted(() => {
         <h3>想選哪一種方案呢？</h3>
     
         <div class="plans">
-            <router-link to="/Order/PlanForyou" class="link">
+            <a @click="goPlanForyou" class="link">
                 <div class="plan_foryou">
                     <h3>為你搭配</h3>
                     <h5>由專業營養師<br>調配的餐食</h5>
                 </div>
-            </router-link>
-            <router-link to="/Order/Select1_PlanFree" class="link">
+            </a>
+            <a @click="goPlanFree" class="link">
                 <div class="plan_free">
                     <h3>自由搭配</h3>
                     <h5>自己挑選菜色<br>組合餐盒</h5>
                 </div>
-            </router-link>
+            </a>
         </div>
 
         <div class="notice">
@@ -35,7 +68,7 @@ onUnmounted(() => {
         </div>
 
         <div class="linkblock">
-            <a href="#" class="btn">上一步</a>
+            <a @click="goPrev" class="btn">上一步</a>
         </div>
     </div>
     </FrontLayout>
@@ -146,6 +179,8 @@ h5{
     text-align: left;
     display: flex;
     gap: 8px;
+    color: $neutral_black;
+    opacity: .7;
 }
 
 .notice span{

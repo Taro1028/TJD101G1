@@ -27,7 +27,7 @@ onUnmounted(() => {
         <div class="info">
             <div class="title">
                 <i class="bi bi-check-circle"></i>
-                <h2>訂單完成</h2>
+                <h3>訂單完成</h3>
             </div>
             <h4>感謝您的訂購與支持，我們將處理您的訂單</h4>
             <div class="receipt">
@@ -125,7 +125,7 @@ background-image: url(../assets/images/Order/background.svg);
 .orderpaper{
     margin: 40px auto;
     width: 520px;
-    padding: 32px 40px;
+    padding: 24px 32px;
     background-color: $neutral_white;
     display: flex;
     flex-direction: column;
@@ -146,8 +146,8 @@ background-image: url(../assets/images/Order/background.svg);
     gap: 20px;
 }
 
-.title h2{
-    font-size: $font_h2;
+.title h3{
+    font-size: $font_h3;
     font-weight: normal;
 }
 

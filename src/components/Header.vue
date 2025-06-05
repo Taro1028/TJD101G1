@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
       <nav class="nav-wrapper" :class="{ open: isMobileMenuOpen }" v-show="!isMobile || isMobileMenuOpen">
         <ul class="header_nav">
             <li><router-link to="/LunchBox">餐盒介紹</router-link></li>
-            <li><router-link to="/Order">預約訂餐</router-link></li>
+            <li><router-link to="/Order/Select">預約訂餐</router-link></li>
             <li 
                 class="dropdown"
                 ref="dropdownRef">

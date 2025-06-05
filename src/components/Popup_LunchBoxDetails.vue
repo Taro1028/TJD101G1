@@ -7,105 +7,93 @@ const activeDishIndex = ref(0)  // 預設第一道配菜的介紹
 
 // 要 new URL 圖片字串
 const getImageUrl = (fileName) => {
-  return new URL(`../assets/images/Order/${fileName}`, import.meta.url).href
+    return new URL(`../assets/images/Order/${fileName}`, import.meta.url).href
 }
 
 function toggleDish(index) {
-  activeDishIndex.value = activeDishIndex.value === index ? null : index
+    activeDishIndex.value = activeDishIndex.value === index ? null : index
 }
 
 // 手風琴效果
 function beforeEnter(el) {
-  el.style.height = '0'
-  el.style.opacity = '0'
-  el.style.transition = 'height 0.3s ease, opacity 0.3s ease'
+    el.style.height = '0'
+    el.style.opacity = '0'
+    el.style.transition = 'height 0.3s ease, opacity 0.3s ease'
 }
 
 function enter(el) {
-  const height = el.scrollHeight
-  el.style.height = height + 'px'
-  el.style.opacity = '1'
+    const height = el.scrollHeight
+    el.style.height = height + 'px'
+    el.style.opacity = '1'
 }
 
 function afterEnter(el) {
-  el.style.height = 'auto' // 避免展開後被限制高度
+    el.style.height = 'auto' // 避免展開後被限制高度
 }
 
 function leave(el) {
-  el.style.height = el.scrollHeight + 'px' // 設定初始高度以開始過渡
-  el.offsetHeight // 觸發 reflow（必要）
-  el.style.height = '0'
-  el.style.opacity = '0'
+    el.style.height = el.scrollHeight + 'px' // 設定初始高度以開始過渡
+    el.offsetHeight // 觸發 reflow（必要）
+    el.style.height = '0'
+    el.style.opacity = '0'
 }
 
 // 關閉視窗
 const emit = defineEmits(['close'])
 
 function closePopup() {
-  emit('close')
+    emit('close')
 }
 </script>
 
 <template>
-<div class="overlay">
-<div class="detailCard">
-    <button class="closebtn"  @click="closePopup"><i class="bi bi-x-circle"></i></button>
-    <div class="intro">
-        <h4>{{ menu.title }}</h4>
-        <h6>{{ menu.description }}</h6>
-        <ul class="ingredients">
-            <li v-for="(item, i) in menu.ingredients" :key="i">
-            <img :src="getImageUrl(item.icon)" :alt="item.label" />
-            <p>{{ item.label }}</p>
-          </li>
-        </ul>
-    </div>
-    <div class="info">
-        <div class="img_price">
-            <img :src="getImageUrl(menu.boximage)" :alt="menu.title" />
-            <h5>售價 ${{ menu.price }}</h5>
-        </div>
-        <div class="infotxtblock">
-            <div 
-            class="infotxt"
-            v-for="(dish, index) in menu.dishes"
-            :key="index"
-            >
-                <div 
-                class="foodtitle"
-                @click="toggleDish(index)">
-                    <h5>{{ dish.name }}</h5>
-                    
-                    <i 
-                    :class="activeDishIndex === index ? 'bi-chevron-up' : 'bi-chevron-down'"
-                    ></i>
-                   
+    <div class="overlay">
+        <div class="detailCard">
+            <button class="closebtn" @click="closePopup"><i class="bi bi-x-circle"></i></button>
+            <div class="intro">
+                <h4>{{ menu.title }}</h4>
+                <h6>{{ menu.description }}</h6>
+                <ul class="ingredients">
+                    <li v-for="(item, i) in menu.ingredients" :key="i">
+                        <img :src="getImageUrl(item.icon)" :alt="item.label" />
+                        <p>{{ item.label }}</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="info">
+                <div class="img_price">
+                    <img :src="getImageUrl(menu.boximage)" :alt="menu.title" />
+                    <h5>售價 ${{ menu.price }}</h5>
                 </div>
-                <transition 
-                @before-enter="beforeEnter"
-                @enter="enter"
-                @after-enter="afterEnter"
-                @leave="leave">
-                <div class="foodtxt" v-show="activeDishIndex === index">
-                    <h6>{{ dish.description }}</h6>
+                <div class="infotxtblock">
+                    <div class="infotxt" v-for="(dish, index) in menu.dishes" :key="index">
+                        <div class="foodtitle" @click="toggleDish(index)">
+                            <h5>{{ dish.name }}</h5>
+
+                            <i :class="activeDishIndex === index ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+
+                        </div>
+                        <transition @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter" @leave="leave">
+                            <div class="foodtxt" v-show="activeDishIndex === index">
+                                <h6>{{ dish.description }}</h6>
+                            </div>
+                        </transition>
+                    </div>
                 </div>
-                </transition>
             </div>
         </div>
     </div>
-</div>
-</div>
-    
+
 </template>
 
 <style scoped lang="scss">
-.overlay{
+.overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color:rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.4);
 
     display: flex;
     align-items: center;
@@ -114,7 +102,7 @@ function closePopup() {
     z-index: 1000;
 }
 
-.detailCard{
+.detailCard {
     width: 640px;
     margin: auto;
     padding: 48px;
@@ -128,7 +116,7 @@ function closePopup() {
     position: relative;
 }
 
-.closebtn{
+.closebtn {
     position: absolute;
     right: 24px;
     top: 20px;
@@ -138,140 +126,142 @@ function closePopup() {
     height: 32px;
     padding: 0;
 
-    &:hover{
+    &:hover {
         cursor: pointer;
     }
 }
 
-.closebtn i{
+.closebtn i {
     font-size: 24px;
 }
 
-.intro{
+.intro {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.intro h4{
+.intro h4 {
     font-size: $font_h4;
     margin: 0;
 }
 
-.intro h6{
+.intro h6 {
     font-size: $font_h6;
     margin: 0;
     font-weight: normal;
 }
 
-.ingredients{
+.ingredients {
     margin: 0;
     display: flex;
     gap: 32px;
 }
 
-.ingredients li{
+.ingredients li {
     display: flex;
     gap: 4px;
 }
 
-.ingredients p{
+.ingredients p {
     margin: 0;
 }
 
-.info{
+.info {
     width: 640px;
     display: flex;
     gap: 64px;
 }
 
-.img_price{
+.img_price {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-.img_price img{
+.img_price img {
     display: block;
     width: 240px;
     height: 240px;
 }
 
-.img_price h5{
+.img_price h5 {
     margin: 0;
     font-size: $font_h5;
 }
 
-.infotxtblock{
+.infotxtblock {
     width: 336px;
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-.infotxt{
+.infotxt {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.foodtitle{
+.foodtitle {
     display: flex;
     justify-content: space-between;
 }
 
-.foodtitle h5{
+.foodtitle i {
+    cursor: pointer;
+}
+
+.foodtitle h5 {
     font-size: $font_h5;
 }
 
-.foodtxt h6{
+.foodtxt h6 {
     font-size: $font_h6;
     font-weight: normal;
     margin: 0;
 }
 
-.hidden{
+.hidden {
     display: none;
 }
 
 // --- RWD ---
 @media screen and (max-width: 780px) {
 
-.detailCard{
-    width: 300px;
-    max-height: 90vh;
-    overflow-y: auto;
-    gap: 20px;
-    padding: 24px;
+    .detailCard {
+        width: 300px;
+        max-height: 90vh;
+        overflow-y: auto;
+        gap: 20px;
+        padding: 24px;
+    }
+
+    .ingredients {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .info {
+        width: 300px;
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .infotxtblock {
+        width: 300px;
+    }
+
+    .img_price img {
+        width: 160px;
+        height: 160px;
+        align-self: center;
+    }
+
+    .foodtxt h6 {
+        text-align: left;
+    }
+
 }
-
-.ingredients{
-    flex-direction: column;
-    gap: 8px;
-}
-
-.info{
-    width: 300px;
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-}
-
-.infotxtblock{
-    width: 300px;
-}
-
-.img_price img{
-    width: 160px;
-    height: 160px;
-    align-self: center;
-}
-
-.foodtxt h6{
-    text-align: left;
-}
-
-}
-
-
 </style>

@@ -14,7 +14,7 @@ function closePopup() {
         </div>
         <h5>確定離開本頁面嗎？</h5>
         <div class="btnblock">
-        <router-link to="/Order" class="btn-1">確定</router-link>
+        <router-link to="/Order/Select" class="btn-1">確定</router-link>
         <button @click="closePopup" class="btn-2">取消</button>
         </div>
     </div>
