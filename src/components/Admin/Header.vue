@@ -1,33 +1,31 @@
 <template>
-    <div>
-        <section>
-            <img src="../../assets/images/Logo_S.svg" alt="">
-            <p class="word">後台中心</p>
-            <img src="../../assets/images/Admin/userphoto.png" alt="">
-        </section>
-    </div>
+  <div>
+    <section>
+      <img src="../../assets/images/Logo_S.svg" alt="" />
+      <p class="word">後台中心</p>
+      <img src="../../assets/images/Admin/userphoto.png" alt="" />
+    </section>
+  </div>
 </template>
 
-<script setup>
-   
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
-section{
-    display: flex;
-    background-color: $primary_100;
+section {
+  display: flex;
+  background-color: $primary_100;
+  padding: 0px 10px 0px 30px;
 }
-section .word{
-    font-size: $font_h5;
-    display: flex;
-    align-items: center;
-   margin: 0;
+section .word {
+  font-size: $font_h5;
+  display: flex;
+  align-items: center;
+  margin: 0;
 }
-section img:nth-of-type(2){
-  
-    width: 60px;
-    border-radius: 50%;
-   margin-left: auto;
-   padding: 10px;
+section img:nth-of-type(2) {
+  width: 60px;
+  border-radius: 50%;
+  margin-left: auto;
+  padding: 10px;
 }
 </style>

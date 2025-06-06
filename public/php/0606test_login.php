@@ -1,22 +1,44 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+header('Content-Type: application/json');
+// 取得前端送來的 JSON 輸入
 $member = json_decode(file_get_contents("php://input"), true);
-//MySQL相關資訊
+
+// 引入資料庫連線（connection.php 檔案已包含 $pdo）
 include 'connection.php';
 
-//建立SQL語法
-$sql = "SELECT ID, EMAIL, PASSWORD 
-        FROM `MEMBER`
-        WHERE EMAIL = :usr and PASSWORD = :pwd";
+try {
+        // 查詢該帳號是否存在
+        $sql = "SELECT ID, EMAIL, PASSWORD 
+          FROM MEMBERS 
+          WHERE EMAIL = :usr AND PASSWORD = :pwd";
 
-$stmt = $pdo->prepare($sql);
-$stmt->bindValue(':usr', $member['EMAIL']);
-$stmt->bindValue(':pwd', $member['PASSWORD']);
-$stmt->execute();
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':usr', $member['EMAIL']);
+        $stmt->bindValue(':pwd', $member['PASSWORD']);
+        $stmt->execute();
 
-$result = $stmt->fetch();
-$respBody['ID'] = $result['ID'];
-$respBody['EMAIL'] = $result['EMAIL'];
-$respBody['PASSWORD'] = $result['PASSWORD'];
+        $result = $stmt->fetch();
 
-echo json_encode($respBody);
-?>
+        if ($result) {
+                // 登入成功（不回傳密碼）
+                echo json_encode([
+                        'success' => true,
+                        'ID' => $result['ID'],
+                        'EMAIL' => $result['EMAIL']
+                ]);
+        } else {
+                // 查無資料
+                echo json_encode([
+                        'success' => false,
+                        'message' => '帳號或密碼錯誤'
+                ]);
+        }
+} catch (PDOException $e) {
+        // SQL 錯誤處理
+        echo json_encode([
+                'success' => false,
+                'message' => '伺服器錯誤：' . $e->getMessage()
+        ]);
+}

@@ -197,7 +197,7 @@ section {
   overflow: hidden;
 }
 div {
-  width: 16.5%;
+  // width: 16.5%;
   background-color: $primary_100;
 }
 .adimnbtn {
@@ -213,5 +213,9 @@ div {
   line-height: 50px;
   text-decoration: none;
   color: white;
+}
+
+.adimnbtn:hover{
+  background-color:$primary_400;
 }
 </style>

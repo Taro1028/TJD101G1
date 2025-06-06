@@ -162,6 +162,10 @@ const props = defineProps([
   color: #fff;
   cursor: pointer;
 }
+
+.out button:hover{
+  background-color:$primary_400;
+}
 .page-item.previous .page-link {
   background-color: $primary_600;
   color: white;
@@ -177,6 +181,5 @@ const props = defineProps([
   border: 1px solid black;
   z-index: 999;
 }
-.out {
-}
+
 </style>
