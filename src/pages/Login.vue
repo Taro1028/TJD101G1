@@ -12,7 +12,7 @@
             <label for="name">姓名</label>
             <input
               type="text"
-              id="name"
+              id="EMAIL"
               name="name"
               class="signup_name"
               placeholder="登入帳號"
@@ -24,7 +24,7 @@
             <input
               type="password"
               name="password"
-              id="password"
+              id="PASSWORD"
               class="signup_password"
               placeholder="8-16個英數組成"
             />
@@ -66,6 +66,32 @@
 </template>
 
 <script setup>
+const EMAIL = document.querySelector('#EMAIL');
+const PASSWORD = document.querySelector('#PASSWORD');
+
+  document.querySelector('button').addEventListener('click', async () => {
+    if (!EMAIL.value) {
+        alert('請輸入使用者email');
+        return;
+    }
+
+    if (!PASSWORD.value) {
+        alert('請輸入使用者密碼');
+        return;
+    }
+
+    const resp = await fetch('0606test_login.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            EMAIL: EMAIL.value,
+            PASSWORD: PASSWORD.value
+        })
+    });
+
+});
 
 
 </script>
