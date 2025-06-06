@@ -80,7 +80,7 @@ const PASSWORD = document.querySelector('#PASSWORD');
         return;
     }
 
-    const resp = await fetch('0606test_login.php', {
+    const resp = await fetch('/public/php/0606test_login.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
