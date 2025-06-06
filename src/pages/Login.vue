@@ -1,99 +1,116 @@
 <template>
-<div class="page-container">
-  <div class="content-wrapper">
-    <div class="left-section">
-       <RouterLink to="/front/Home"><img src="../assets/images//Logo_S.svg" alt="logo_s" /></RouterLink>
-        <h1 class="signup-title">會員登入</h1>
-        <p class="signup-subtitle">開始點餐吧</p>
+  <div class="page-container">
+    <div class="content-wrapper">
+      <div class="left-section">
+        <RouterLink to="/front/Home"><img src="../assets/images//Logo_S.svg" alt="logo_s" /></RouterLink>
+          <h1 class="signup-title">會員登入</h1>
+          <p class="signup-subtitle">開始點餐吧</p>
 
-        <!-- 建立帳號表單 -->
-        <div class="signup_form">
-          <div class="signup_form_component">
-            <label for="name">姓名</label>
-            <input
-              type="text"
-              id="EMAIL"
-              name="name"
-              class="signup_name"
-              placeholder="登入帳號"
-            />
-          </div>
-
-          <div class="signup_form_component">
-            <label for="password">密碼</label>
-            <input
-              type="password"
-              name="password"
-              id="PASSWORD"
-              class="signup_password"
-              placeholder="8-16個英數組成"
-            />
-          </div>
-
-          <div>
-            <a href="#" class="forgot-password">忘記密碼/帳號？</a>
-          </div>
-
-          <div>
-          <RouterLink to="/front/Sign_Up" class="signup_link">還沒有帳號？點我註冊</RouterLink>
-          </div>
-
-          <!-- 快速註冊區塊 -->
-          <div class="fast_signup">
-            <p>快速登入</p>
-            <div class="social_links">
-              <a href="#"
-                ><img src="../assets/images/Member/Google_color.svg" alt="google-signup"
-              /></a>
-              <a href="#"
-                ><img src="../assets/images/Member/Line_color.svg" alt="line-signup"
-              /></a>
+          <!-- 建立帳號表單 -->
+          <div class="signup_form">
+            <div class="signup_form_component">
+              <label for="name">姓名</label>
+              <input
+                type="text"
+                id="EMAIL"
+                name="name"
+                class="signup_name"
+                placeholder="登入帳號"
+                v-model="email"
+              />
             </div>
-          </div>
 
-          <button type="submit" class="signup_submit">建立</button>
-        </div>
-        <!-- 註冊表單結束 -->
-    </div>
-<!-- 右側圖片區塊 -->
-    <div class="right-section">
-        <img src="../assets/images/Member/login_pic.svg" alt="外送插圖" />
+            <div class="signup_form_component">
+              <label for="password">密碼</label>
+              <input
+                type="password"
+                name="password"
+                id="PASSWORD"
+                class="signup_password"
+                placeholder="8-16個英數組成"
+                v-model="password"
+              />
+            </div>
+
+            <div>
+              <a href="#" class="forgot-password">忘記密碼/帳號？</a>
+            </div>
+
+            <div>
+            <RouterLink to="/front/Sign_Up" class="signup_link">還沒有帳號？點我註冊</RouterLink>
+            </div>
+
+            <!-- 快速註冊區塊 -->
+            <div class="fast_signup">
+              <p>快速登入</p>
+              <div class="social_links">
+                <a href="#"
+                  ><img src="../assets/images/Member/Google_color.svg" alt="google-signup"
+                /></a>
+                <a href="#"
+                  ><img src="../assets/images/Member/Line_color.svg" alt="line-signup"
+                /></a>
+              </div>
+            </div>
+
+            <button type="submit" class="signup_submit" @click="handleLogin">建立</button>
+          </div>
+          <!-- 註冊表單結束 -->
+      </div>
+  <!-- 右側圖片區塊 -->
+      <div class="right-section">
+          <img src="../assets/images/Member/login_pic.svg" alt="外送插圖" />
+      </div>
     </div>
   </div>
-</div>
-       
-
 </template>
 
 <script setup>
-const EMAIL = document.querySelector('#EMAIL');
-const PASSWORD = document.querySelector('#PASSWORD');
+import { ref } from 'vue'
 
-  document.querySelector('button').addEventListener('click', async () => {
-    if (!EMAIL.value) {
-        alert('請輸入使用者email');
-        return;
+// 響應式數據
+const email = ref('')
+const password = ref('')
+
+// 登入處理函數
+const handleLogin = async () => {
+  // 驗證輸入
+  if (!email.value) {
+    alert('請輸入使用者email')
+    return
+  }
+
+  if (!password.value) {
+    alert('請輸入使用者密碼')
+    return
+  }
+
+  try {
+    const response = await fetch('0606test_login.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        EMAIL: email.value,
+        PASSWORD: password.value
+      })
+    })
+
+    // 處理響應
+    if (response.ok) {
+      const result = await response.json()
+      console.log('登入成功:', result)
+      // 這裡可以添加登入成功後的邏輯，例如跳轉頁面
+    } else {
+      console.error('登入失敗:', response.statusText)
+      alert('登入失敗，請檢查您的帳號密碼')
     }
-
-    if (!PASSWORD.value) {
-        alert('請輸入使用者密碼');
-        return;
-    }
-
-    const resp = await fetch('0606test_login.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            EMAIL: EMAIL.value,
-            PASSWORD: PASSWORD.value
-        })
-    });
-
-});
-
-
+  } catch (error) {
+    console.error('網路錯誤:', error)
+    alert('網路連線錯誤，請稍後再試')
+  }
+}
 </script>
 
 <style scoped lang="scss">
