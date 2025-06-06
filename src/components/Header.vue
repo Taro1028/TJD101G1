@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
                 </ul>
                 </div>
             </li>
-            <li><router-link to="/Member">登入/註冊</router-link></li>
+            <li><router-link to="/Login">登入/註冊</router-link></li>
         </ul>
       </nav>
       
