@@ -2,8 +2,16 @@
 import { ref, computed, nextTick, onMounted } from 'vue'
 import foodData from '@/data/LunchBoxItems.json'
 
-const menu = ref(foodData[0])  // 目前顯示第一組餐點 之後隨點擊該餐盒做移除
-const activeDishIndex = ref(0)  // 預設第一道配菜的介紹
+// 接收父元件傳來的單筆 menu 資料
+const props = defineProps({
+  menu: {
+    type: Object,
+    required: true
+  }
+})
+
+// 選中的 dish index
+const activeDishIndex = ref(0)  
 
 // 要 new URL 圖片字串
 const getImageUrl = (fileName) => {

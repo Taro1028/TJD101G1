@@ -33,6 +33,7 @@ onUnmounted(() => {
             <div class="receipt">
                 <h5>訂單編號： 2506071</h5>
                 <h5>訂單項目： 為你搭配 + 小卡 / 50份餐盒</h5>
+                <h5>訂單金額： $18,150</h5>
                 <h5>配送時間： 2025.06.07 — 2025.06.13 午間配送 (7日)</h5>
                 <h5>收貨人： 林榮傑</h5>
                 <h5>手機： 0987-078-587</h5>
@@ -291,11 +292,24 @@ h4{
     font-size: $font_h3;
 }
 
+.title h3{
+    font-size: $font_h4;
+}
+
+.info h4{
+    font-size: $font_h5;
+}
+
+.info{
+    gap: 20px;
+}
+
 .receipt h5{
     font-size: $font_h6;
 }
 
 .btnblock{
+    margin-top: 12px;
     justify-content: center;
 }
 

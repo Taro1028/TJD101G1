@@ -1,14 +1,21 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
+import { onMounted, onUnmounted, computed, ref } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import 'swiper/css'
-import { onMounted, onUnmounted, computed, ref } from 'vue'
-import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
-import LunchBox from '@/components/Popup_LunchBoxDetails.vue'
+import foodData from '@/data/LunchBoxItems.json'
 import { useOrderStore } from '@/stores/orderStore.js';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-tw';
 dayjs.locale('zh-tw');
+import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
+import LunchBox from '@/components/Popup_LunchBoxDetails.vue'
+
+// 菜單內容
+const menulist = ref(foodData)
+const getImageUrl = (fileName) => {
+    return new URL(`../assets/images/Order/${fileName}`, import.meta.url).href
+}
 
 // 背景圖
 onMounted(() => {
@@ -43,14 +50,76 @@ const formatPeriod = (dateStr) => formatDateWithOptions(dateStr, { showYear: tru
 // 日期按鈕預設第一天
 const selectedIndex = ref(0)
 
+const props = defineProps({
+  currentDate: String,   // 當天的日期
+  mealName: String       // 餐盒名稱（例如「樂活元氣餐」）
+})
+
+const getTotalCount = (date) => orderStore.getTotalCountForDate(date)
+const getTotalPrice = (date) => orderStore.getTotalPriceForDate(date)
+
+const getMealSummary = (date) => {
+  const day = orderStore.planForYouSelections.find(d => d.date === date)
+  if (!day) return ''
+  return day.meals
+    .filter(meal => meal.count > 0)
+    .map(meal => `${meal.name} * ${meal.count}`)
+    .join(' / ')
+}
+
+// 找出該餐點當天的 count
+const count = computed(() => {
+  const day = orderStore.planForYouSelections.find(d => d.date === props.currentDate)
+  return day?.meals.find(m => m.name === props.mealName)?.count || 0
+})
+
+function getCount(mealName) {
+  const date = deliveryDates.value[selectedIndex.value]
+  const day = orderStore.planForYouSelections.find(d => d.date === date)
+  return day?.meals.find(m => m.name === mealName)?.count || 0
+}
+
+function increase(mealName) {
+  const date = deliveryDates.value[selectedIndex.value]
+  const currentCount = getCount(mealName)
+  const total = getTotalCountForSelectedDate()
+  if (total < 10) {
+    orderStore.updateMealCount(date, mealName, currentCount + 1)
+  }
+}
+
+function decrease(mealName) {
+  const date = deliveryDates.value[selectedIndex.value]
+  const currentCount = getCount(mealName)
+  if (currentCount > 0) {
+    orderStore.updateMealCount(date, mealName, currentCount - 1)
+  }
+}
+
+function getTotalCountForSelectedDate() {
+  const date = deliveryDates.value[selectedIndex.value]
+  return orderStore.getTotalCountForDate(date)
+}
+
+const getTotalAllDates = computed(() => {
+  return orderStore.planForYouSelections.reduce((sum, day) => {
+    return sum + day.meals.reduce((subtotal, meal) => subtotal + meal.count * meal.price, 0)
+  }, 0)
+})
 
 // Popup
 const showPopup = ref(null)
-function openPopup(value) {
-    showPopup.value = value
+const selectedMenu = ref(null)
+
+function openPopup(type, payload = null) {
+    showPopup.value = type
+  if (type === 'content' && payload) {
+    selectedMenu.value = payload
+  }
 }
 function closePopup() {
     showPopup.value = null
+    selectedMenu.value = null
 }
 </script>
 
@@ -82,13 +151,20 @@ function closePopup() {
                                     @click="selectedIndex = index"
                                     :class="{ active: selectedIndex === index }">
                                     <div class="date">{{ formatDate(date) }}</div>
-                                    <div class="lunchboxtxt">請選擇餐點</div>
+                                    <div class="lunchboxtxt">
+                                        <template v-if="getTotalCount(date) > 0">
+                                            訂 {{ getTotalCount(date) }} 份餐盒 · ${{ getTotalPrice(date) }}
+                                        </template>
+                                        <template v-else>
+                                            請選擇餐點
+                                        </template>
+                                    </div>
                                 </div>
                             </SwiperSlide>
                         </Swiper>
                     </div>
                 </div>
-                <LunchBox v-if="showPopup && showPopup !== 'leave'" @close="closePopup" />
+                <LunchBox v-if="showPopup === 'content'" :menu="selectedMenu" @close="closePopup" />
                 <div class="order">
                     <div class="orderarea">
                         <div class="day">
@@ -96,97 +172,41 @@ function closePopup() {
                         </div>
                         <div class="lunchboxlist">
                             <Swiper v-bind="swiperOptions" class="lunchbox-swiper">
-                                <SwiperSlide>
+                                <SwiperSlide
+                                    v-for="menuitem in menulist" 
+                                    :key="menuitem.title">
                                     <div class="boxcard">
                                         <div class="boxname">
-                                            <h4>樂活元氣餐</h4>
+                                            <h4>{{ menuitem.title }}</h4>
                                         </div>
                                         <div class="imginfo">
-                                            <img src="../assets/images/Order/box01.png" alt="">
+                                            <img :src="getImageUrl(menuitem.boximage)" :alt="menuitem.title">
                                             <div class="ingredients">
-                                                <img src="../assets/images/Order/sesame.svg" alt="">
-                                                <img src="../assets/images/Order/taiwanPork.svg" alt="">
-                                                <img src="../assets/images/Order/seafood.svg" alt="">
-                                                <img src="../assets/images/Order/aussieBeef.svg" alt="">
+                                                <img 
+                                                v-for="(ingredient, idx) in menuitem.ingredients"
+                                                :key="idx"
+                                                :src="getImageUrl(ingredient.icon)"
+                                                :alt="ingredient.label">
                                             </div>
                                         </div>
                                         <div class="detail-price">
-                                            <div class="detail"><a @click="openPopup('test')">詳細內容</a></div>
-                                            <div class="price">$320</div>
+                                            <div class="detail"><a @click="openPopup('content', menuitem)">詳細內容</a></div>
+                                            <div class="price">${{ menuitem.price }}</div>
                                         </div>
                                         <div class="quantity-selector">
-                                            <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
-                                            <div class="count">0</div>
-                                            <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
-                                        </div>
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div class="boxcard">
-                                        <div class="boxname">
-                                            <h4>舒心控醣餐</h4>
-                                        </div>
-                                        <div class="imginfo">
-                                            <img src="../assets/images/Order/box02.png" alt="">
-                                            <div class="ingredients">
-                                                <img src="../assets/images/Order/taiwanPork.svg" alt="">
-                                                <img src="../assets/images/Order/seafood.svg" alt="">
-                                                <img src="../assets/images/Order/aussieBeef.svg" alt="">
-                                            </div>
-                                        </div>
-                                        <div class="detail-price">
-                                            <div class="detail"><a href="#">詳細內容</a></div>
-                                            <div class="price">$320</div>
-                                        </div>
-                                        <div class="quantity-selector">
-                                            <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
-                                            <div class="count">0</div>
-                                            <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
-                                        </div>
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div class="boxcard">
-                                        <div class="boxname">
-                                            <h4>柔食樂活餐</h4>
-                                        </div>
-                                        <div class="imginfo">
-                                            <img src="../assets/images/Order/box03.png" alt="">
-                                            <div class="ingredients">
-                                                <img src="../assets/images/Order/taiwanpork.svg" alt="">
-                                            </div>
-                                        </div>
-                                        <div class="detail-price">
-                                            <div class="detail"><a href="#">詳細內容</a></div>
-                                            <div class="price">$320</div>
-                                        </div>
-                                        <div class="quantity-selector">
-                                            <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
-                                            <div class="count">0</div>
-                                            <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
-                                        </div>
-                                    </div>
-                                </SwiperSlide>
-                                <SwiperSlide>
-                                    <div class="boxcard">
-                                        <div class="boxname">
-                                            <h4>蔬食養生餐</h4>
-                                        </div>
-                                        <div class="imginfo">
-                                            <img src="../assets/images/Order/box04.png" alt="">
-                                            <div class="ingredients">
-                                                <img src="../assets/images/Order/sesame.svg" alt="">
-                                                <img src="../assets/images/Order/vegetarianDiet.svg" alt="">
-                                            </div>
-                                        </div>
-                                        <div class="detail-price">
-                                            <div class="detail"><a href="#">詳細內容</a></div>
-                                            <div class="price">$360</div>
-                                        </div>
-                                        <div class="quantity-selector">
-                                            <button class="decrease-btn"><i class="bi bi-dash-circle-fill"></i></button>
-                                            <div class="count">0</div>
-                                            <button class="increase-btn"><i class="bi bi-plus-circle-fill"></i></button>
+                                            <button
+                                                class="decrease-btn"
+                                                @click="decrease(menuitem.title)"
+                                                :disabled="getCount(menuitem.title) <= 0">
+                                                <i class="bi bi-dash-circle-fill"></i>
+                                            </button>
+                                            <div class="count">{{ getCount(menuitem.title) }}</div>
+                                            <button
+                                                class="increase-btn"
+                                                @click="increase(menuitem.title)"
+                                                :disabled="getTotalCountForSelectedDate() >= 10">
+                                                <i class="bi bi-plus-circle-fill"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </SwiperSlide>
@@ -198,12 +218,12 @@ function closePopup() {
                         </div>
                     </div>
                     <div class="ordertxt">
-                        <h5 class="boxitem">餐盒項目：</h5>
-                        <h5 class="subtotal">小計： $-</h5>
+                        <h5 class="boxitem">餐盒項目：{{ getMealSummary(deliveryDates[selectedIndex]) }}</h5>
+                        <h5 class="subtotal">小計：${{ getTotalPrice(deliveryDates[selectedIndex]) }}</h5>
                     </div>
                     <div class="total_option-btn">
                         <div class="total">
-                            <h5>總計金額：<br>$-</h5>
+                            <h5>總計金額：<br>${{ getTotalAllDates }}</h5>
                         </div>
                         <div class="option-btn">
                             <button class="prevbtn" disabled>上一步</button>
@@ -311,6 +331,7 @@ h1 {
 
 .lunchbox-swiper {
     width: auto;
+    margin-left: 0;
 }
 
 .dateItem {
@@ -365,8 +386,8 @@ h1 {
 
 .lunchboxlist {
     display: flex;
-    gap: 48px;
-    align-self: center;
+    // gap: 48px;
+    // align-self: center;
 }
 
 // 餐盒卡片
@@ -375,7 +396,7 @@ h1 {
     flex-direction: column;
     gap: 20px;
     padding: 16px 20px;
-    margin: 0 40px;
+    margin: 0 32px;
     border: 1px solid $neutral_300;
     border-radius: 20px;
 }
