@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import path from 'path'   // 載入 path
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import path from "path"; // 載入 path
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,13 +14,22 @@ export default defineConfig({
           @use "@/assets/sass/basic/font.scss" as *;
           @use "@/assets/sass/basic/radius.scss" as *;
           @use "@/assets/sass/basic/spacing.scss" as *;
-        `
-      }
-    }
+        `,
+      },
+    },
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src") // @ 符號：直接指向到 src 資料夾
-    }
-  }
-})
+      "@": path.resolve(__dirname, "./src"), // @ 符號：直接指向到 src 資料夾
+    },
+  },
+  // server: {
+  //   //本機測試專用
+  //   proxy: {
+  //     "/tjd101/g1/php": {
+  //       target: "http://localhost",
+  //       changeOrigin: true,
+  //     },
+  //   },
+  // },
+});

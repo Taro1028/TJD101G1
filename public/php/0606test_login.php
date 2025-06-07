@@ -6,11 +6,12 @@ header('Content-Type: application/json');
 $member = json_decode(file_get_contents("php://input"), true);
 
 // 引入資料庫連線（connection.php 檔案已包含 $pdo）
-include 'connection.php';
+include_once 'connection.php';
+include_once 'cors.php';
 
 try {
         // 查詢該帳號是否存在
-        $sql = "SELECT ID, EMAIL, PASSWORD 
+        $sql = "SELECT * 
           FROM MEMBERS 
           WHERE EMAIL = :usr AND PASSWORD = :pwd";
 
@@ -26,7 +27,16 @@ try {
                 echo json_encode([
                         'success' => true,
                         'ID' => $result['ID'],
-                        'EMAIL' => $result['EMAIL']
+                        'EMAIL' => $result['EMAIL'],
+                        'M_NAME' => $result['M_NAME'],
+                        'GENDER' => $result['GENDER'],
+                        'ADDRESS' => $result['ADDRESS'],
+                        'PASSWORD' => $result['PASSWORD'],
+                        'TELEPHONE' => $result['TELEPHONE'],
+                        'PHONE' => $result['PHONE'],
+                        'EMERGENCY_CONTACTS_NAME' => $result['EMERGENCY_CONTACTS_NAME'],
+                        'EMERGENCY_CONTACTS_PHONE' => $result['EMERGENCY_CONTACTS_PHONE'],
+                        'BIRTHDAY' => $result['BIRTHDAY'],
                 ]);
         } else {
                 // 查無資料

@@ -1,9 +1,7 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /tjd101/g1
-
-
-    RewriteCond %{REQUEST_URI} ^/tjd101/g1/public/php/
+    # RewriteCond %{REQUEST_URI} ^/tjd101/g1/public/php/
     RewriteRule ^ - [L]
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

@@ -35,7 +35,9 @@
           </div>
 
           <div>
-            <router-link to="/ForgotPassword" class="forgot-password">忘記密碼？</router-link>
+            <router-link to="/ForgotPassword" class="forgot-password"
+              >忘記密碼？</router-link
+            >
           </div>
 
           <div>
@@ -76,11 +78,16 @@
 </template>
 <script setup>
 import { ref } from "vue";
+import { useMemberStore } from "../stores/MemberStore";
+import { useRouter } from "vue-router";
+const member = useMemberStore();
+const router = useRouter();
 
 // 響應式數據
 const email = ref("");
 const password = ref("");
-
+const env = import.meta.env.VITE_API_URL;
+// const env = "";
 // 登入處理函數
 const handleLogin = async () => {
   // 驗證輸入
@@ -95,7 +102,7 @@ const handleLogin = async () => {
   }
 
   try {
-    const response = await fetch("/tjd101/g1/php/0606test_login.php", {
+    const response = await fetch(env + "/tjd101/g1/php/0606test_login.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -110,6 +117,9 @@ const handleLogin = async () => {
     if (response.ok) {
       const result = await response.json();
       console.log("登入成功:", result);
+      member.setMember(result);
+      console.log('ppp',member.id)
+      router.push("/Home");
       // 這裡可以添加登入成功後的邏輯，例如跳轉頁面
     } else {
       console.error("登入失敗:", response.statusText);
