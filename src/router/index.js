@@ -188,6 +188,14 @@ const routes = [
     },
   },
   {
+    path: "/ForgotPassword",
+    component: () => import("@/pages/ForgotPassword.vue"),
+    meta: {
+      title: "忘記密碼 - TibaEAT 提膳家",
+      requiredLogin: false,
+    },
+  },
+  {
     path: '/MemberCenter',
     component: () => import('@/pages/MemberCenter.vue'),
     meta: {
