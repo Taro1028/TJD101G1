@@ -101,11 +101,6 @@ const partners = [
                 </div>
             </section>
             <h2><i class="bi bi-flag" style="color: #e54343;"></i>合作機構</h2>
-            <!-- <section class="partner-logos">
-                <div class="logo" v-for="(logo, i) in logos" :key="i">
-                    <img :src="logo" alt="partner logo" />
-                </div>
-            </section> -->
             <div class="partner-wrapper" @click="closeAll">
                 <div class="partner-grid">
                     <PartnerCard

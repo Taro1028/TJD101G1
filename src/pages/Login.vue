@@ -2,16 +2,16 @@
   <div class="page-container">
     <div class="content-wrapper">
       <div class="left-section">
-        <RouterLink to="/Home"
+        <router-link to="/Home"
           ><img src="../assets/images//Logo_S.svg" alt="logo_s"
-        /></RouterLink>
+        /></router-link>
         <h1 class="signup-title">會員登入</h1>
         <p class="signup-subtitle">開始點餐吧</p>
 
         <!-- 建立帳號表單 -->
         <div class="signup_form">
           <div class="signup_form_component">
-            <label for="name">姓名</label>
+            <label for="name">帳號</label>
             <input
               type="text"
               id="EMAIL"
@@ -35,12 +35,12 @@
           </div>
 
           <div>
-            <a href="#" class="forgot-password">忘記密碼/帳號？</a>
+            <router-link to="/ForgotPassword" class="forgot-password">忘記密碼？</router-link>
           </div>
 
           <div>
-            <RouterLink to="/front/Sign_Up" class="signup_link"
-              >還沒有帳號？點我註冊</RouterLink
+            <router-link to="/Sign_Up" class="signup_link"
+              >還沒有帳號？點我註冊</router-link
             >
           </div>
 
@@ -62,7 +62,7 @@
           </div>
 
           <button type="submit" class="signup_submit" @click="handleLogin">
-            建立
+            登入
           </button>
         </div>
         <!-- 註冊表單結束 -->
@@ -275,8 +275,8 @@ a.signup_link {
 
   img {
     width: 100%;
-    height: 100%;
-    min-height: 100vh;
+    height: 100vh;
+    min-height: 100%;
     object-fit: cover;
     object-position: center;
   }

@@ -1,103 +1,160 @@
+<script setup>
+import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const form = reactive({
+  name: '',
+  sex: '',
+  address: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  telephone: '',
+  phone: '',
+  contactsName: '',
+  contactsPhone: ''
+})
+
+const handleSubmit = () => {
+  if (!form.name || !form.sex || !form.address || !form.email || !form.password || !form.confirmPassword || !form.phone) {
+    alert('請填寫所有必填欄位')
+    return
+  }
+  if (form.password !== form.confirmPassword) {
+    alert('密碼與確認密碼不一致')
+    return
+  }
+
+  alert('註冊成功，請登入！')
+  router.push('/Login')
+}
+
+</script>
+
 <template>
-<div class="page-container">
-  <div class="content-wrapper">
-    <div class="left-section">
-       <RouterLink to="/Home"><img src="../assets/images//Logo_S.svg" alt="logo_s" /></RouterLink>
+  <div class="page-container">
+    <div class="content-wrapper">
+      <!-- 左側區塊 -->
+      <div class="left-section">
+        <router-link to="/home">
+          <img src="../assets/images/Logo_S.svg" alt="logo_s" />
+        </router-link>
         <h1 class="signup-title">加入會員</h1>
         <p class="signup-subtitle">從每餐感受到連結</p>
 
-        <!-- 建立帳號表單 -->
-        <div class="signup_form">
+        <!-- 註冊表單 -->
+        <form class="signup_form" @submit.prevent="handleSubmit">
           <div class="signup_form_component">
-            <label for="name">姓名</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              class="signup_name"
-              placeholder="作為帳號之用"
-            />
+            <label for="name">姓名 (必填)</label>
+            <input type="text" id="name" v-model="form.name" placeholder="請輸入姓名" />
+          </div>
+
+          <div class="signup_form_radio">
+            <label>性別 (必填)</label>
+            <label><input type="radio" value="男" v-model="form.sex" />男</label>
+            <label><input type="radio" value="女" v-model="form.sex" />女</label>
           </div>
 
           <div class="signup_form_component">
-            <label for="email">電子信箱</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="signup_email"
-              placeholder="請輸入有效之電子信箱"
-            />
+            <label for="address">地址 (必填)</label>
+            <input type="text" id="address" v-model="form.address" placeholder="請輸入地址" />
           </div>
 
           <div class="signup_form_component">
-            <label for="phone">電話</label>
+            <label for="email">電子信箱 (必填)</label>
+            <input 
+              type="email" 
+              id="email" 
+              v-model="form.email" 
+              placeholder="請輸入有效之電子信箱" 
+              />
+          </div>
+
+          <div class="signup_form_component">
+            <label for="password">密碼 (必填)</label>
+            <input 
+              type="password" 
+              id="password" 
+              v-model="form.password" 
+              placeholder="至少8-16個英數組成" 
+              />
+          </div>
+
+          <div class="signup_form_component">
+            <label for="confirm_password">確認密碼 (必填)</label>
+            <input 
+              type="password" 
+              id="confirm_password" 
+              v-model="form.confirmPassword" 
+              placeholder="請再次輸入密碼" 
+              />
+          </div>
+
+          <div class="signup_form_component">
+            <label for="telephone">電話</label>
+            <input 
+              type="tel" 
+              id="telephone" 
+              v-model="form.telephone" 
+              placeholder="請輸入電話" 
+              />
+          </div>
+
+          <div class="signup_form_component">
+            <label for="phone">手機 (必填)</label>
             <input
               type="tel"
               id="phone"
-              name="phone"
-              class="signup_phone"
+              v-model="form.phone"
               placeholder="請輸入手機號碼"
             />
           </div>
 
           <div class="signup_form_component">
-            <label for="password">密碼</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              class="signup_password"
-              placeholder="至少8-16個英數組成"
-            />
+            <label for="contacts_name">備用聯絡人姓名</label>
+            <input 
+              type="text" 
+              id="contacts_name" 
+              v-model="form.contactsName" 
+              placeholder="請輸入備用聯絡人姓名" 
+              />
           </div>
 
           <div class="signup_form_component">
-            <label for="confirm_password">確認密碼</label>
+            <label for="contacts_phone">備用聯絡人手機</label>
             <input
-              type="password"
-              name="confirm_password"
-              id="confirm_password"
-              class="signup_confirm_password"
-              placeholder="請再次輸入密碼"
+              type="tel"
+              id="contacts_phone"
+              v-model="form.contactsPhone"
+              pattern="^09\\d{8}$"
+              placeholder="請輸入備用聯絡人手機號碼"
             />
           </div>
-          <div>
-           <RouterLink to="/Member" class="longin-link">已經有帳號？點我登入</RouterLink>
-          </div>
 
+          <router-link to="/member" class="longin-link">已經有帳號？點我登入</router-link>
 
           <!-- 快速註冊區塊 -->
           <div class="fast_signup">
             <p>快速註冊</p>
             <div class="social_links">
-              <a href="#"
-                ><img src="../assets/images/Member/Google_color.svg" alt="google-signup"
-              /></a>
-              <a href="#"
-                ><img src="../assets/images/Member/Line_color.svg" alt="line-signup"
-              /></a>
+              <a href="#"><img src="../assets/images/Member/Google_color.svg" alt="google-signup" /></a>
+              <a href="#"><img src="../assets/images/Member/Line_color.svg" alt="line-signup" /></a>
             </div>
           </div>
 
           <button type="submit" class="signup_submit">建立</button>
-        </div>
-        <!-- 註冊表單結束 -->
-    </div>
-<!-- 右側圖片區塊 -->
-    <div class="right-section">
+        </form>
+      </div>
+
+      <!-- 右側圖片 -->
+      <div class="right-section">
         <img src="../assets/images/Member/login_pic.svg" alt="外送插圖" />
+      </div>
     </div>
   </div>
-</div>
-       
-
 </template>
-
-<script setup>
-
-
-</script>
 
 <style scoped lang="scss">
 
@@ -132,7 +189,7 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 3rem;
+  // margin-top: 3rem;
 }
 
 .signup-title{
@@ -177,7 +234,6 @@ a {
 
 .signup_form_component input {
   width: 100%;
-  height: 48px;
   padding: 12px 16px;
   background-color: $neutral_white;
   border: 1px solid $neutral_300; 
@@ -198,6 +254,22 @@ a {
 
 .longin-link{
   color: $point_700;
+}
+
+.signup_form_radio{
+  color: $neutral_black;
+  align-items: center;
+  margin: 8px 0;
+  gap: 10px;
+}
+
+.signup_form_radio input[type="radio"] {
+  transform: scale(1.5);
+  margin-right: 4px;
+  width: 40px;
+  height: 12px;
+  margin-left: 48px;
+  background-color: $neutral_white;
 }
 
 /* 快速註冊區塊 */
@@ -238,8 +310,8 @@ a {
   
   img {
     width: 100%;
-    height: 100%;  
-    min-height: 100vh; 
+    height: 100vh;  
+    min-height: 100%; 
     object-fit: cover; 
     object-position: center;
   }
