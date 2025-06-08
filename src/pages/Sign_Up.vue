@@ -206,7 +206,7 @@ const handleSubmit = async () => {
             />
           </div>
 
-          <router-link to="/member" class="longin-link"
+          <router-link to="/Login" class="longin-link"
             >已經有帳號？點我登入</router-link
           >
 
