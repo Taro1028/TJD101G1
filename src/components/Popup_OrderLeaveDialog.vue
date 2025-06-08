@@ -1,8 +1,13 @@
 <script setup>
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'confirm-leave'])
 
 function closePopup() {
   emit('close')
+}
+
+function confirmLeave() {
+  emit('confirm-leave') // 發出確認離開事件
+  emit('close') // 同時關閉彈窗
 }
 </script>
 <template>
@@ -14,7 +19,7 @@ function closePopup() {
         </div>
         <h5>確定離開本頁面嗎？</h5>
         <div class="btnblock">
-        <router-link to="/Order/Select" class="btn-1">確定</router-link>
+        <button @click="confirmLeave" class="btn-1">確定</button>
         <button @click="closePopup" class="btn-2">取消</button>
         </div>
     </div>

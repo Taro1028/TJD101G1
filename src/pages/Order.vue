@@ -2,11 +2,23 @@
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useDateRangeStore } from '@/stores/dateRangeStore' // 共用日期 store
+// import { useOrderStore } from '@/stores/orderStore' 
+// import { usePlanCustomStore } from '@/stores/planCustomStore' 
 
 const route = useRoute()
 const router = useRouter()
+
 const startDate = route.query.start
 const endDate = route.query.end
+
+const dateRangeStore = useDateRangeStore()
+dateRangeStore.setDates(startDate, endDate)
+
+// 在頁面載入時，將日期設定到共用 store 中
+// 這裡很重要，確保日期已儲存，其他 store 才能從這裡讀取
+// 請確保 dateRangeStore 有 setDates 這個 action，否則請檢查 dateRangeStore.js
+dateRangeStore.setDates(startDate, endDate) // <-- 確保你的 dateRangeStore 有 setDates 這個方法
 
 onMounted(() => {
   document.body.classList.add('custom-bg')
@@ -22,22 +34,28 @@ function goPrev() {
 }
 
 function goPlanForyou() {
+    // const orderStore = useOrderStore()
+    // orderStore.initDateRange(startDate, endDate)
+
     router.push({
     path: '/Order/PlanForyou',
-    query: {
-        start: startDate,
-        end: endDate
-    }
+    // query: {
+    //     start: startDate,
+    //     end: endDate
+    // }
 })
 }
 
 function goPlanFree(){
+    // const planCustomStore = usePlanCustomStore()
+    // planCustomStore.initDateRange(startDate, endDate)
+
     router.push({
     path: '/Order/Select1_PlanFree',
-    query: {
-        start: startDate,
-        end: endDate
-    }
+    // query: {
+    //     start: startDate,
+    //     end: endDate
+    // }
 })
 
 }
@@ -74,6 +92,7 @@ function goPlanFree(){
     </FrontLayout>
 
 </template>
+
 <style>
 .custom-bg{
 background-image: url(../assets/images/Order/background.svg);

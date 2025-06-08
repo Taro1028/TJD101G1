@@ -4,8 +4,8 @@ import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import flatpickr from 'flatpickr'
 import 'flatpickr/dist/flatpickr.min.css'
 import { Mandarin } from 'flatpickr/dist/l10n/zh.js'
+import { useDateRangeStore } from '@/stores/dateRangeStore'
 import { useRouter } from 'vue-router'
-import { useOrderStore } from '@/stores/orderStore'
 
 const router = useRouter()
 
@@ -78,8 +78,8 @@ function goNext() {
     emit('confirm', [dateRange.start, dateRange.end])
 
     // 新增：初始化 pinia store
-    const orderStore = useOrderStore()
-    orderStore.initDateRange(dateRange.start, dateRange.end)
+    const dateRangeStore = useDateRangeStore()
+    dateRangeStore.setDates(dateRange.start, dateRange.end)
 
     
     router.push({

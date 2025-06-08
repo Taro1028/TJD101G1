@@ -1,6 +1,7 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted, computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import 'swiper/css'
 import foodData from '@/data/LunchBoxItems.json'
@@ -10,6 +11,7 @@ import 'dayjs/locale/zh-tw';
 dayjs.locale('zh-tw');
 import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
 import LunchBox from '@/components/Popup_LunchBoxDetails.vue'
+import MessageCard from '@/components/Popup_MessageCard.vue'
 
 // 菜單內容
 const menulist = ref(foodData)
@@ -20,6 +22,10 @@ const getImageUrl = (fileName) => {
 // 背景圖
 onMounted(() => {
     document.body.classList.add('custom-bg')
+    // 在這裡呼叫 orderStore 的初始化函式
+    console.log('Order_PlanForyou.vue: onMounted 鉤子執行，呼叫 orderStore.initializeOrderDates()');
+    orderStore.initializeOrderDates(); // <-- 加入這行！
+    
 })
 onUnmounted(() => {
     document.body.classList.remove('custom-bg')
@@ -34,6 +40,21 @@ const swiperOptions = {
 // Pinia 資料
 const orderStore = useOrderStore();
 const deliveryDates = computed(() => orderStore.deliveryDates);
+const isAllDatesSelected = computed(() => {
+  return orderStore.planForYouSelections.every(day =>
+    day.meals.some(meal => meal.count > 0)
+  )
+})
+
+const router = useRouter()
+
+function handleNextClick() {
+  if (isAllDatesSelected.value) {
+    openPopup('msgcard')
+  } else {
+    goNextDate()
+  }
+}
 
 // 日期格式化（統一處理）
 const formatDateWithOptions = (dateStr, { showYear = false, showWeekday = false } = {}) => {
@@ -102,10 +123,19 @@ function getTotalCountForSelectedDate() {
 }
 
 const getTotalAllDates = computed(() => {
-  return orderStore.planForYouSelections.reduce((sum, day) => {
+    return orderStore.planForYouSelections.reduce((sum, day) => {
     return sum + day.meals.reduce((subtotal, meal) => subtotal + meal.count * meal.price, 0)
   }, 0)
 })
+
+function hasSelectedMeal(index) {
+  const dayData = orderStore.planForYouSelections[index]
+  if (!dayData || !dayData.meals) return false
+
+  return dayData.meals.some(function(meal) {
+    return meal.count > 0
+  })
+}
 
 // Popup
 const showPopup = ref(null)
@@ -121,6 +151,35 @@ function closePopup() {
     showPopup.value = null
     selectedMenu.value = null
 }
+
+// 清除原本選擇的選項
+function handleLeaveConfirmed() {
+  orderStore.resetSelection(); // 清除選擇
+
+  router.push('/Order/Select'); 
+
+  closePopup(); 
+}
+
+// 上、下一步
+function goPrevDate() {
+  if (selectedIndex.value > 0) {
+    selectedIndex.value--
+  }
+}
+
+function goNextDate() {
+  if (selectedIndex.value < deliveryDates.value.length - 1) {
+    selectedIndex.value++
+  }
+}
+
+const isNextDisabled = computed(() => {
+  const isLastDate = selectedIndex.value === orderStore.planForYouSelections.length - 1
+  const todayMeals = orderStore.planForYouSelections[selectedIndex.value]?.meals || []
+  const todayHasNoSelection = todayMeals.every(meal => meal.count === 0)
+  return isLastDate && todayHasNoSelection
+})
 </script>
 
 <template>
@@ -128,7 +187,7 @@ function closePopup() {
         <div class="headline">
             <h1>為你搭配<span class="decorate"></span></h1>
             <a @click="openPopup('leave')">回主選單</a>
-            <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" />
+            <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" @confirm-leave="handleLeaveConfirmed" />
         </div>
         <div class="operate">
             <div class="order-container">
@@ -138,7 +197,7 @@ function closePopup() {
                             {{ formatDateWithOptions(deliveryDates[0], { showYear: true, showWeekday: true }) }}
                         </template>
                         <template v-else>
-                            {{ formatDateWithOptions(deliveryDates[0], { showYear: true, showWeekday: true }) }} –
+                            {{ formatDateWithOptions(deliveryDates[0], { showYear: true, showWeekday: true }) }}– 
                             {{ formatDateWithOptions(deliveryDates.at(-1), { showYear: false, showWeekday: true }) }}
                         </template>
                     </div>
@@ -149,7 +208,10 @@ function closePopup() {
                                 :key="index">
                                 <div class="dateItem"
                                     @click="selectedIndex = index"
-                                    :class="{ active: selectedIndex === index }">
+                                    :class="{ 
+                                            active: selectedIndex === index,
+                                            done: hasSelectedMeal(index) 
+                                            }">
                                     <div class="date">{{ formatDate(date) }}</div>
                                     <div class="lunchboxtxt">
                                         <template v-if="getTotalCount(date) > 0">
@@ -159,7 +221,7 @@ function closePopup() {
                                             請選擇餐點
                                         </template>
                                     </div>
-                                </div>
+                                </div>  
                             </SwiperSlide>
                         </Swiper>
                     </div>
@@ -197,14 +259,16 @@ function closePopup() {
                                             <button
                                                 class="decrease-btn"
                                                 @click="decrease(menuitem.title)"
-                                                :disabled="getCount(menuitem.title) <= 0">
+                                                :disabled="getCount(menuitem.title) <= 0"
+                                                :class="{'active-decrease':menuitem.title > 1 }">
                                                 <i class="bi bi-dash-circle-fill"></i>
                                             </button>
                                             <div class="count">{{ getCount(menuitem.title) }}</div>
                                             <button
                                                 class="increase-btn"
                                                 @click="increase(menuitem.title)"
-                                                :disabled="getTotalCountForSelectedDate() >= 10">
+                                                :disabled="getTotalCountForSelectedDate() >= 10"
+                                                :class="{'active-increase':getTotalCountForSelectedDate() >= 10 }">
                                                 <i class="bi bi-plus-circle-fill"></i>
                                             </button>
                                         </div>
@@ -226,8 +290,21 @@ function closePopup() {
                             <h5>總計金額：<br>${{ getTotalAllDates }}</h5>
                         </div>
                         <div class="option-btn">
-                            <button class="prevbtn" disabled>上一步</button>
-                            <button class="nextbtn" disabled>下一步</button>
+                            <button class="prevbtn"
+                                    :disabled="selectedIndex === 0"
+                                    @click="goPrevDate">
+                                上一步
+                            </button>
+                            <button 
+                                    :disabled="isNextDisabled"
+                                    :class="{
+                                            nextbtn: !isAllDatesSelected,
+                                            finish: isAllDatesSelected
+                                    }"
+                                    @click="handleNextClick">
+                                    {{ isAllDatesSelected ? '訂購餐點' : '下一步' }}
+                            </button>
+                            <MessageCard v-if="showPopup === 'msgcard'" @close="closePopup" />
                         </div>
                     </div>
                 </div>
@@ -343,6 +420,10 @@ h1 {
     border: 1px solid $neutral_300;
     background-color: $primary_50;
     cursor: pointer;
+}
+
+.dateItem.done {
+    background-color: $primary_400;
 }
 
 .dateItem.active {
@@ -468,7 +549,6 @@ h1 {
     align-items: center;
     justify-content: center;
     font-size: 32px;
-    opacity: 25%;
 }
 
 .increase-btn {
@@ -478,6 +558,20 @@ h1 {
     align-items: center;
     justify-content: center;
     font-size: 32px;
+}
+
+.quantity-selector button:disabled i {
+    color: $neutral_300;
+    cursor: not-allowed;
+}
+
+.decrease-btn.active-decrease i {
+    color: $neutral_black; 
+}
+
+.increase-btn.active-increase i {
+    color: $neutral_300; 
+    cursor: not-allowed; 
 }
 
 // 注意事項
@@ -540,6 +634,13 @@ h1 {
     padding: 12px 24px;
     background-color: $primary_100;
     border: 1px solid $primary_100;
+    border-radius: 24px;
+}
+
+.finish{
+    padding: 12px 24px;
+    background-color: $neutral_black;
+    color: $neutral_white;
     border-radius: 24px;
 }
 

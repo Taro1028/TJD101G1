@@ -2,88 +2,88 @@
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted, computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { usePlanCustomStore } from '@/stores/planCustomStore.js'; // 引入 Pinia Store
 import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
+
+// 引入 Pinia Store
+const planCustomStore = usePlanCustomStore();
+const router = useRouter();
 
 // 背景圖
 onMounted(() => {
-    document.body.classList.add('custom-bg')
+    document.body.classList.add('custom-bg');
+    // 從 Pinia store 恢復上次的選擇
+    // 使用結構賦值確保是值的複製，避免響應式代理問題
+    localSelectedSideDishGroups.value = [...planCustomStore.selectedSideDishGroups];
+    console.log('Order_Select2_PlanFree mounted, restored selected side dish groups:', localSelectedSideDishGroups.value);
+
+    // 可以在這裡加入驗證，如果 Step 1 的主菜沒有選，就導回 Step 1
+    if (planCustomStore.selectedMainCourseTypes.length !== 2) {
+      console.warn('Step 1 main course types not selected. Redirecting to Step 1.');
+      router.replace('/Order/PlanFree/Step1'); // 強制用戶從 Step 1 開始
+    }
 })
 
 onUnmounted(() => {
     document.body.classList.remove('custom-bg')
 })
 
+const localSelectedSideDishGroups = ref([]);
 
-const dishes = [
-  {
-    img: new URL('@/assets/images/Order/sidedish1.jpg', import.meta.url).href,
-    text: ['蒜蓉花椰菜', '炒高麗菜', '醋拌黑木耳']
-  },
-  {
-    img: new URL('@/assets/images/Order/sidedish2.jpg', import.meta.url).href,
-    text: ['蕃茄炒蛋', '金沙南瓜', '蒜炒空心菜']
-  },
-  {
-    img: new URL('@/assets/images/Order/sidedish3.jpg', import.meta.url).href,
-    text: ['鐵板豆芽菜', '蔥花炒蛋', '川燙青江菜']
-  },
-  {
-    img: new URL('@/assets/images/Order/sidedish4.jpg', import.meta.url).href,
-    text: ['川燙地瓜葉', '乾煸四季豆', '紅蘿蔔炒蛋']
-  },
-  {
-    img: new URL('@/assets/images/Order/sidedish5.jpg', import.meta.url).href,
-    text: ['香滷筍絲', '豆干炒芹菜', '炒三色椒']
-  },
-  {
-    img: new URL('@/assets/images/Order/sidedish6.jpg', import.meta.url).href,
-    text: ['醋拌小黃瓜', '蒜香薯丁', '椒鹽杏鮑菇']
-  },
-  {
-    img: new URL('@/assets/images/Order/sidedish7.jpg', import.meta.url).href,
-    text: ['酥炸豆腐', '涼拌海帶絲', '蒜炒菠菜']
-  },
-  {
-    img: new URL('@/assets/images/Order/sidedish8.jpg', import.meta.url).href,
-    text: ['麻婆豆腐', '香滷白菜', '玉米粒炒蛋']
-  },
-  
-]
-
-// Props & Emit
-const props = defineProps({
-    modelValue: {
-        type: Array,
-        default: () => []
-    }
-})
-const emit = defineEmits(['update:modelValue'])
-
-// 本地選取資料
-const selectedDishes = ref([...props.modelValue])
+// 副菜組合作為 computed 屬性從 store 獲取
+// 假設 planCustomStore 有一個 getter 叫做 availableSideDishOptions，提供所有可選的副菜組合
+// 且其數據結構與您之前 local 的 dishes 相同，例如：
+// availableSideDishOptions: [ { img: '...', text: [...] }, { img: '...', text: [...] }, ... ]
+const availableSideDishOptions = computed(() => planCustomStore.availableSideDishOptions);
 
 function toggleDish(index) {
-  const i = selectedDishes.value.indexOf(index)
-  if (i > -1) {
-    selectedDishes.value.splice(i, 1)
-  } else if (selectedDishes.value.length < 5) {
-    selectedDishes.value.push(index)
-  }
+    const i = localSelectedSideDishGroups.value.indexOf(index);
+    if (i > -1) {
+        // 如果已選中，則移除
+        localSelectedSideDishGroups.value.splice(i, 1);
+    } else if (localSelectedSideDishGroups.value.length < 5) {
+        // 如果未選中且數量小於 5，則新增
+        localSelectedSideDishGroups.value.push(index);
+    } else {
+        // 如果已滿 5 個，則提示
+        alert('最多只能選擇 5 組副菜喔！');
+        return; // 不更新選擇
+    }
+    // 同步更新 Pinia Store 中的 selectedSideDishGroups
+    planCustomStore.setSelectedSideDishGroups(localSelectedSideDishGroups.value);
+    console.log('Pinia store selectedSideDishGroups updated:', [...planCustomStore.selectedSideDishGroups]);
 }
 
+// 判斷是否選中（UI 狀態）
+function isSelected(index) {
+    return localSelectedSideDishGroups.value.includes(index);
+}
+
+// 判斷是否禁用（UI 狀態）
 function isDisabled(index) {
-  return selectedDishes.value.length >= 5 && !selectedDishes.value.includes(index)
+    // 當前項目未選中，且已選項目數量達到上限時禁用
+    return !isSelected(index) && localSelectedSideDishGroups.value.length >= 5;
 }
 
 // 判斷符合 下一步 條件
-const canProceed = computed(() => selectedDishes.value.length === 5)
+const canProceed = computed(() => localSelectedSideDishGroups.value.length === 5);
 
-const router = useRouter()
+
+// 下一步邏輯
 function goNext() {
-    if (!canProceed.value) return
-    localStorage.setItem('selectedSideDishes', JSON.stringify(selectedDishes.value))
-    router.push('/Order/Loading')
+    if (!canProceed.value) {
+        alert('請選擇五組副菜組合！'); // 增加提示
+        return;
+    }
+    // 在進入 Step 3 (確認菜單) 之前，初始化每天的餐盒內容
+    // 這裡會根據 Step 1 和 Step 2 的選擇隨機生成菜單
+    planCustomStore.initializeCustomMealsByDate(); 
+    router.push('/Order/Select3_PlanFree'); // 確保路徑正確
+}
 
+// 上一步邏輯 (返回 Step 1)
+function goPrevious() {
+    router.push('/Order/PlanFree/Step1'); // 或者 router.back()
 }
 
 // Popup
@@ -97,6 +97,17 @@ function closePopup() {
     showPopup.value = null
 }
 
+// 清除原本選擇的選項
+function handleLeaveConfirmed() {
+  planCustomStore.resetMainCourseSelection(); // 清除主菜選擇
+  planCustomStore.setSelectedSideDishGroups([]); // 清除副菜組合選擇
+  planCustomStore.customMealsByDate = []; // 清除已生成的每日菜單
+
+  router.push('/Order/Select'); 
+
+  closePopup(); 
+}
+
 </script>
 
 <template>
@@ -104,9 +115,7 @@ function closePopup() {
         <div class="headline">
             <div class="title-btn">
                 <h1>自由搭配<span class="decorate"></span></h1>
-                <div><a class="mobile" @click="openPopup('leave')">回主選單</a>
-                <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" />
-                </div>
+                <div><a class="mobile" @click="openPopup('leave')">回主選單</a></div>
             </div>
             <ul class="step">
                 <li class="finish"><span class="finishspan">1</span>選擇主菜</li>
@@ -114,28 +123,28 @@ function closePopup() {
                 <li><span>3</span>確認菜單</li>
             </ul>
             <a class="desktop" @click="openPopup('leave')">回主選單</a>
-            <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" />
+            <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" @confirm-leave="handleLeaveConfirmed" />
         </div>
         <div class="operate">
             <h3>副菜組合 8 選 5</h3>
             <div class="select">
-            <div class="selectblock">
-                <button
-                v-for="(item, index) in dishes"
-                :key="index"
-                class="dish-button"
-                :class="{ selected: selectedDishes.includes(index), disabled: isDisabled(index) }"
-                @click="toggleDish(index)"
-                :disabled="isDisabled(index) && !selectedDishes.includes(index)"
-                >
-                <img :src="item.img" :alt="item.name" />
-                <h5 v-for="line in item.text" :key="line">{{ line }}</h5>
-                </button>
-            </div>
-            <img class="mainbox" src="../assets/images/Order/mainbox2.png" alt="mainbox2">
+                <div class="selectblock">
+                    <button
+                        v-for="(item, index) in availableSideDishOptions"
+                        :key="index"
+                        class="dish-button"
+                        :class="{ selected: isSelected(index), disabled: isDisabled(index) }"
+                        @click="toggleDish(index)"
+                        :disabled="isDisabled(index) && !isSelected(index)"
+                    >
+                        <img :src="item.img" :alt="item.name" />
+                        <h5 v-for="line in item.text" :key="line">{{ line }}</h5>
+                    </button>
+                </div>
+                <img class="mainbox" src="../assets/images/Order/mainbox2.png" alt="mainbox2">
             </div>
             <div class="btnblock">
-                <button class="btn-1">上一步</button>
+                <button class="btn-1" @click="goPrevious">上一步</button>
                 <button class="btn-2"
                         :disabled="!canProceed" 
                         @click="goNext">下一步</button>

@@ -32,7 +32,7 @@ function goNext() {
             <h3>預約訂餐成功</h3>
             <h5>您預約的餐點已添加至購物車</h5>
             <div class="btnblock">
-            <router-link to="/Order" class="btn-1">繼續訂餐</router-link>
+            <router-link to="/Order/Select" class="btn-1">繼續訂餐</router-link>
             <button class="btn-2" @click="goNext">前往結帳</button>
             </div>
         </div>

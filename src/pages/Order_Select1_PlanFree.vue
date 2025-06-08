@@ -1,136 +1,158 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
-import { onMounted, onUnmounted, computed, watch, ref } from 'vue'
+import { onMounted, onUnmounted, computed, ref } from 'vue' // 移除 watch，因為不再需要 computed setter
+import { usePlanCustomStore } from '@/stores/planCustomStore.js';
 import { useRouter } from 'vue-router'
+import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue' // 引入 LeaveDialog
+
 // 背景圖
 onMounted(() => {
-    document.body.classList.add('custom-bg')
+  document.body.classList.add('custom-bg')
+  // 從 store 恢復上次的選擇（如果有的話）
+  // 這裡需要將 store 中的 selectedMainCourseTypes 複製到 localSelectedMeats
+  // 確保組件內部的 ref 與 store 狀態同步
+  localSelectedMeats.value = [...planCustomStore.selectedMainCourseTypes];
 })
 
 onUnmounted(() => {
-    document.body.classList.remove('custom-bg')
+  document.body.classList.remove('custom-bg')
 })
 
-// Props & Emit
-const props = defineProps({
-    modelValue: {
-        type: Array,
-        default: () => []
-    }
-})
-const emit = defineEmits(['update:modelValue'])
+const planCustomStore = usePlanCustomStore();
+const router = useRouter();
 
-// 主菜資料
+
 const meats = [
-    { value: 'pork', label: '豬肉', img: new URL('@/assets/images/Order/taiwanPork.svg', import.meta.url).href },
-    { value: 'beef', label: '牛肉', img: new URL('@/assets/images/Order/aussieBeef.svg', import.meta.url).href },
-    { value: 'fish', label: '魚肉', img: new URL('@/assets/images/Order/seafood.svg', import.meta.url).href },
-    { value: 'chicken', label: '雞肉', img: new URL('@/assets/images/Order/chicken.svg', import.meta.url).href }
+  { value: 'pork', label: '豬肉', img: new URL('@/assets/images/Order/taiwanPork.svg', import.meta.url).href },
+  { value: 'beef', label: '牛肉', img: new URL('@/assets/images/Order/aussieBeef.svg', import.meta.url).href },
+  { value: 'fish', label: '魚肉', img: new URL('@/assets/images/Order/seafood.svg', import.meta.url).href },
+  { value: 'chicken', label: '雞肉', img: new URL('@/assets/images/Order/chicken.svg', import.meta.url).href }
 ]
 
-// 本地選取資料
-const localSelected = ref([...props.modelValue])
-const router = useRouter()
+// 使用一個 local ref 來管理 checkbox 的選擇狀態，然後在 `toggleSelect` 時更新 Pinia Store
+const localSelectedMeats = ref([]);
 
-// 判斷符合 下一步 條件
-const canProceed = computed(() => localSelected.value.length === 2)
+// 判斷是否符合 下一步 條件
+const canProceed = computed(() => localSelectedMeats.value.length === 2);
 
-// 雙向綁定 v-model
-watch(localSelected, (val, oldVal) => {
-    if (val.length <= 2) {
-        emit('update:modelValue', val)
-    } else {
-        // 限制最多 2 個
-        alert('最多只能選擇 2 種主菜喔！')
-        val.pop()
-    }
-})
-watch(() => props.modelValue, (val) => {
-    localSelected.value = [...val]
-})
-
-// 切換邏輯
+// 切換選擇邏輯
 function toggleSelect(value) {
-    const index = localSelected.value.indexOf(value)
-    if (index >= 0) {
-        localSelected.value.splice(index, 1)
+  const index = localSelectedMeats.value.indexOf(value);
+
+  if (index >= 0) {
+    // 如果已選中，則移除
+    localSelectedMeats.value.splice(index, 1);
+  } else {
+    // 如果未選中
+    if (localSelectedMeats.value.length < 2) {
+      // 如果未滿兩個，則新增
+      localSelectedMeats.value.push(value);
     } else {
-        if (localSelected.value.length < 2) {
-            localSelected.value.push(value)
-        } else {
-            alert('最多只能選擇 2 種主菜喔！')
-        }
+      // 如果已滿兩個，則提示
+      console.log('localSelectedMeats.value.length:', localSelectedMeats.value.length);
+      console.log('預期觸發 alert，已選:', [...localSelectedMeats.value]);
+      alert('最多只能選擇 2 種主菜喔！');
+      return; // 不更新 localSelectedMeats
     }
+  }
+  console.log('點擊後 localSelectedMeats:', [...localSelectedMeats.value]);
+  // 每當 localSelectedMeats 變動時，同步更新 Pinia Store 中的 selectedMainCourseTypes
+  planCustomStore.setSelectedMainCourseTypes(localSelectedMeats.value);
+  console.log('Pinia store updated:', [...planCustomStore.selectedMainCourseTypes]);
 }
 
+// 判斷是否選中（UI 狀態）
 function isSelected(value) {
-    return localSelected.value.includes(value)
-}
-function isDisabled(value) {
-    // return !isSelected(value) && localSelected.value.length >= 2
-    return false
+  return localSelectedMeats.value.includes(value);
 }
 
+// 判斷是否禁用（UI 狀態）
+function isDisabled(value) {
+  // 當前項目未選中，且已選項目數量達到上限時禁用
+  return !isSelected(value) && localSelectedMeats.value.length >= 2;
+}
 
 // 下一步邏輯
 function goNext() {
-    if (!canProceed.value) return
-
-    // 儲存所選主菜（也可以改用 pinia）
-    localStorage.setItem('selectedMeats', JSON.stringify(localSelected.value))
-
-    // 導向下一頁
-    router.push('/Order/Select2_PlanFree') // 或你的實際路徑
-
+  if (!canProceed.value) {
+    alert('請選擇兩種主菜！'); // 增加提示
+    return;
+  }
+  router.push('/Order/Select2_PlanFree'); // 確保路徑正確
 }
 
+// Popup 邏輯
+const showPopup = ref(null)
 
+function openPopup(value) {
+  showPopup.value = value
+}
+
+function closePopup() {
+  showPopup.value = null
+}
+
+// 清除原本選擇的選項
+function handleLeaveConfirmed() {
+  planCustomStore.resetMainCourseSelection(); 
+  localSelectedMeats.value = []; // 同步清除組件內部的狀態
+
+  router.push('/Order/Select'); 
+
+  closePopup(); 
+}
 </script>
+
 <template>
-    <FrontLayout>
-        <div class="headline">
-            <div class="title-btn">
-                <h1>自由搭配<span class="decorate"></span></h1>
-                <router-link to="/Order" class="mobile">回主選單</router-link>
+  <FrontLayout>
+    <div class="headline">
+      <div class="title-btn">
+        <h1>自由搭配<span class="decorate"></span></h1>
+        <a class="mobile" @click="openPopup('leave')">回主選單</a>
+      </div>
+      <ul class="step">
+        <li class="finish"><span class="finishspan">1</span>選擇主菜</li>
+        <li><span>2</span>選擇副菜</li>
+        <li><span>3</span>確認菜單</li>
+      </ul>
+      <a class="desktop" @click="openPopup('leave')">回主選單</a>
+      <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" @confirm-leave="handleLeaveConfirmed" />
+    </div>
+
+    <div class="operate">
+      <h3>主菜 4 選 2</h3>
+      <div class="checkboxblock">
+        <label v-for="item in meats" :key="item.value"
+            :class="{ 'selected-label': isSelected(item.value), 'disabled-label': isDisabled(item.value) }"
+            @click="toggleSelect(item.value)"> 
+            <div class="custom-checkbox">
+                <i class="bi bi-check-square-fill" v-if="isSelected(item.value)"></i>
+                <i class="bi bi-square" v-else></i>
             </div>
-            <ul class="step">
-                <li class="finish"><span class="finishspan">1</span>選擇主菜</li>
-                <li><span>2</span>選擇副菜</li>
-                <li><span>3</span>確認菜單</li>
-            </ul>
-            <router-link to="/Order" class="desktop">回主選單</router-link>
+            <h4>{{ item.label }}</h4>
+        </label>
+      </div>
+      <div class="selectimg">
+        <div class="mainblock">
+          <img src="../assets/images/Order/mainblock.png" alt="mainblock">
+          <div class="selectmeal">
+            <button v-for="item in meats" :key="item.value" class="btn"
+                :class="[item.value + '-btn', isSelected(item.value) ? 'active' : '', isDisabled(item.value) ? 'disabled-btn' : '']"
+                @click="toggleSelect(item.value)"> <img :src="item.img" :alt="item.label" />
+            </button>
+          </div>
         </div>
-        <div class="operate">
-            <h3>主菜 4 選 2</h3>
-            <div class="checkboxblock">
-                <label v-for="item in meats" :key="item.value">
-                    <input type="checkbox" :value="item.value" v-model="localSelected"
-                        :disabled="isDisabled(item.value)" />
-                    <h4>{{ item.label }}</h4>
-                </label>
-            </div>
-            <div class="selectimg">
-                <div class="mainblock">
-                    <img src="../assets/images/Order/mainblock.png" alt="mainblock">
-                    <div class="selectmeal">
-                        <button v-for="item in meats" :key="item.value" class="btn"
-                            :class="[item.value + '-btn', isSelected(item.value) ? 'active' : '']"
-                            @click="toggleSelect(item.value)">
-                            <img :src="item.img" :alt="item.label" />
-                        </button>
-                    </div>
-                </div>
-                <img class="mainbox" src="../assets/images/Order/mainbox1.png" alt="mainbox1">
-            </div>
-            <div class="btnblock">
-                <button class="btn-1">上一步</button>
-                <button class="btn-2" 
-                        :disabled="!canProceed" 
-                        @click="goNext">下一步
-                </button>
-            </div>
-        </div>
-    </FrontLayout>
+        <img class="mainbox" src="../assets/images/Order/mainbox1.png" alt="mainbox1">
+      </div>
+      <div class="btnblock">
+        <button class="btn-1" @click="router.back()">上一步</button>
+        <button class="btn-2" 
+                :disabled="!canProceed" 
+                @click="goNext">下一步
+        </button>
+      </div>
+    </div>
+  </FrontLayout>
 </template>
 
 <style>
@@ -260,6 +282,7 @@ h3 {
     height: 20px;
     accent-color: $primary_400;
     cursor: pointer;
+    display: none;
 }
 
 // 選擇圖片區塊
