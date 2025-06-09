@@ -1,22 +1,82 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
-import { onMounted, onUnmounted, ref, computed } from 'vue' // 引入 computed
+import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
 import MessageCard from '@/components/Popup_MessageCard.vue' // 注意這裡應該是 MessageCard
 import { usePlanCustomStore } from '@/stores/planCustomStore.js' // 引入 planCustomStore
+import { useDateRangeStore } from '@/stores/dateRangeStore.js';
 import dayjs from 'dayjs' // 引入 dayjs
 import 'dayjs/locale/zh-tw' // 引入中文語系
 dayjs.locale('zh-tw') // 設定 dayjs 語系
+import SettingActionMenu from '@/components/SettingActionMenu.vue'; // 新增的全局選單組件
+import DailyMealEditPopup from '@/components/DailyMealEditPopup.vue'; // 新增的當日菜單編輯彈窗組件
 
-const router = useRouter()
-const planCustomStore = usePlanCustomStore()
+// --- Store 相關 ---
+const planCustomStore = usePlanCustomStore();
+const dateRangeStore = useDateRangeStore();
+const menuMode = computed(() => planCustomStore.menuMode); // 從 store 取得 menuMode
+const isEditingModeActive = computed(() => planCustomStore.isEditingModeActive); // 從 store 取得 isEditingModeActive
 
 // 從 Store 獲取數據
 const customMealsByDate = computed(() => planCustomStore.customMealsByDate)
 const deliveryDates = computed(() => planCustomStore.deliveryDates)
 const CUSTOM_MEAL_PRICE = computed(() => planCustomStore.CUSTOM_MEAL_PRICE) // 獲取統一價格
 
+// --- 路由 ---
+const router = useRouter()
+
+// --- 全局操作選單邏輯 (SettingActionMenu) ---
+const showSettingActionMenu = ref(false); // 控制全局操作選單的顯示
+
+function toggleSettingActionMenu() {
+    showSettingActionMenu.value = !showSettingActionMenu.value;
+}
+
+function handleMoveOrder() {
+    planCustomStore.setMenuMode('moveOrder'); // 設定全局模式為移動順序
+    showSettingActionMenu.value = false; // 關閉浮動選單
+    console.log('進入移動菜單順序模式');
+    // 這裡您可以啟動一個拖曳排序功能 (可能需要額外的庫，如 Vue.Draggable)
+    // 或者簡化為僅顯示移動icon，實際排序通過另一個「儲存順序」按鈕觸發
+}
+
+function handleEditContent() {
+    planCustomStore.setMenuMode('editContent'); // 設定全局模式為編輯內容
+    showSettingActionMenu.value = false; // 關閉浮動選單
+    console.log('進入編輯菜單內容模式');
+    // 進入此模式後，每個 day-item 會顯示鉛筆 icon
+}
+
+// 處理「完成」按鈕點擊，回到數量調整模式
+function handleCompleteEdit() {
+    planCustomStore.setMenuMode('quantity'); // 將模式重設回數量調整
+    showSettingActionMenu.value = false;
+    console.log('完成編輯，回到數量調整模式');
+    // 如果有任何暫存的編輯狀態，也可以在這裡重置，例如拖曳排序的狀態
+}
+
+// --- 單日菜單編輯彈窗邏輯 (DailyMealEditPopup) ---
+const showDailyEditPopup = ref(false);
+const editingDayMeal = ref(null); // 儲存當前正在編輯的 dayMeal 物件
+
+function openDailyEditPopup(dayMeal) {
+    editingDayMeal.value = dayMeal;
+    showDailyEditPopup.value = true;
+}
+
+function closeDailyEditPopup() {
+    showDailyEditPopup.value = false;
+    editingDayMeal.value = null;
+}
+
+function handleMealUpdate(updatedMeal) {
+    // 處理 DailyMealEditPopup 返回的更新後的菜單數據
+    planCustomStore.updateCustomMeal(updatedMeal.date, updatedMeal.mainCourse, updatedMeal.sideDishes);
+    closeDailyEditPopup();
+}
+
+// --- 生命週期鉤子 ---
 // 背景圖
 onMounted(() => {
     document.body.classList.add('custom-bg')
@@ -24,81 +84,84 @@ onMounted(() => {
 
     // 在此步驟初始化每天的菜單
     // 只有在確保前一步的選擇都完成時才執行初始化
-    // 修正: 將 selectedMainDishes 改為 selectedMainCourseTypes
-    if (planCustomStore.selectedMainCourseTypes.length === 2 && planCustomStore.selectedSideDishGroups.length === 5) {
+    if (planCustomStore.selectedMainCourseTypes.length === 2 && planCustomStore.selectedSideDishGroups.length === 5 && planCustomStore.deliveryDates.length > 0) {
         planCustomStore.initializeCustomMealsByDate()
     } else {
         // 如果沒有完成前置選擇，導回 Step 2 (或 Step 1)
-        alert('請先完成主菜和副菜組合選擇！')
-        router.replace('/Order/PlanFree/Step2') // 導回 Step 2
+        alert('請先完成主菜、副菜組合選擇及日期選擇！');
+        // router.replace('/Order/PlanFree/Step2'); // 如果是 Step2 是進入點，則導回
+        router.replace('/Order/PlanFree/Step1'); // 更安全的做法，導回 Step1 讓使用者重新選擇
     }
 })
 
 onUnmounted(() => {
-  document.body.classList.remove('custom-bg')
+    document.body.classList.remove('custom-bg')
 })
 
-// Popup 邏輯
+// --- Popup 彈窗邏輯 (LeaveDialog, MessageCard) ---
 const showPopup = ref(null)
 
 function openPopup(value) {
-  showPopup.value = value
+    showPopup.value = value
 }
 
 function closePopup() {
-  showPopup.value = null
+    showPopup.value = null
 }
 
 // 清除原本選擇的選項
 function handleLeaveConfirmed() {
-  planCustomStore.resetMainCourseSelection(); // 清除主菜選擇
-  planCustomStore.setSelectedSideDishGroups([]); // 清除副菜組合選擇
-  planCustomStore.customMealsByDate = []; // 清除已生成的每日菜單
+    planCustomStore.resetMainCourseSelection(); // 清除主菜選擇
+    planCustomStore.setSelectedSideDishGroups([]); // 清除副菜組合選擇
+    dateRangeStore.clearDates(); // 清除日期選擇
+    planCustomStore.customMealsByDate = []; // 清除已生成的每日菜單
+    planCustomStore.setMenuMode('quantity'); // 重置菜單模式
 
-  router.push('/Order/Select'); 
+    router.push('/Order/Select');
 
-  closePopup(); 
+    closePopup();
 }
 
+// --- 日期和價格相關計算屬性與函數 ---
 // 日期格式化函數
 const formatDateWithOptions = (dateStr, { showYear = false, showWeekday = false } = {}) => {
-  const d = dayjs(dateStr)
-  const weekday = ['日', '一', '二', '三', '四', '五', '六'][d.day()]
-  const formatStr = showYear ? 'YYYY.MM.DD' : 'MM.DD'
-  const base = d.format(formatStr)
-  return showWeekday ? `${base}（${weekday}）` : base
+    const d = dayjs(dateStr)
+    const weekday = ['日', '一', '二', '三', '四', '五', '六'][d.day()]
+    const formatStr = showYear ? 'YYYY.MM.DD' : 'MM.DD'
+    const base = d.format(formatStr)
+    return showWeekday ? `${base}（${weekday}）` : base
 }
 
 // 顯示期間範圍（例如「06.07(六) - 06.13(五)」）
 const customPeriodDisplay = computed(() => {
-  if (deliveryDates.value.length === 0) {
-    return '';
-  } else if (deliveryDates.value.length === 1) {
-    // 如果只有一天，只顯示單日
-    return formatDateWithOptions(deliveryDates.value[0], { showYear: false, showWeekday: true });
-  } else {
-    // 如果超過一天，顯示範圍
-    const start = deliveryDates.value[0];
-    const end = deliveryDates.value[deliveryDates.value.length - 1];
-    return `${formatDateWithOptions(start, { showYear: false, showWeekday: true })} - ${formatDateWithOptions(end, { showYear: false, showWeekday: true })}`;
-  }
+    if (deliveryDates.value.length === 0) {
+        return '';
+    } else if (deliveryDates.value.length === 1) {
+        // 如果只有一天，只顯示單日
+        return formatDateWithOptions(deliveryDates.value[0], { showYear: false, showWeekday: true });
+    } else {
+        // 如果超過一天，顯示範圍
+        const start = deliveryDates.value[0];
+        const end = deliveryDates.value[deliveryDates.value.length - 1];
+        return `${formatDateWithOptions(start, { showYear: false, showWeekday: true })} - ${formatDateWithOptions(end, { showYear: false, showWeekday: true })}`;
+    }
 })
 
 // 獲取星期幾的簡寫 (MON, TUE 等)
 const getDayOfWeekShort = (dateStr) => {
-  const d = dayjs(dateStr)
-  const weekdayShort = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.day()]
-  return weekdayShort
+    const d = dayjs(dateStr)
+    const weekdayShort = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.day()]
+    return weekdayShort
 }
 
 // 增加餐盒數量
 function increaseCount(date) {
-  planCustomStore.increaseCustomCount(date)
+    planCustomStore.increaseCustomCount(date)
 }
 
 // 減少餐盒數量
 function decreaseCount(date) {
-  planCustomStore.decreaseCustomCount(date)
+    planCustomStore.decreaseCustomCount(date)
 }
 
 // 計算總天數
@@ -116,96 +179,132 @@ const getTotalAllDatesPrice = computed(() => {
 
 // 下一步/訂購餐點按鈕邏輯
 const isOrderButtonDisabled = computed(() => {
-  // 如果沒有生成菜單，或者總數量為 0，則禁用按鈕
-  return customMealsByDate.value.length === 0 || totalMealsCount.value === 0
-})
+    // 如果沒有生成菜單，或者總數量為 0，則禁用按鈕
+    return customMealsByDate.value.length === 0 || totalMealsCount.value === 0
+});
 
 function handleOrderClick() {
-  // 這裡可以導航到結帳頁面，或者觸發加入購物車的 API
-  openPopup('message') // 假設點擊訂購餐點會彈出訊息
+    // 這裡可以導航到結帳頁面，或者觸發加入購物車的 API
+    openPopup('message') // 假設點擊訂購餐點會彈出訊息
 }
 </script>
 
 <template>
-  <FrontLayout>
-    <div class="headline">
-      <div class="title-btn">
-        <h1>自由搭配<span class="decorate"></span></h1>
-        <div>
-          <a class="mobile" @click="openPopup('leave')">回主選單</a>
-        </div>
-      </div>
-      <ul class="step">
-        <li class="finish"><span class="finishspan">1</span>選擇主菜</li>
-        <li class="finish"><span class="finishspan">2</span>選擇副菜</li>
-        <li class="finish"><span class="finishspan">3</span>確認菜單</li>
-      </ul>
-      <a class="desktop" @click="openPopup('leave')">回主選單</a>
-      <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" @confirm-leave="handleLeaveConfirmed" />
-    </div>
-    <div class="operate">
-      <div class="menubox">
-        <div class="title">
-          <div class="titletxt">
-            <h5>餐盒資訊</h5>
-            <div class="period">
-              <h5>{{ customPeriodDisplay }}</h5>
-            </div>
-          </div>
-          <button class="set"><i class="bi bi-three-dots"></i></button>
-        </div>
-        <hr>
-        <div class="menulist">
-          <div class="day-item" v-for="dayMeal in customMealsByDate" :key="dayMeal.date">
-            <div class="item">
-              <h6>{{ getDayOfWeekShort(dayMeal.date) }}</h6>
-              <div class="meal">
-                <div class="mealname">🍱 {{ dayMeal.mainCourse }}餐食</div>
-                <div class="mealinfo">
-                  <span id="mainmeal">{{ dayMeal.mainCourse }} / </span>
-                  <span id="sidemeal">{{ dayMeal.sideDishes.join(' / ') }}</span>
+    <FrontLayout>
+        <div class="headline">
+            <div class="title-btn">
+                <h1>自由搭配<span class="decorate"></span></h1>
+                <div>
+                    <a class="mobile" @click="openPopup('leave')">回主選單</a>
                 </div>
-              </div>
-              <div class="price">${{ CUSTOM_MEAL_PRICE }}</div> </div>
-            <div class="quantity-selector">
-              <button class="decrease-btn" 
-                      @click="decreaseCount(dayMeal.date)" 
-                      :disabled="dayMeal.count <= 1"
-                      :class="{ 'active-decrease': dayMeal.count > 1 }" >
-                <i class="bi bi-dash-circle-fill"></i>
-              </button>
-              <div class="count">{{ dayMeal.count }}</div>
-              <button class="increase-btn" 
-                      @click="increaseCount(dayMeal.date)"
-                      :class="{ 'active-increase': dayMeal.count >= 10 }" >
-                <i class="bi bi-plus-circle-fill"></i>
-              </button>
             </div>
-          </div>
-          <h6 class="notice"><i class="bi bi-info-circle-fill"></i> 單日餐盒數超過 10 份，請直接來電訂購</h6>
+            <ul class="step">
+                <li class="finish"><span class="finishspan">1</span>選擇主菜</li>
+                <li class="finish"><span class="finishspan">2</span>選擇副菜</li>
+                <li class="finish"><span class="finishspan">3</span>確認菜單</li>
+            </ul>
+            <a class="desktop" @click="openPopup('leave')">回主選單</a>
+            <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" @confirm-leave="handleLeaveConfirmed" />
         </div>
-      </div>
-      <div class="image-btn">
-        <div class="priceinfo">
-          <span class="perblock">訂購期間：&nbsp;<span>{{ customPeriodDisplay }}<br>(共 {{ totalDeliveryDays }} 天)</span>
-          </span>
-          <span>餐盒金額： ${{ CUSTOM_MEAL_PRICE }} 元</span>
-          <span>數量合計： {{ totalMealsCount }} 份</span>
-          <span>總計金額： ${{ getTotalAllDatesPrice }}</span>
+        <div class="operate">
+            <div class="menubox">
+                <div class="title">
+                    <div class="titletxt">
+                        <h5>餐盒資訊</h5>
+                        <div class="period">
+                            <h5>{{ customPeriodDisplay }}</h5>
+                        </div>
+                    </div>
+                    <button v-if="!isEditingModeActive" class="set" @click="toggleSettingActionMenu">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                    <button v-else class="set complete-btn" @click="handleCompleteEdit">
+                        完成
+                    </button>
+
+                    <SettingActionMenu
+                        v-if="showSettingActionMenu && !isEditingModeActive"
+                        @close="toggleSettingActionMenu"
+                        @move-order="handleMoveOrder"
+                        @edit-content="handleEditContent"
+                        style="position: absolute; top: 64px; right: 24px; z-index: 100;" />
+                </div>
+                <hr>
+                <div class="menulist">
+                    <div class="day-item" v-for="dayMeal in customMealsByDate" :key="dayMeal.date">
+                        <div class="item">
+                            <h6>{{ getDayOfWeekShort(dayMeal.date) }}</h6>
+                            <div class="meal">
+                                <div class="mealname">🍱 {{ dayMeal.mainCourse }}餐食</div>
+                                <div class="mealinfo">
+                                    <span id="mainmeal">{{ dayMeal.mainCourse }} / </span>
+                                    <span id="sidemeal">{{ dayMeal.sideDishes.join(' / ') }}</span>
+                                </div>
+                            </div>
+                            <div class="price">${{ CUSTOM_MEAL_PRICE }}</div>
+                        </div>
+
+                        <div class="action-area">
+                            <div v-if="menuMode === 'quantity'" class="quantity-selector">
+                                <button
+                                    class="decrease-btn"
+                                    @click="decreaseCount(dayMeal.date)"
+                                    :disabled="dayMeal.count <= 1"
+                                    :class="{ 'active-decrease': dayMeal.count > 1 }"
+                                >
+                                    <i class="bi bi-dash-circle-fill"></i>
+                                </button>
+                                <div class="count">{{ dayMeal.count }}</div>
+                                <button
+                                    class="increase-btn"
+                                    @click="increaseCount(dayMeal.date)"
+                                    :disabled="dayMeal.count >= 10"
+                                    :class="{ 'active-increase': dayMeal.count >= 10 }"
+                                >
+                                    <i class="bi bi-plus-circle-fill"></i>
+                                </button>
+                            </div>
+                            <div v-else-if="menuMode === 'moveOrder'" class="move-order-action">
+                                <button class="move-btn">
+                                    <i class="bi bi-list"></i> </button>
+                            </div>
+                            <div v-else-if="menuMode === 'editContent'" class="edit-content-action">
+                                <button class="edit-btn" @click="openDailyEditPopup(dayMeal)">
+                                    <i class="bi bi-pencil"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                    <h6 class="notice"><i class="bi bi-info-circle-fill"></i> 單日餐盒數超過 10 份，請直接來電訂購</h6>
+                </div>
+                <DailyMealEditPopup
+                    v-if="showDailyEditPopup"
+                    :day-meal="editingDayMeal"
+                    @close="closeDailyEditPopup"
+                    @update-meal="handleMealUpdate"
+                />
+            </div>
+            <div class="image-btn">
+                <div class="priceinfo">
+                    <span class="perblock">訂購期間：&nbsp;<span>{{ customPeriodDisplay }}<br>(共 {{ totalDeliveryDays }} 天)</span>
+                    </span>
+                    <span>餐盒金額： ${{ CUSTOM_MEAL_PRICE }} 元</span>
+                    <span>數量合計： {{ totalMealsCount }} 份</span>
+                    <span>總計金額： ${{ getTotalAllDatesPrice }}</span>
+                </div>
+                <img src="../assets/images/Order/box-complete.png" alt="">
+                <div class="btnblock">
+                    <button class="btn-1" @click="router.back()">上一步</button>
+                    <div>
+                        <button class="btn-2" @click="handleOrderClick" :disabled="isOrderButtonDisabled">
+                            訂購餐點
+                        </button>
+                        <MessageCard v-if="showPopup === 'message'" @close="closePopup" />
+                    </div>
+                </div>
+            </div>
         </div>
-        <img src="../assets/images/Order/box-complete.png" alt="">
-        <div class="btnblock">
-          <button class="btn-1" @click="router.back()">上一步</button>
-          <div>
-            <button class="btn-2" @click="handleOrderClick" :disabled="isOrderButtonDisabled">
-              訂購餐點
-            </button>
-            <MessageCard v-if="showPopup === 'message'" @close="closePopup" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </FrontLayout>
+        
+    </FrontLayout>
 </template>
 
 <style>
@@ -315,6 +414,7 @@ h1 {
     background-color: $neutral_white;
     border: 1px solid $neutral_700;
     border-radius: 8px;
+    position: relative;
 }
 
 .title {
@@ -339,7 +439,24 @@ h1 {
     background-color: transparent;
     border: 2px solid $neutral_black;
     cursor: pointer;
+    display: flex; /* Added for centering content */
+    align-items: center; /* Added for centering content */
+    justify-content: center; /* Added for centering content */
 }
+
+// 新增「完成」按鈕的樣式
+.complete-btn {
+    width: 52px;
+    border: none;
+    color: $neutral_black;
+    font-size: $font_h5;
+
+    &:hover {
+        cursor: pointer;
+        color: $primary_600;
+    }
+}
+
 
 // 菜單清單
 .menulist {
@@ -394,7 +511,7 @@ h1 {
 }
 
 .quantity-selector {
-    // min-width: 116px;
+    // min-width: 116px; // 可以根據實際內容調整，但保持 flex 布局良好
     display: flex;
     gap: 16px;
     justify-content: space-evenly;
@@ -403,7 +520,7 @@ h1 {
 
 .count{
     text-align: center;
-    width: 20px;
+    width: 20px; // 確保數字有足夠的空間
 }
 
 .decrease-btn {
@@ -430,14 +547,40 @@ h1 {
 }
 
 .decrease-btn.active-decrease i {
-    color: $neutral_black; 
+    color: $neutral_black;
 }
 
 .increase-btn.active-increase i {
-    color: $neutral_300; 
-    cursor: not-allowed; 
+    color: $neutral_300;
+    cursor: not-allowed;
 }
 
+.action-area{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    // 為 action-area 設置一個固定的寬度，防止切換時佈局抖動
+    min-width: 116px; // 假設和 quantity-selector 寬度差不多
+}
+
+.move-order-action button,
+.edit-content-action button{
+    border: 1px solid transparent;
+    background-color: transparent;
+    font-size: 32px;
+    border-radius: 8px;
+    width: 42px; /* 確保按鈕大小一致 */
+    height: 42px; /* 確保按鈕大小一致 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover{
+        cursor: pointer;
+        // border: 1px solid $neutral_black;
+        background-color: $neutral_100;
+    }
+}
 
 .notice {
     margin: 0;
@@ -508,6 +651,13 @@ h1 {
         background-color: transparent;
         transition: 0.3s ease;
         color: $neutral_black;
+    }
+
+    &:disabled {
+        background-color: $neutral_300;
+        color: $neutral_700;
+        border-color: $neutral_300;
+        cursor: not-allowed;
     }
 }
 

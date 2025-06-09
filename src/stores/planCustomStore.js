@@ -18,7 +18,7 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
   // 因此，selectedMainCourseTypes 其實就是 selectedMeats 的內容
   // 我會將 selectedMainDishes 的用途調整為「隨機生成時會從這些選定的主菜類型的清單中挑選的總清單」
   // 讓 selectedMainDishes 成為一個內部計算屬性，包含所有可選的主菜名稱
-
+  
   const selectedSideDishGroups = ref([]); // Step 2: 用戶選擇的 5 個副菜組合的索引
 
   const customMealsByDate = ref([]);      // Step 3: 每天實際隨機生成的菜單及數量
@@ -52,17 +52,17 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
   });
 
   // 獲取所有副菜組合選項，用於 Step 2 頁面顯示
-  // const availableSideDishOptions = computed(() => customMealOptions.sideDishes);
-  const availableSideDishOptions = ref([
-    { img: 'images/Order/sidedish2.jpg', text: ['蕃茄炒蛋', '金沙南瓜', '蒜炒空心菜'] },
-    { img: 'images/Order/sidedish1.jpg', text: ['蒜蓉花椰菜', '炒高麗菜', '醋拌黑木耳'] },
-    { img: 'images/Order/sidedish3.jpg', text: ['鐵板豆芽菜', '蔥花炒蛋', '川燙青江菜'] },
-    { img: 'images/Order/sidedish4.jpg', text: ['川燙地瓜葉', '乾煸四季豆', '紅蘿蔔炒蛋'] },
-    { img: 'images/Order/sidedish5.jpg', text: ['香滷筍絲', '豆干炒芹菜', '炒三色椒'] },
-    { img: 'images/Order/sidedish6.jpg', text: ['醋拌小黃瓜', '蒜香薯丁', '椒鹽杏鮑菇'] },
-    { img: 'images/Order/sidedish7.jpg', text: ['酥炸豆腐', '涼拌海帶絲', '蒜炒菠菜'] },
-    { img: 'images/Order/sidedish8.jpg', text: ['麻婆豆腐', '香滷白菜', '玉米粒炒蛋'] },
-  ]);
+  const availableSideDishOptions = computed(() => customMealOptions.sideDishes);
+  // const availableSideDishOptions = ref([
+  //   { img: 'images/Order/sidedish2.jpg', text: ['蕃茄炒蛋', '金沙南瓜', '蒜炒空心菜'] },
+  //   { img: 'images/Order/sidedish1.jpg', text: ['蒜蓉花椰菜', '炒高麗菜', '醋拌黑木耳'] },
+  //   { img: 'images/Order/sidedish3.jpg', text: ['鐵板豆芽菜', '蔥花炒蛋', '川燙青江菜'] },
+  //   { img: 'images/Order/sidedish4.jpg', text: ['川燙地瓜葉', '乾煸四季豆', '紅蘿蔔炒蛋'] },
+  //   { img: 'images/Order/sidedish5.jpg', text: ['香滷筍絲', '豆干炒芹菜', '炒三色椒'] },
+  //   { img: 'images/Order/sidedish6.jpg', text: ['醋拌小黃瓜', '蒜香薯丁', '椒鹽杏鮑菇'] },
+  //   { img: 'images/Order/sidedish7.jpg', text: ['酥炸豆腐', '涼拌海帶絲', '蒜炒菠菜'] },
+  //   { img: 'images/Order/sidedish8.jpg', text: ['麻婆豆腐', '香滷白菜', '玉米粒炒蛋'] },
+  // ]);
 
   // 獲取所有實際的副菜名稱列表 (從所有副菜組合中提取，用於隨機生成)
   const allPossibleSideDishes = computed(() => {
@@ -109,12 +109,18 @@ function initializeCustomMealsByDate() {
         return;
     }
 
-    // *** 關鍵修正點 ***
-    // 獲取已選的副菜組合物件本身，而不是將它們平鋪成單個副菜名稱
-    const selectedSideDishObjects = selectedSideDishGroups.value.map(index => customMealOptions.sideDishes[index]);
-    
-    // 檢查確保我們確實選到了 5 個副菜組合
-    if (selectedSideDishObjects.length !== 5) {
+// *** 關鍵修正點：從索引獲取完整的副菜組合物件陣列 ***
+    const selectedSideDishObjects = selectedSideDishGroups.value.map(index => {
+      // 確保索引有效
+      if (index >= 0 && index < availableSideDishOptions.value.length) {
+        return availableSideDishOptions.value[index]; // 這是整個副菜組合物件 { img: '', text: [] }
+      }
+      console.warn(`無效的副菜組合索引: ${index}`);
+      return null; // 或者處理為空物件
+    }).filter(group => group !== null); // 過濾掉無效的索引
+
+    // 檢查確保我們確實選到了 5 個副菜組合 (如果期望是 5 個)
+    if (selectedSideDishObjects.length !== 5) { // 如果 selectedSideDishGroups 確實傳遞了 5 個索引
         console.error('PlanCustomStore: 未選到足夠的副菜組合！');
         customMealsByDate.value = [];
         return;
@@ -159,6 +165,26 @@ function initializeCustomMealsByDate() {
     }
   }
 
+
+  const menuMode = ref('quantity'); // 'quantity' (預設), 'moveOrder', 'editContent'
+  const isEditingModeActive = computed(() => menuMode.value !== 'quantity');
+  
+  function setMenuMode(mode) {
+    menuMode.value = mode;
+}
+
+// 更新單日餐盒內容的方法
+function updateCustomMeal(date, newMainCourse, newSideDishes) {
+    const index = customMealsByDate.value.findIndex(d => d.date === date);
+    if (index !== -1) {
+        customMealsByDate.value[index].mainCourse = newMainCourse;
+        customMealsByDate.value[index].sideDishes = newSideDishes;
+        console.log(`更新了 ${date} 的餐盒內容:`, customMealsByDate.value[index]);
+    }
+}
+
+
+
   // Step 3: 獲取某天的餐盒總份數
   function getCustomTotalCountForDate(date) {
     const day = customMealsByDate.value.find(d => d.date === date);
@@ -190,7 +216,7 @@ function initializeCustomMealsByDate() {
     availableMainCourseOptions, // 原始的主菜類型選項
     possibleMainDishesBasedOnTypes, // 根據選定類型過濾出的實際主菜清單
     availableSideDishOptions,
-    allPossibleSideDishes,
+    // allPossibleSideDishes,
 
     // Action
     resetMainCourseSelection,
@@ -203,5 +229,9 @@ function initializeCustomMealsByDate() {
     getCustomTotalPriceForDate,
     getTotalAllCustomDatesPrice,
     CUSTOM_MEAL_PRICE,
+    menuMode,
+    isEditingModeActive,
+    setMenuMode,
+    updateCustomMeal
   };
 });
