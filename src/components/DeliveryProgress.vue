@@ -344,7 +344,7 @@ const closeModalOnOverlay = (event) => {
 
   .info-row {
       display: flex;
-      justify-content: space-between;
+      justify-content: start;
       margin-bottom: 8px;
       padding: 4px 0;
   }
