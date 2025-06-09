@@ -56,7 +56,7 @@ export const useMemberStore = defineStore("member", {
     loadFromLocalStorage() {
       const savedMember = localStorage.getItem("member");
       if (savedMember) {
-        const parsed = JSON.parse(savedMemberr);
+        const parsed = JSON.parse(savedMember);//多一個r
         Object.assign(this, parsed);
       }
     },

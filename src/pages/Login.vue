@@ -102,7 +102,7 @@ const handleLogin = async () => {
   }
 
   try {
-    const response = await fetch(env + "/tjd101/g1/php/0606test_login.php", {
+    const response = await fetch(env + "/tjd101/g1/php/Login.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -113,14 +113,14 @@ const handleLogin = async () => {
       }),
     });
 
-    // 處理響應
+    
     if (response.ok) {
       const result = await response.json();
       console.log("登入成功:", result);
       member.setMember(result);
       console.log('ppp',member.id)
       router.push("/Home");
-      // 這裡可以添加登入成功後的邏輯，例如跳轉頁面
+      
     } else {
       console.error("登入失敗:", response.statusText);
       alert("登入失敗，請檢查您的帳號密碼");
