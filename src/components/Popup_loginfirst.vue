@@ -1,13 +1,28 @@
 <script setup>
+import { useModalStore } from '@/stores/ModalStore'
 
+const modalStore = useModalStore()
+
+// 關閉彈窗函數（點擊背景時使用）
+const handleClose = () => {
+  modalStore.closeLoginPopup()
+}
+
+// 前往登入頁面（點擊按鈕時關閉彈窗）
+const handleGoToLogin = () => {
+  // 🔔 點擊按鈕時立即關閉彈窗
+  modalStore.closeLoginPopup()
+}
 </script>
+
 <template>
-<div class="overlay">
-    <div class="alertlogin">
+
+<div v-if="modalStore.showLoginPopup" class="overlay" @click="handleClose">
+    <div class="alertlogin" @click.stop>
         <img src="../assets/images/Logo_L.svg" alt="">
         <h3>請先登入會員</h3>
         <h5>登入會員即可享受完整使用體驗</h5>
-        <router-link to="/Member" class="btn">前往登入</router-link>
+        <router-link to="/Login" class="btn" @click="handleGoToLogin">前往登入</router-link>
     </div>
 </div>
 </template>
@@ -65,5 +80,4 @@ h5{
     color: $neutral_black;
     }
 }
-
 </style>

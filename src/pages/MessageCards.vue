@@ -50,11 +50,11 @@ const stickers = [
 // 顏色 
 const colors = [
   { id: 1, value: '#FFE299', src: color1 },
-  { id: 2, value: '#FFB3BA', src: color2 },
-  { id: 3, value: '#BAFFC9', src: color3 },
-  { id: 4, value: '#BAE1FF', src: color4 },
-  { id: 5, value: '#FFFFBA', src: color5 },
-  { id: 6, value: '#E1BAFF', src: color6 }
+  { id: 2, value: '#FFD3A8', src: color2 },
+  { id: 3, value: '#FFAFA3', src: color3 },
+  { id: 4, value: '#D3BDFF', src: color4 },
+  { id: 5, value: '#B3EFBD', src: color5 },
+  { id: 6, value: '#A8DAFF', src: color6 }
 ]
 
 // 關心小語
