@@ -1,37 +1,72 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { useRouter, useRoute } from 'vue-router';
+import { useMemberStore } from '@/stores/memberStore'; // 根據你的檔案路徑調整
 
-const showDropdown = ref(false);
+const router = useRouter();
+const route = useRoute();
+const memberStore = useMemberStore();
+
+const showAboutDropdown = ref(false);
+const showMemberDropdown = ref(false);
 const isMobileMenuOpen = ref(false);
 const isMounted = ref(false);
 const isMobile = ref(false);
-const dropdownRef = ref(null);
+const aboutDropdownRef = ref(null);
+const memberDropdownRef = ref(null);
 
-// 切換關於我們下拉選單
-const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value;
+// 使用 Pinia store 的資料
+const isLoggedIn = computed(() => !!memberStore.id);
+const userAvatar = computed(() => {
+  // 如果 store 中有頭像就用，沒有就用預設頭像
+  return memberStore.avatar || new URL('../assets/images/Member/person-fill.svg', import.meta.url).href;
+});
+const userName = computed(() => memberStore.name || '會員');
+
+// 登出功能
+const logout = () => {
+  memberStore.clearUser(); // 使用 store 的清除方法
+  showMemberDropdown.value = false;
+  closeMobileMenu();
+  router.push('/Home');
+};
+
+// 關於我們下拉選單
+const toggleAboutDropdown = () => {
+  showAboutDropdown.value = !showAboutDropdown.value;
+  showMemberDropdown.value = false; // 關閉其他下拉選單
+};
+
+// 會員下拉選單
+const toggleMemberDropdown = () => {
+  showMemberDropdown.value = !showMemberDropdown.value;
+  showAboutDropdown.value = false; // 關閉其他下拉選單
 };
 
 // 切換手機側邊選單
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
   if (!isMobileMenuOpen.value) {
-    showDropdown.value = false;
+    showAboutDropdown.value = false;
+    showMemberDropdown.value = false;
   }
 };
 
-// 點擊遮罩或外部時收合選單
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false;
-  showDropdown.value = false;
+  showAboutDropdown.value = false;
+  showMemberDropdown.value = false;
 };
 
-// 偵測點擊外部關閉 dropdown & 側邊選單
 const handleClickOutside = (event) => {
-  const clickedOutsideDropdown =
-    dropdownRef.value &&
-    !dropdownRef.value.contains(event.target) &&
+  const clickedOutsideAboutDropdown =
+    aboutDropdownRef.value &&
+    !aboutDropdownRef.value.contains(event.target) &&
+    !event.target.closest(".hamburger");
+
+  const clickedOutsideMemberDropdown =
+    memberDropdownRef.value &&
+    !memberDropdownRef.value.contains(event.target) &&
     !event.target.closest(".hamburger");
 
   const clickedOutsideNav =
@@ -39,8 +74,12 @@ const handleClickOutside = (event) => {
     !event.target.closest(".nav-wrapper") &&
     !event.target.closest(".hamburger");
 
-  if (clickedOutsideDropdown) {
-    showDropdown.value = false;
+  if (clickedOutsideAboutDropdown) {
+    showAboutDropdown.value = false;
+  }
+
+  if (clickedOutsideMemberDropdown) {
+    showMemberDropdown.value = false;
   }
 
   if (clickedOutsideNav) {
@@ -48,7 +87,6 @@ const handleClickOutside = (event) => {
   }
 };
 
-// 偵測是否為手機寬度
 const checkIsMobile = () => {
   isMobile.value = window.innerWidth <= 820;
 };
@@ -56,6 +94,7 @@ const checkIsMobile = () => {
 onMounted(() => {
   isMounted.value = true;
   checkIsMobile();
+  memberStore.loadFromLocalStorage();
   window.addEventListener("resize", checkIsMobile);
   document.addEventListener("click", handleClickOutside);
 });
@@ -69,62 +108,85 @@ onBeforeUnmount(() => {
 <template>
   <header>
     <router-link to="/Home">
-      <img src="../assets/images/Logo_S.svg" alt="logo_s" />
+      <img src="../assets/images/Logo_S.svg" alt="logo_s" class="logo"/>
     </router-link>
 
-      <button class="hamburger" :class="{ active: isMobileMenuOpen }" @click="toggleMobileMenu">
-        <span></span><span></span><span></span>
-      </button>
+    <button class="hamburger" :class="{ active: isMobileMenuOpen }" @click="toggleMobileMenu">
+      <span></span><span></span><span></span>
+    </button>
 
-      <div
-        v-if="isMobileMenuOpen"
-        class="mobile-backdrop"
-        @click="closeMobileMenu"
-      ></div>
+    <div
+      v-if="isMobileMenuOpen"
+      class="mobile-backdrop"
+      @click="closeMobileMenu"
+    ></div>
 
-      <nav class="nav-wrapper" :class="{ open: isMobileMenuOpen }" v-show="!isMobile || isMobileMenuOpen">
-        <ul class="header_nav">
-            <li><router-link to="/LunchBox">餐盒介紹</router-link></li>
-            <li><router-link to="/Order/Select">預約訂餐</router-link></li>
-            <li 
-                class="dropdown"
-                ref="dropdownRef">
-                <div>
-                <a href="javascript:void(0)"
-                    @click.stop="toggleDropdown">
-                    關於我們
-                </a>
-                <ul v-if="showDropdown" class="dropdown-menu">
-                    <li><router-link to="/About">理念及目標</router-link></li>
-                    <li><router-link to="/About/SmallFarmer">配合小農</router-link></li>
-                    <li><router-link to="/About/Cooperation">合作夥伴</router-link></li>
-                    <li><router-link to="/About/News">最新消息</router-link></li>
-                </ul>
-                </div>
-            </li>
-            <li><router-link to="/Login">登入/註冊</router-link></li>
-        </ul>
-      </nav>
-      
+    <nav class="nav-wrapper" :class="{ open: isMobileMenuOpen }" v-show="!isMobile || isMobileMenuOpen">
+      <ul class="header_nav">
+        <!-- 主要導航項目 -->
+        <li class="nav-item">
+          <router-link to="/LunchBox" :class="{ active: route.path === '/LunchBox' }">
+            餐盒介紹
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/Order/Select" :class="{ active: route.path === '/Order/Select' }">
+            預約訂餐
+          </router-link>
+        </li>
+        <li class="nav-item dropdown" ref="aboutDropdownRef">
+          <div>
+            <a href="javascript:void(0)"
+               @click.stop="toggleAboutDropdown" 
+               :class="{ active: route.path.startsWith('/About') }">
+              關於我們
+            </a>
+            <ul v-if="showAboutDropdown" class="dropdown-menu">
+              <li><router-link to="/About" :class="{ active: route.path === '/About' }">理念及目標</router-link></li>
+              <li><router-link to="/About/SmallFarmer" :class="{ active: route.path === '/About/SmallFarmer' }">配合小農</router-link></li>
+              <li><router-link to="/About/Cooperation" :class="{ active: route.path === '/About/Cooperation' }">合作夥伴</router-link></li>
+              <li><router-link to="/About/News" :class="{ active: route.path === '/About/News' }">最新消息</router-link></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+      <ul class="header_nav_right">
+        <li v-if="!isLoggedIn" class="nav-item">
+          <router-link to="/Login" :class="{ active: route.path === '/Login' }">登入/註冊</router-link>
+        </li>
+        <template v-else>
+          <li class="nav-item dropdown member-dropdown" ref="memberDropdownRef">
+            <div>
+              <a href="javascript:void(0)" @click.stop="toggleMemberDropdown">
+                <img :src="userAvatar" alt="會員頭像" class="avatar"/>
+              </a>
+              <ul v-if="showMemberDropdown" class="dropdown-menu member-menu">
+                <li>
+                  <router-link to="/MemberCenter" :class="{ active: route.path === '/MemberCenter' }">會員中心</router-link>
+                </li>
+                <li>
+                  <a href="javascript:void(0)" @click="logout" class="logout-btn">登出</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item cart-item">
+            <router-link to="/Cart">
+              <i class="bi bi-cart3"></i>
+            </router-link>
+          </li>
+        </template>
+      </ul>
+    </nav>
   </header>
 </template>
-
-
-<style>
-html, body{
-  overflow-x: hidden;
-}
-
-</style>
 
 <style scoped lang="scss">
 header {
   max-width: 100%;
   height: 60px;
   display: flex;
-  padding: 0;
-  padding-left: 48px;
-  padding-right: 48px;
   justify-content: space-between;
   align-items: center;
   background-color: $primary_100;
@@ -136,34 +198,72 @@ header a {
   display: block;
 }
 
-header a .img {
+header a img {
   display: block;
   height: 48px;
 }
 
-.header_nav {
+.logo{
+  margin-left: 40px;
+}
+
+.nav-wrapper {
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+
+  &.open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+}
+
+.header_nav,
+.header_nav_right {
   padding: 0;
   margin: 0;
-  height: 100%;
   display: flex;
   list-style-type: none;
-  gap: 8px;
   position: relative;
 }
 
-.header_nav li {
-  padding: 8px;
-  position: relative;
+.header_nav_right {
+  margin-left: auto;
 }
 
-.header_nav li a {
-  display: block;
-  color: $neutral_black;
-  text-decoration: none;
-  line-height: 36px;
+.nav-item {
+  padding-left: 16px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
 
-  &:hover {
-    color: $primary_600;
+  a {
+    display: block;
+    color: $neutral_black;
+    text-decoration: none;
+    line-height: 60px;
+
+    &:hover {
+      color: $primary_600;
+    }
+
+    &.active {
+      color: $primary_600;
+    }
+  }
+
+  i {
+    font-size: $font_h4;
+    margin-right: 20px;
+    cursor: pointer;
+
+    &:hover {
+      color: $primary_600;
+    }
   }
 }
 
@@ -173,23 +273,58 @@ header a .img {
   left: 0;
   background-color: $primary_100;
   border-radius: 6px;
-  padding: 0.5rem 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 999;
+  min-width: 120px;
 
   li {
     white-space: nowrap;
 
     a {
       display: block;
-      padding: 5px 10px;
+      text-align: center;
       color: $neutral_black;
 
       &:hover {
         background-color: $primary_50;
         color: $primary_600;
       }
+
+      &.active {
+        color: $primary_600;
+      }
     }
+  }
+}
+
+.member-dropdown {
+  .dropdown-menu {
+    right: 0;
+  }
+}
+
+.member-menu {
+  .logout-btn {
+    color: #dc3545;
+
+    &:hover {
+      background-color: $primary_50;
+      color: #dc3545;
+    }
+  }
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid $neutral_black;
+  object-fit: cover;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+
+  &:hover {
+    border-color: $primary_600;
   }
 }
 
@@ -224,15 +359,6 @@ header a .img {
   }
 }
 
-.nav-wrapper {
-  display: flex;
-  z-index: 1000;
-
-  &.open {
-    display: block;
-  }
-}
-
 .mobile-backdrop {
   position: fixed;
   top: 60px;
@@ -246,19 +372,22 @@ header a .img {
 @media (max-width: 820px) {
   .hamburger {
     display: flex;
+    margin-right: 20px;
   }
 
   .nav-wrapper {
     position: fixed;
     top: 60px;
     right: 0;
-    width: 260px;
+    width: 280px;
     height: calc(100vh - 60px);
-    padding: 10px;
+    padding: 20px;
     background-color: $primary_100;
     box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
+    align-items: stretch;
+    gap: 0;
 
     transform: translateX(100%);
     opacity: 0;
@@ -277,19 +406,68 @@ header a .img {
     }
   }
 
-  .header_nav {
+  .header_nav{
     flex-direction: column;
+    width: 100%;
+    gap: 0;
+    text-align: center;
+  }
 
-    .dropdown-menu {
-      position: static;
-      box-shadow: none;
-      padding-left: 10px;
+  .header_nav_right{
+    order: -1;
+    border-bottom: 1px solid $neutral_300;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+  }
+
+  .nav-item {
+    padding: 12px 8px;
+    margin-right: 0;
+  }
+
+  .dropdown-menu {
+    position: static;
+    box-shadow: none;
+    background-color: $primary_50;
+    width: 300px;
+    border-radius: 0;
+    margin-top: 8px;
+
+    li {
+      white-space: nowrap;
+
+      a {
+        display: block;
+        text-align: center;
+        color: $neutral_black;
+
+        &:hover {
+          background-color: $primary_50;
+          color: $primary_600;
+        }
+
+        &.active {
+          color: $primary_600;
+        }
+      }
     }
   }
 
-  .mobile-backdrop {
-    z-index: 999; 
+  .member-dropdown .dropdown-menu {
+    right: auto;
+    left: 0;
+  }
+
+  .avatar{
+    margin: 0 auto;
+  }
+
+  .nav-item .dropdown li a{
+    margin: 0 auto;
+  }
+  .cart-item i{
+    margin-right: 0px;
   }
 }
-
 </style>

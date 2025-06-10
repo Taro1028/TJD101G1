@@ -96,7 +96,7 @@ const handleSubmit = async () => {
         <!-- 註冊表單 -->
         <form class="signup_form" @submit.prevent="handleSubmit">
           <div class="signup_form_component">
-            <label for="name">姓名 (必填)</label>
+            <label for="name">姓名</label>
             <input
               type="text"
               id="name"
@@ -106,7 +106,7 @@ const handleSubmit = async () => {
           </div>
 
           <div class="signup_form_radio">
-            <label>性別 (必填)</label>
+            <label>性別</label>
             <label
               ><input type="radio" value="男" v-model="form.sex" />男</label
             >
@@ -116,7 +116,7 @@ const handleSubmit = async () => {
           </div>
 
           <div class="signup_form_component">
-            <label for="address">地址 (必填)</label>
+            <label for="address">地址</label>
             <input
               type="text"
               id="address"
@@ -126,7 +126,7 @@ const handleSubmit = async () => {
           </div>
 
           <div class="signup_form_component">
-            <label for="email">電子信箱 (必填)</label>
+            <label for="email">電子信箱</label>
             <input
               type="email"
               id="email"
@@ -135,7 +135,7 @@ const handleSubmit = async () => {
             />
           </div>
           <div class="signup_form_component">
-            <label for="birthday">生日 (必填)</label>
+            <label for="birthday">生日</label>
             <input
               type="text"
               id="birthday"
@@ -146,7 +146,7 @@ const handleSubmit = async () => {
           </div>
 
           <div class="signup_form_component">
-            <label for="password">密碼 (必填)</label>
+            <label for="password">密碼</label>
             <input
               type="password"
               id="password"
@@ -156,7 +156,7 @@ const handleSubmit = async () => {
           </div>
 
           <div class="signup_form_component">
-            <label for="confirm_password">確認密碼 (必填)</label>
+            <label for="confirm_password">確認密碼</label>
             <input
               type="password"
               id="confirm_password"
@@ -176,7 +176,7 @@ const handleSubmit = async () => {
           </div>
 
           <div class="signup_form_component">
-            <label for="phone">手機 (必填)</label>
+            <label for="phone">手機</label>
             <input
               type="tel"
               id="phone"

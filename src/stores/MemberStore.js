@@ -15,6 +15,7 @@ export const useMemberStore = defineStore("member", {
     contactsName: "",
     contactsPhone: "",
     birthday: "",
+    avatar: "",
     
     // ✨ 新增：登入狀態管理
     isLoggedIn: false,
@@ -60,6 +61,7 @@ export const useMemberStore = defineStore("member", {
         this.contactsName = member.EMERGENCY_CONTACTS_NAME ?? "";
         this.contactsPhone = member.EMERGENCY_CONTACTS_PHONE ?? "";
         this.birthday = member.BIRTHDAY ?? "";
+        this.avatar = member.AVATAR ?? "";
         this.success = member.success;
         
         // ✨ 新增：設定登入狀態
