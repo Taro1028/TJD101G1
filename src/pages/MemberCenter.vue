@@ -1,11 +1,15 @@
-    <script setup>
+<script setup>
     import { ref } from 'vue';
     import FrontLayout from '../layouts/FrontLayout.vue';
     import Gotop from "../components/Gotop.vue"
+    import { useMemberStore } from '@/stores/MemberStore'
+    import { useRouter } from 'vue-router'
 
     const showDefaultAvatar = ref(true);
     const uploadedImageSrc = ref('');
     const avatarInput = ref(null);
+    const memberStore = useMemberStore()
+    const router = useRouter()
 
     // 點擊大頭照區域觸發檔案選擇
     const handleAvatarClick = () => {
@@ -73,8 +77,24 @@
     if (avatarInput.value) {
         avatarInput.value.value = '';
     }
-    };  
-    </script>
+    };
+    
+    // 登出處理函數
+const handleLogout = () => {
+  // 確認是否要登出
+  if (confirm('確定要登出嗎？')) {
+    // 清除會員資料
+    memberStore.logout()
+    
+    // 跳轉到首頁
+    router.push('/Home')
+    
+    // 顯示登出成功訊息
+    alert('登出成功！')
+  }
+}
+
+</script>
     <template>
         <FrontLayout>
         <section class="memberCenter">
@@ -145,7 +165,9 @@
                             <li><RouterLink to="/MemberCenter/MyOrders">訂單總覽</RouterLink></li>
                             <li><RouterLink to="/MemberCenter/MyCards">我的小卡</RouterLink></li>
                             <li><RouterLink to="/MemberCenter/Recipients">收件者管理</RouterLink></li>
-                            <li class="logout"><button class="btn">登出</button></li>
+                            <li class="logout">
+                                <button class="btn" @click="handleLogout">登出</button>
+                            </li>
                         </ul>
                     </div>
                     

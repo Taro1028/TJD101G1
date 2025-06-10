@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useMemberStore } from "@/stores/MemberStore";
+import { useModalStore } from "@/stores/ModalStore";
 
 // path → component
 const routes = [
@@ -164,14 +166,6 @@ const routes = [
     }
   },
   {
-    path: "/Member",
-    component: () => import("@/pages/Member.vue"),
-    meta: {
-      title: "會員中心 - TibaEAT 提膳家",
-      requiredLogin: false,
-    },
-  },
-  {
     path: "/Login",
     component: () => import("@/pages/Login.vue"),
     meta: {
@@ -200,7 +194,7 @@ const routes = [
     component: () => import('@/pages/MemberCenter.vue'),
     meta: {
       title: '個人資料 - TibaEAT 提膳家',
-      requiredLogin: false
+      requiredLogin: true
     }
   },
 
@@ -209,7 +203,7 @@ const routes = [
     component: () => import('@/pages/Recipients.vue'),
     meta: {
       title: '收件者管理 - TibaEAT 提膳家',
-      requiredLogin: false
+      requiredLogin: true
     }
   },
   {
@@ -217,7 +211,7 @@ const routes = [
     component: () => import('@/pages/MyCards.vue'),
     meta: {
       title: '我的小卡 - TibaEAT 提膳家',
-      requiredLogin: false
+      requiredLogin: true
     }
   },
   {
@@ -225,7 +219,7 @@ const routes = [
     component: () => import('@/pages/MyOrders.vue'),
     meta: {
       title: '訂單總覽 - TibaEAT 提膳家',
-      requiredLogin: false
+      requiredLogin: true
     }
   },
   // === 後台 ===
@@ -280,3 +274,35 @@ router.afterEach((to) => {
 
 // 匯出 router
 export default router;
+
+// 全域前置守衛 - 檢查登入狀態
+router.beforeEach((to, from, next) => {
+  const memberStore = useMemberStore()
+  const modalStore = useModalStore()
+  
+  // 檢查是否需要登入
+  const requiresAuth = to.meta.requiredLogin
+  
+  // 如果需要登入但使用者未登入
+  if (requiresAuth && !memberStore.isAuthenticated) {
+    console.log('需要登入才能進入此頁面:', to.path)
+    
+    // 🔔 顯示登入彈窗，並記住要重定向的路徑
+    modalStore.openLoginPopup(
+      to.fullPath, 
+      `請先登入才能進入「${to.meta.title || '此頁面'}」`
+    )
+    
+    // 阻止導航，停留在當前頁面
+    next(false)
+    
+  } else if (to.path === '/Login' && memberStore.isAuthenticated) {
+    // 如果已經登入但試圖進入登入頁面，跳轉到首頁
+    console.log('已登入，跳轉到會員中心')
+    next('/MemberCenter')
+    
+  } else {
+    // 正常進入頁面
+    next()
+  }
+})
