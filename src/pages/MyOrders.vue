@@ -154,7 +154,7 @@
 
                             <p class="nickName">阿官</p>
                             <!-- 一開始隱藏的登出鈕 -->
-                            <button class="logout btn">登出</button>
+                            <button class="logout btn" @click="handleLogout">登出</button>
                         </div>
 
                         <!-- 頁面導覽列 -->
