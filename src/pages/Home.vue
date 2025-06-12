@@ -2,6 +2,7 @@
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import Carousel from '../components/Carousel.vue'
 import Marquree from '../components/Marquee.vue'
+import Gotop from "../components/Gotop.vue";
 // import Marquree from '../components/TestMarquee.vue'
 
 
@@ -172,6 +173,7 @@ import Marquree from '../components/Marquee.vue'
         <router-link to="/About/News" class="btn">瞭解更多</router-link>
       </div>
     </section>
+    <Gotop />
   </FrontLayout>
 </template>
 

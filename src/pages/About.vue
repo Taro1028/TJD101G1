@@ -3,6 +3,8 @@ import FrontLayout from "../layouts/FrontLayout.vue";
 import MarqueeText from '@/components/MarqueeText.vue';
 import CoreValues from '@/components/CoreValues.vue';
 import MainGoals from '@/components/MainGoals.vue';
+import Gotop from "../components/Gotop.vue";
+
 
 </script>
 
@@ -13,6 +15,7 @@ import MainGoals from '@/components/MainGoals.vue';
             <CoreValues />
             <MainGoals />
         </div>
+        <Gotop />
     </FrontLayout>
 </template>
 

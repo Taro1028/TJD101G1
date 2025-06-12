@@ -1,6 +1,8 @@
 <script setup>
 import FrontLayout from '@/layouts/FrontLayout.vue'
+import Gotop from "../components/Gotop.vue";
 </script>
+
 <template>
     <FrontLayout>
         <div class="wrapper">
@@ -187,6 +189,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
                 </div>
             </div>
         </div>
+        <Gotop />
     </FrontLayout>
 </template>
 

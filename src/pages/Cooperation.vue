@@ -2,6 +2,7 @@
 import FrontLayout from "../layouts/FrontLayout.vue";
 import { ref, computed } from 'vue';
 import PartnerCard from '@/components/PartnerCard.vue';
+import Gotop from "../components/Gotop.vue";
 
 const doctors = [
   {
@@ -115,6 +116,7 @@ const partners = [
                 </div>
             </div>
         </div>
+        <Gotop />
     </FrontLayout>
 </template>
 
