@@ -17,7 +17,7 @@
               id="EMAIL"
               name="name"
               class="signup_name"
-              placeholder="登入帳號"
+              placeholder="請輸入註冊信箱"
               v-model="email"
             />
           </div>

@@ -156,7 +156,7 @@
                             <p class="nickName">阿官</p>
                             
                             <!-- 一開始隱藏的登出鈕 -->
-                            <button class="logout btn2">登出</button>
+                            <button class="logout btn2" @click="handleLogout">登出</button>
 
                         </div>
                         <ul class="quck_link">

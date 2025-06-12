@@ -5,6 +5,8 @@ import Gotop from "../components/Gotop.vue"
 import { ref, reactive, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
+import html2canvas from 'html2canvas'
+
 // 背景圖片
 import backgroundImg from '@/assets/images/Order/background.svg'
 
@@ -34,6 +36,11 @@ const addedStickers = ref([])
 const draggedSticker = ref(null)
 const previewArea = ref(null)
 const isDragging = ref(false)
+
+// 截圖功能
+const isCapturing = ref(false)
+const capturedImageUrl = ref('')
+
 
 // 貼紙
 const stickers = [
@@ -185,52 +192,127 @@ function insertCareWord(word) {
   messageText.value = word
 }
 
-// 保存卡片狀態到後端
-// async function saveCardState() {
-//   const cardData = {
-//     backgroundColor: selectedColor.value,
-//     message: messageText.value,
-//     stickers: addedStickers.value.map(sticker => ({
-//       id: sticker.originalId,
-//       x: sticker.x,
-//       y: sticker.y,
-//       src: sticker.src,
-//       alt: sticker.alt
-//     })),
-//     timestamp: new Date().toISOString()
-//   }
-  
-//   try {
-//     // 呼叫後端 PHP API
-//     const response = await fetch('http://localhost/tjd101/g1/php/save-message-card.php', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(cardData)
-//     })
+// 截圖功能函數
+async function captureCard() {
+  if (!previewArea.value) {
+    console.error('預覽區域不存在')
+    return null
+  }
+
+  try {
+    isCapturing.value = true
     
-//     const result = await response.json()
+    // 使用 html2canvas 截圖
+    const canvas = await html2canvas(previewArea.value, {
+      backgroundColor: null, // 保持透明背景
+      scale: 2, // 提高解析度
+      useCORS: true, // 允許跨域圖片
+      allowTaint: true,
+      width: previewArea.value.offsetWidth,
+      height: previewArea.value.offsetHeight
+    })
     
-//     if (result.success) {
-//       console.log('卡片狀態已保存:', result)
-//       return cardData
-//     } else {
-//       throw new Error(result.message || '保存失敗')
-//     }
-//   } catch (error) {
-//     console.error('保存卡片狀態時發生錯誤:', error)
-//     // 備用方案：儲存到 localStorage
-//     localStorage.setItem('messageCardState', JSON.stringify(cardData))
-//     return cardData
-//   }
-// }
+    // 將 canvas 轉為 blob
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob)
+      }, 'image/png', 0.9)
+    })
+    
+  } catch (error) {
+    console.error('截圖失敗:', error)
+    return null
+  } finally {
+    isCapturing.value = false
+  }
+}
+
+// 【簡化版】測試用的 saveCardState 函數（移除訂單ID）
+async function saveCardState() {
+  // 檢查是否有內容需要儲存
+  if (!messageText.value.trim() && addedStickers.value.length === 0) {
+    console.log('沒有內容需要儲存')
+    alert('請先輸入留言或添加貼紙')
+    return
+  }
+
+  try {
+    console.log('開始儲存卡片...')
+    
+    // 截圖
+    const imageBlob = await captureCard()
+    
+    if (!imageBlob) {
+      throw new Error('截圖失敗')
+    }
+    
+    console.log('截圖成功，檔案大小:', imageBlob.size, 'bytes')
+
+    // 準備要送到後端的資料
+    const formData = new FormData()
+    
+    // 添加卡片資料
+    const cardData = {
+      messageText: messageText.value,
+      selectedColor: selectedColor.value,
+      stickers: addedStickers.value.map(sticker => ({
+        id: sticker.originalId,
+        x: sticker.x,
+        y: sticker.y
+      }))
+    }
+    
+    console.log('卡片資料:', cardData)
+    
+    formData.append('cardData', JSON.stringify(cardData))
+    formData.append('cardImage', imageBlob, `card_${Date.now()}.png`)
+
+    // 發送到後端 API
+    console.log('發送請求到 PHP...')
+    const response = await fetch('http://localhost/tjd101/g1/php/save-message-card.php', {
+      method: 'POST',
+      body: formData
+    })
+
+    console.log('回應狀態:', response.status)
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('HTTP錯誤回應:', errorText)
+      throw new Error(`HTTP錯誤: ${response.status}`)
+    }
+
+    const result = await response.json()
+    console.log('後端回應:', result)
+    
+    if (!result.success) {
+      throw new Error(result.error || '儲存失敗')
+    }
+
+    // 成功處理
+    console.log('卡片儲存成功:', result)
+    
+    // 儲存回傳的資料到 localStorage（可選）
+    localStorage.setItem('savedCardImagePath', result.imagePath)
+    localStorage.setItem('savedCardId', result.cardId)
+    
+
+    // 回傳成功狀態，讓 finishMessage 知道可以跳轉
+    return true
+
+  } catch (error) {
+    console.error('儲存卡片失敗:', error)
+    alert(`儲存失敗：${error.message}`)
+  }
+}
+
 
 function goNext() {
   saveCardState().then(() => {
     router.push('/Order/AddCart')  
   })
 }
+
 
 async function finishMessage() {
   if (messageText.value.trim() || addedStickers.value.length > 0) {
