@@ -167,6 +167,16 @@ const routes = [
   },
   {
     path: "/Login",
+    name: 'Login',
+    beforeEnter: (to, from, next) => {
+      const member = useMemberStore()
+      member.loadFromLocalStorage?.()
+      if (member.id) {
+        next('/home')
+      } else {
+        next()
+      }
+    },
     component: () => import("@/pages/Login.vue"),
     meta: {
       title: "會員登入 - TibaEAT 提膳家",
@@ -282,7 +292,7 @@ router.beforeEach((to, from, next) => {
   
   // 檢查是否需要登入
   const requiresAuth = to.meta.requiredLogin
-  
+  console.log(memberStore.isAuthenticated)
   // 如果需要登入但使用者未登入
   if (requiresAuth && !memberStore.isAuthenticated) {
     console.log('需要登入才能進入此頁面:', to.path)
