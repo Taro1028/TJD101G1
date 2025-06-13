@@ -108,7 +108,7 @@ const checkIsMobile = () => {
 onMounted(() => {
   isMounted.value = true;
   checkIsMobile();
-  memberStore.loadFromLocalStorage();
+  memberStore.loadFromsessionStorage();
   window.addEventListener("resize", checkIsMobile);
   document.addEventListener("click", handleClickOutside);
 });

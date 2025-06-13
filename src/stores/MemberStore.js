@@ -107,8 +107,8 @@ export const useMemberStore = defineStore("member", {
         this.isLoggedIn = true;
         this.success = true;
 
-        // 儲存到 localStorage
-        this.saveToLocalStorage();
+        // 儲存到 sessionStorage
+        this.saveTosessionStorage();
         console.log("會員資料設定成功:", this.memberName);
       } else {
         console.error("登入失敗，未收到正確的會員資料");
@@ -126,24 +126,24 @@ export const useMemberStore = defineStore("member", {
         return;
       }
 
-      // ✨ 關鍵修正：同時更新 state 和 localStorage
+      // ✨ 關鍵修正：同時更新 state 和 sessionStorage
       this.avatar = avatarData;
 
       // 更新響應式的會員頭像儲存
       this.memberAvatars[this.id] = avatarData;
 
-      // 同步到 localStorage
+      // 同步到 sessionStorage
       this.saveMemberAvatars();
 
-      // 同步更新會員資料的 localStorage
-      this.saveToLocalStorage();
+      // 同步更新會員資料的 sessionStorage
+      this.saveTosessionStorage();
 
       console.log(`會員 ${this.id} 的頭像已更新並永久儲存`);
 
       // ✨ 新增：設定登入狀態
       this.isLoggedIn = true;
 
-      // ✅ 存入 localStorage（讓資料刷新也還在）
+      // ✅ 存入 sessionStorage（讓資料刷新也還在）
       this.saveToStorage();
     },
 
@@ -164,16 +164,16 @@ export const useMemberStore = defineStore("member", {
         return;
       }
 
-      // ✨ 關鍵修正：同時更新 state 和 localStorage
+      // ✨ 關鍵修正：同時更新 state 和 sessionStorage
       this.avatar = "";
 
       // 從響應式的會員頭像儲存中移除
       delete this.memberAvatars[this.id];
 
-      // 同步到 localStorage
+      // 同步到 sessionStorage
       this.saveMemberAvatars();
 
-      this.saveToLocalStorage();
+      this.saveTosessionStorage();
 
       console.log(`會員 ${this.id} 的頭像已重置為預設`);
 
@@ -184,7 +184,7 @@ export const useMemberStore = defineStore("member", {
     // ✨ 新增：載入所有會員頭像到響應式 state
     loadMemberAvatars() {
       try {
-        const saved = localStorage.getItem("memberAvatars");
+        const saved = sessionStorage.getItem("memberAvatars");
         this.memberAvatars = saved ? JSON.parse(saved) : {};
       } catch (error) {
         console.error("載入會員頭像失敗:", error);
@@ -192,10 +192,10 @@ export const useMemberStore = defineStore("member", {
       }
     },
 
-    // ✨ 新增：儲存響應式會員頭像到 localStorage
+    // ✨ 新增：儲存響應式會員頭像到 sessionStorage
     saveMemberAvatars() {
       try {
-        localStorage.setItem(
+        sessionStorage.setItem(
           "memberAvatars",
           JSON.stringify(this.memberAvatars)
         );
@@ -208,7 +208,7 @@ export const useMemberStore = defineStore("member", {
     saveAvatarForMember(memberId, avatarData) {
       // 更新響應式 state
       this.memberAvatars[memberId] = avatarData;
-      // 同步到 localStorage
+      // 同步到 sessionStorage
       this.saveMemberAvatars();
     },
 
@@ -248,18 +248,20 @@ export const useMemberStore = defineStore("member", {
 
       // ✨ 重要：不清除 memberAvatars，讓頭像儲存保持永久
 
-      // 清除 localStorage 中的會員資料，但保留頭像儲存
-      this.clearLocalStorage();
+      // 清除 sessionStorage 中的會員資料，但保留頭像儲存
+      this.clearsessionStorage();
 
       console.log("會員已登出，頭像儲存保留");
     },
 
-    // ✨ 修正：儲存到 localStorage
-    saveToLocalStorage() {
+    // ✨ 修正：儲存到 sessionStorage
+    saveTosessionStorage() {
       try {
         const memberData = {
           id: this.id,
           name: this.name,
+          nickname: this.nickname,
+          note: this.note,
           sex: this.sex,
           address: this.address,
           email: this.email,
@@ -280,10 +282,10 @@ export const useMemberStore = defineStore("member", {
       }
     },
 
-    // ✨ 修正：從 localStorage 載入
-    loadFromLocalStorage() {
+    // ✨ 修正：從 sessionStorage 載入
+    loadFromsessionStorage() {
       try {
-        const savedData = localStorage.getItem("memberData");
+        const savedData = sessionStorage.getItem("memberData");
         if (savedData) {
           const memberData = JSON.parse(savedData);
 
@@ -291,6 +293,8 @@ export const useMemberStore = defineStore("member", {
           if (memberData.isLoggedIn) {
             this.id = memberData.id;
             this.name = memberData.name;
+            this.nickname = memberData.nickname ?? "";
+            this.note = memberData.note ?? "";
             this.sex = memberData.sex;
             this.address = memberData.address;
             this.email = memberData.email;
@@ -310,21 +314,21 @@ export const useMemberStore = defineStore("member", {
             const savedAvatar = this.memberAvatars[memberData.id];
             this.avatar = savedAvatar || memberData.avatar;
 
-            console.log(`從 localStorage 恢復會員 ${this.name} 的資料`);
+            console.log(`從 sessionStorage 恢復會員 ${this.name} 的資料`);
             return true;
           }
         }
       } catch (error) {
-        console.error("從 localStorage 載入會員資料失敗:", error);
-        this.clearLocalStorage();
+        console.error("從 sessionStorage 載入會員資料失敗:", error);
+        this.clearsessionStorage();
       }
       return false;
     },
 
-    // ✨ 修正：清除 localStorage（但保留頭像儲存）
-    clearLocalStorage() {
+    // ✨ 修正：清除 sessionStorage（但保留頭像儲存）
+    clearsessionStorage() {
       try {
-        localStorage.removeItem("memberData");
+        sessionStorage.removeItem("memberData");
         // 注意：不清除 'memberAvatars'，讓頭像儲存保持永久
       } catch (error) {
         console.error("清除 sessionStorage 失敗:", error);
@@ -334,8 +338,8 @@ export const useMemberStore = defineStore("member", {
     // ✨ 修正：完全清除所有資料（包含頭像，供測試或特殊需求使用）
     clearAllData() {
       try {
-        localStorage.removeItem("memberData");
-        localStorage.removeItem("memberAvatars");
+        sessionStorage.removeItem("memberData");
+        sessionStorage.removeItem("memberAvatars");
         this.memberAvatars = {};
         console.log("所有會員資料已清除（包含頭像儲存）");
       } catch (error) {
@@ -344,7 +348,7 @@ export const useMemberStore = defineStore("member", {
     },
     // ✨ 新增：檢查登入狀態（用於應用程式啟動時）
     checkAuthStatus() {
-      return this.loadFromLocalStorage();
+      return this.loadFromsessionStorage();
     },
   },
 });
