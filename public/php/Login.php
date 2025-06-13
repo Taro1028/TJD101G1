@@ -29,6 +29,7 @@ try {
                         'ID' => $result['ID'],
                         'EMAIL' => $result['EMAIL'],
                         'M_NAME' => $result['M_NAME'],
+                        'NICKNAME' => $result['NICKNAME'],
                         'GENDER' => $result['GENDER'],
                         'ADDRESS' => $result['ADDRESS'],
                         'PASSWORD' => $result['PASSWORD'],
@@ -37,6 +38,7 @@ try {
                         'EMERGENCY_CONTACTS_NAME' => $result['EMERGENCY_CONTACTS_NAME'],
                         'EMERGENCY_CONTACTS_PHONE' => $result['EMERGENCY_CONTACTS_PHONE'],
                         'BIRTHDAY' => $result['BIRTHDAY'],
+                        'NOTE' => $result['NOTE'],
                 ]);
         } else {
                 // 查無資料

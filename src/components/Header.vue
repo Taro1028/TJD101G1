@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import { useRouter, useRoute } from 'vue-router';
-import { useMemberStore } from '@/stores/memberStore'; // 根據你的檔案路徑調整
+import { useRouter, useRoute } from "vue-router";
+import { useMemberStore } from "@/stores/memberStore"; // 根據你的檔案路徑調整
 
 const router = useRouter();
 const route = useRoute();
@@ -21,7 +21,7 @@ const isLoggedIn = computed(() => !!memberStore.id);
 // ✨ 修改：使用 memberStore 的 getter 取得頭像
 const userAvatar = computed(() => memberStore.userAvatar);
 
-const userName = computed(() => memberStore.name || '會員');
+const userName = computed(() => memberStore.name || "會員");
 // // 登出功能
 // const logout = () => {
 //   memberStore.clearUser(); // 使用 store 的清除方法
@@ -33,17 +33,17 @@ const userName = computed(() => memberStore.name || '會員');
 // 登出處理函數
 const handleLogout = () => {
   // 確認是否要登出
-  if (confirm('確定要登出嗎？')) {
+  if (confirm("確定要登出嗎？")) {
     // 清除會員資料
-    memberStore.logout()
-    
+    memberStore.logout();
+
     // 跳轉到首頁
-    router.push('/Home')
-    
+    router.push("/Home");
+
     // 顯示登出成功訊息
-    alert('登出成功！')
+    alert("登出成功！");
   }
-}
+};
 
 // 關於我們下拉選單
 const toggleAboutDropdown = () => {
@@ -122,10 +122,14 @@ onBeforeUnmount(() => {
 <template>
   <header>
     <router-link to="/Home">
-      <img src="../assets/images/Logo_S.svg" alt="logo_s" class="logo"/>
+      <img src="../assets/images/Logo_S.svg" alt="logo_s" class="logo" />
     </router-link>
 
-    <button class="hamburger" :class="{ active: isMobileMenuOpen }" @click="toggleMobileMenu">
+    <button
+      class="hamburger"
+      :class="{ active: isMobileMenuOpen }"
+      @click="toggleMobileMenu"
+    >
       <span></span><span></span><span></span>
     </button>
 
@@ -135,31 +139,67 @@ onBeforeUnmount(() => {
       @click="closeMobileMenu"
     ></div>
 
-    <nav class="nav-wrapper" :class="{ open: isMobileMenuOpen }" v-show="!isMobile || isMobileMenuOpen">
+    <nav
+      class="nav-wrapper"
+      :class="{ open: isMobileMenuOpen }"
+      v-show="!isMobile || isMobileMenuOpen"
+    >
       <ul class="header_nav">
         <!-- 主要導航項目 -->
         <li class="nav-item">
-          <router-link to="/LunchBox" :class="{ active: route.path === '/LunchBox' }">
+          <router-link
+            to="/LunchBox"
+            :class="{ active: route.path === '/LunchBox' }"
+          >
             餐盒介紹
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/Order/Select" :class="{ active: route.path === '/Order/Select' }">
+          <router-link
+            to="/Order/Select"
+            :class="{ active: route.path === '/Order/Select' }"
+          >
             預約訂餐
           </router-link>
         </li>
         <li class="nav-item dropdown" ref="aboutDropdownRef">
           <div>
-            <a href="javascript:void(0)"
-               @click.stop="toggleAboutDropdown" 
-               :class="{ active: route.path.startsWith('/About') }">
+            <a
+              href="javascript:void(0)"
+              @click.stop="toggleAboutDropdown"
+              :class="{ active: route.path.startsWith('/About') }"
+            >
               關於我們
             </a>
             <ul v-if="showAboutDropdown" class="dropdown-menu">
-              <li><router-link to="/About" :class="{ active: route.path === '/About' }">理念及目標</router-link></li>
-              <li><router-link to="/About/SmallFarmer" :class="{ active: route.path === '/About/SmallFarmer' }">配合小農</router-link></li>
-              <li><router-link to="/About/Cooperation" :class="{ active: route.path === '/About/Cooperation' }">合作夥伴</router-link></li>
-              <li><router-link to="/About/News" :class="{ active: route.path === '/About/News' }">最新消息</router-link></li>
+              <li>
+                <router-link
+                  to="/About"
+                  :class="{ active: route.path === '/About' }"
+                  >理念及目標</router-link
+                >
+              </li>
+              <li>
+                <router-link
+                  to="/About/SmallFarmer"
+                  :class="{ active: route.path === '/About/SmallFarmer' }"
+                  >配合小農</router-link
+                >
+              </li>
+              <li>
+                <router-link
+                  to="/About/Cooperation"
+                  :class="{ active: route.path === '/About/Cooperation' }"
+                  >合作夥伴</router-link
+                >
+              </li>
+              <li>
+                <router-link
+                  to="/About/News"
+                  :class="{ active: route.path === '/About/News' }"
+                  >最新消息</router-link
+                >
+              </li>
             </ul>
           </div>
         </li>
@@ -167,20 +207,31 @@ onBeforeUnmount(() => {
 
       <ul class="header_nav_right">
         <li v-if="!isLoggedIn" class="nav-item">
-          <router-link to="/Login" :class="{ active: route.path === '/Login' }">登入/註冊</router-link>
+          <router-link to="/Login" :class="{ active: route.path === '/Login' }"
+            >登入/註冊</router-link
+          >
         </li>
         <template v-else>
           <li class="nav-item dropdown member-dropdown" ref="memberDropdownRef">
             <div>
               <a href="javascript:void(0)" @click.stop="toggleMemberDropdown">
-                <img :src="userAvatar" alt="會員頭像" class="avatar"/>
+                <img :src="userAvatar" alt="會員頭像" class="avatar" />
               </a>
               <ul v-if="showMemberDropdown" class="dropdown-menu member-menu">
                 <li>
-                  <router-link to="/MemberCenter" :class="{ active: route.path === '/MemberCenter' }">會員中心</router-link>
+                  <router-link
+                    to="/MemberCenter"
+                    :class="{ active: route.path === '/MemberCenter' }"
+                    >會員中心</router-link
+                  >
                 </li>
                 <li>
-                  <a href="javascript:void(0)" @click="handleLogout" class="logout-btn">登出</a>
+                  <a
+                    href="javascript:void(0)"
+                    @click="handleLogout"
+                    class="logout-btn"
+                    >登出</a
+                  >
                 </li>
               </ul>
             </div>
@@ -217,7 +268,7 @@ header a img {
   height: 48px;
 }
 
-.logo{
+.logo {
   margin-left: 40px;
 }
 
@@ -408,9 +459,7 @@ header a img {
     visibility: hidden;
     z-index: 1000;
 
-    transition: 
-      transform 0.4s ease-in-out,
-      opacity 0.4s ease-in-out,
+    transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out,
       visibility 0.4s ease-in-out;
 
     &.open {
@@ -420,14 +469,14 @@ header a img {
     }
   }
 
-  .header_nav{
+  .header_nav {
     flex-direction: column;
     width: 100%;
     gap: 0;
     text-align: center;
   }
 
-  .header_nav_right{
+  .header_nav_right {
     order: -1;
     border-bottom: 1px solid $neutral_300;
     flex-direction: column;
@@ -473,14 +522,14 @@ header a img {
     left: 0;
   }
 
-  .avatar{
+  .avatar {
     margin: 0 auto;
   }
 
-  .nav-item .dropdown li a{
+  .nav-item .dropdown li a {
     margin: 0 auto;
   }
-  .cart-item i{
+  .cart-item i {
     margin-right: 0px;
   }
 }
