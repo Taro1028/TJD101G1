@@ -1,85 +1,86 @@
 <script setup>
-    import { ref } from 'vue';
-    import FrontLayout from '../layouts/FrontLayout.vue';
-    import Gotop from "../components/Gotop.vue"
-    import { useMemberStore } from '@/stores/MemberStore'
-    import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue';
+import FrontLayout from '../layouts/FrontLayout.vue';
+import Gotop from "../components/Gotop.vue"
+import { useMemberStore } from '@/stores/MemberStore'
+import { useRouter } from 'vue-router'
 
-    const showDefaultAvatar = ref(true);
-    const uploadedImageSrc = ref('');
-    const avatarInput = ref(null);
-    const memberStore = useMemberStore()
-    const router = useRouter()
+const avatarInput = ref(null);
+const memberStore = useMemberStore()
+const router = useRouter()
 
-    // 點擊大頭照區域觸發檔案選擇
-    const handleAvatarClick = () => {
-    console.log('Avatar clicked!');
-    console.log('avatarInput.value:', avatarInput.value);
-    
-    if (avatarInput.value) {
-        console.log('Triggering file input click');
-        avatarInput.value.click();
-    } else {
-        console.error('avatarInput ref is null');
-    }
-    };
+// ✨ 改用 computed 從 memberStore 取得頭像狀態
+const showDefaultAvatar = computed(() => !memberStore.hasCustomAvatar);
+const userAvatar = computed(() => memberStore.userAvatar);
 
-    // 處理檔案上傳
-    const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    
-      console.log('File selected:', file); // 調試用
-    
-    if (!file) {
-        console.log('No file selected');
-        return;
-    }
-    
-    // 檢查檔案類型
-    if (!file.type.startsWith('image/')) {
-        alert('請選擇圖片檔案');
-        console.log('Invalid file type:', file.type);
-        return;
-    }
-    
-    // 檢查檔案大小 (限制 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-        alert('檔案大小不能超過 5MB');
-        console.log('File too large:', file.size);
-        return;
-    }
-    
-    console.log('File validation passed, reading file...');
-    
-    // 使用 FileReader 讀取檔案
-    const reader = new FileReader();
-    
-    reader.onload = (e) => {
-        console.log('File read successfully');
-        uploadedImageSrc.value = e.target.result;
-        showDefaultAvatar.value = false;
-        console.log('State updated - showDefaultAvatar:', showDefaultAvatar.value);
-    };
-    
-    reader.onerror = () => {
-        console.error('File read error');
-        alert('檔案讀取失敗，請重新選擇');
-    };
-    
-    reader.readAsDataURL(file);
-    };
+// 點擊大頭照區域觸發檔案選擇
+const handleAvatarClick = () => {
+  console.log('Avatar clicked!');
+  console.log('avatarInput.value:', avatarInput.value);
+  
+  if (avatarInput.value) {
+    console.log('Triggering file input click');
+    avatarInput.value.click();
+  } else {
+    console.error('avatarInput ref is null');
+  }
+};
 
-    // 重置大頭照
-    const resetAvatar = () => {
-    showDefaultAvatar.value = true;
-    uploadedImageSrc.value = '';
-    
-    if (avatarInput.value) {
-        avatarInput.value.value = '';
-    }
-    };
-    
-    // 登出處理函數
+// ✨ 修改：處理檔案上傳，直接更新到 memberStore
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  
+  console.log('File selected:', file); // 調試用
+  
+  if (!file) {
+    console.log('No file selected');
+    return;
+  }
+  
+  // 檢查檔案類型
+  if (!file.type.startsWith('image/')) {
+    alert('請選擇圖片檔案');
+    console.log('Invalid file type:', file.type);
+    return;
+  }
+  
+  // 檢查檔案大小 (限制 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert('檔案大小不能超過 5MB');
+    console.log('File too large:', file.size);
+    return;
+  }
+  
+  console.log('File validation passed, reading file...');
+  
+  // 使用 FileReader 讀取檔案
+  const reader = new FileReader();
+  
+  reader.onload = (e) => {
+    console.log('File read successfully');
+    // ✨ 直接更新到 memberStore，不再使用本地狀態
+    memberStore.updateAvatar(e.target.result);
+    console.log('Avatar updated to memberStore');
+  };
+  
+  reader.onerror = () => {
+    console.error('File read error');
+    alert('檔案讀取失敗，請重新選擇');
+  };
+  
+  reader.readAsDataURL(file);
+};
+
+// ✨ 修改：重置大頭照，使用 memberStore 方法
+const resetAvatar = () => {
+  memberStore.resetAvatar();
+  
+  if (avatarInput.value) {
+    avatarInput.value.value = '';
+  }
+};
+
+// 登出處理函數
 const handleLogout = () => {
   // 確認是否要登出
   if (confirm('確定要登出嗎？')) {
@@ -93,65 +94,49 @@ const handleLogout = () => {
     alert('登出成功！')
   }
 }
-
 </script>
+
     <template>
         <FrontLayout>
-        <section class="memberCenter">
+            <section class="memberCenter">
             <div class="wrapper">
                 <h2>會員中心</h2>
                 <!-- 會員管理區 -->
                 <div class="memberArea">
-                    <!-- 左側導覽列 -->
-
-                    <div class="user_nav">
-                        <div class="head-area">
-                        <div class="default-avatar" id="defaultAvatar">
-                                <i class="bi bi-person-fill-gear"></i>
+                <!-- 左側導覽列 -->
+                <div class="user_nav">
+                    <div class="head-area">
+                    <div class="avatar-container" @click="handleAvatarClick">
+                        <!-- 預設圖標顯示區 -->
+                        <div 
+                        class="default-avatar" 
+                        v-show="showDefaultAvatar"
+                        >
+                        <i class="bi bi-person-fill-gear"></i>
                         </div>
-                            
-                        <!-- 上傳後的圖片顯示區（初始隱藏） -->
-                        <img id="uploadedAvatar" class="uploaded-avatar" alt="大頭照" style="display: none;" />
-                            
+                        
+                        <!-- 上傳後的圖片顯示區 -->
+                        <img 
+                        class="uploaded-avatar" 
+                        alt="大頭照" 
+                        v-show="!showDefaultAvatar"
+                        :src="userAvatar"
+                        />
+                        
                         <!-- 上傳按鈕覆蓋層 -->
-                        <div class="upload-overlay" id="uploadOverlay">
-                            <i class="bi bi-camera-fill"></i>
-                            <!-- <span>更換照片</span> -->
+                        <div class="upload-overlay">
+                        <i class="bi bi-camera-fill"></i>
                         </div>
-                            
+                        
                         <!-- 隱藏的檔案輸入 -->
-                        <div class="avatar-container" @click="handleAvatarClick">
-                                <!-- 預設圖標顯示區 -->
-                                <div 
-                                    class="default-avatar" 
-                                    v-show="showDefaultAvatar"
-                                >
-                                    <i class="bi bi-person-fill-gear"></i>
-                                </div>
-                                
-                                <!-- 上傳後的圖片顯示區（初始隱藏） -->
-                                <img 
-                                    class="uploaded-avatar" 
-                                    alt="大頭照" 
-                                    v-show="!showDefaultAvatar"
-                                    :src="uploadedImageSrc"
-                                />
-                                
-                                <!-- 上傳按鈕覆蓋層 -->
-                                <div class="upload-overlay">
-                                    <i class="bi bi-camera-fill"></i>
-                                    <!-- <span>{{ showDefaultAvatar ? '上傳照片' : '更換照片' }}</span> -->
-                                </div>
-                    
-                                <!-- 隱藏的檔案輸入 -->
-                                <input 
-                                    ref="avatarInput"
-                                    type="file" 
-                                    accept="image/*" 
-                                    style="display: none;" 
-                                    @change="handleFileChange"
-                                />
-                            </div>
+                        <input 
+                        type="file" 
+                        ref="avatarInput"
+                        @change="handleFileChange"
+                        accept="image/*"
+                        style="display: none;"
+                        />
+                    </div>
 
                             <p class="nickName">阿官</p>
 

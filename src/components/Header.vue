@@ -17,19 +17,33 @@ const memberDropdownRef = ref(null);
 
 // 使用 Pinia store 的資料
 const isLoggedIn = computed(() => !!memberStore.id);
-const userAvatar = computed(() => {
-  // 如果 store 中有頭像就用，沒有就用預設頭像
-  return memberStore.avatar || new URL('../assets/images/Member/person-fill.svg', import.meta.url).href;
-});
-const userName = computed(() => memberStore.name || '會員');
 
-// 登出功能
-const logout = () => {
-  memberStore.clearUser(); // 使用 store 的清除方法
-  showMemberDropdown.value = false;
-  closeMobileMenu();
-  router.push('/Home');
-};
+// ✨ 修改：使用 memberStore 的 getter 取得頭像
+const userAvatar = computed(() => memberStore.userAvatar);
+
+const userName = computed(() => memberStore.name || '會員');
+// // 登出功能
+// const logout = () => {
+//   memberStore.clearUser(); // 使用 store 的清除方法
+//   showMemberDropdown.value = false;
+//   closeMobileMenu();
+//   router.push('/Home');
+// };
+
+// 登出處理函數
+const handleLogout = () => {
+  // 確認是否要登出
+  if (confirm('確定要登出嗎？')) {
+    // 清除會員資料
+    memberStore.logout()
+    
+    // 跳轉到首頁
+    router.push('/Home')
+    
+    // 顯示登出成功訊息
+    alert('登出成功！')
+  }
+}
 
 // 關於我們下拉選單
 const toggleAboutDropdown = () => {
@@ -166,7 +180,7 @@ onBeforeUnmount(() => {
                   <router-link to="/MemberCenter" :class="{ active: route.path === '/MemberCenter' }">會員中心</router-link>
                 </li>
                 <li>
-                  <a href="javascript:void(0)" @click="logout" class="logout-btn">登出</a>
+                  <a href="javascript:void(0)" @click="handleLogout" class="logout-btn">登出</a>
                 </li>
               </ul>
             </div>

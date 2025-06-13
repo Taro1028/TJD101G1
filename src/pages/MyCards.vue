@@ -1,12 +1,12 @@
  <script setup>
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
     import FrontLayout from '../layouts/FrontLayout.vue';
     import Gotop from "../components/Gotop.vue"
     import { useMemberStore } from '@/stores/MemberStore'
     import { useRouter } from 'vue-router'
 
-    const showDefaultAvatar = ref(true);
-    const uploadedImageSrc = ref('');
+    const showDefaultAvatar = computed(() => !memberStore.hasCustomAvatar);
+    const userAvatar = computed(() => memberStore.userAvatar);
     const avatarInput = ref(null);
     const memberStore = useMemberStore()
     const router = useRouter()
@@ -68,10 +68,7 @@
     const reader = new FileReader();
     
     reader.onload = (e) => {
-        console.log('File read successfully');
-        uploadedImageSrc.value = e.target.result;
-        showDefaultAvatar.value = false;
-        console.log('State updated - showDefaultAvatar:', showDefaultAvatar.value);
+    memberStore.updateAvatar(e.target.result);
     };
     
     reader.onerror = () => {
@@ -84,12 +81,10 @@
 
     // 重置大頭照
     const resetAvatar = () => {
-    showDefaultAvatar.value = true;
-    uploadedImageSrc.value = '';
-    
-    if (avatarInput.value) {
-        avatarInput.value.value = '';
-    }
+        memberStore.resetAvatar();
+        if (avatarInput.value) {
+            avatarInput.value.value = '';
+        }
     };
 
     // 小卡燈箱功能
@@ -127,7 +122,7 @@
         alert('登出成功！')
     }
     }
-    </script>
+</script>
     <template>
         <FrontLayout>
         <section class="memberCenter">
@@ -139,10 +134,7 @@
 
                     <div class="user_nav">
                         <div class="head-area">
-                        <div class="default-avatar" id="defaultAvatar">
-                                <i class="bi bi-person-fill-gear"></i>
-                        </div>
-                            
+
                         <!-- 上傳後的圖片顯示區（初始隱藏） -->
                         <img id="uploadedAvatar" class="uploaded-avatar" alt="大頭照" style="display: none;" />
                             
@@ -167,7 +159,7 @@
                                     class="uploaded-avatar" 
                                     alt="大頭照" 
                                     v-show="!showDefaultAvatar"
-                                    :src="uploadedImageSrc"
+                                    :src="userAvatar"
                                 />
                                 
                                 <!-- 上傳按鈕覆蓋層 -->
