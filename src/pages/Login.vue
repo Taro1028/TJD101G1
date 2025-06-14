@@ -77,9 +77,9 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useMemberStore } from "../stores/MemberStore";
-import { useModalStore } from "../stores/ModalStore"; 
+import { useModalStore } from "../stores/ModalStore";
 import { useRouter } from "vue-router";
 
 const member = useMemberStore();
@@ -116,33 +116,31 @@ const handleLogin = async () => {
       }),
     });
 
-    
     if (response.ok) {
       const result = await response.json();
       console.log("登入成功:", result);
-      
+
       // 設定會員資料到 store
       member.setMember(result);
-      console.log('會員 ID:', member.id);
-      
+      console.log("會員 ID:", member.id);
+
       // 🔔 優先檢查 ModalStore 的重定向路徑
-      let redirectPath = '/Home';
-      
+      let redirectPath = "/Home";
+
       if (modalStore.hasRedirectPath) {
         // 如果有彈窗設定的重定向路徑，使用它
         redirectPath = modalStore.redirectPath;
         modalStore.clearRedirectPath(); // 清除重定向路徑
       } else {
         // 否則檢查 URL query 參數
-        redirectPath = router.currentRoute.value.query.redirect || '/Home';
+        redirectPath = router.currentRoute.value.query.redirect || "/Home";
       }
-      
+
       // 關閉登入彈窗（如果有開啟的話）
       modalStore.closeLoginPopup();
-      
+
       // 跳轉到指定頁面
       router.push(redirectPath);
-      
     } else {
       console.error("登入失敗:", response.statusText);
       alert("登入失敗，請檢查您的帳號密碼");

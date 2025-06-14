@@ -47,12 +47,12 @@ const routes = [
     },
   },
   {
-    path: '/Order/PlanForyou',
-    component: () => import('@/pages/Order_PlanForyou.vue'),
+    path: "/Order/PlanForyou",
+    component: () => import("@/pages/Order_PlanForyou.vue"),
     meta: {
-      title: '為你搭配 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "為你搭配 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
     path: "/Order/Select1_PlanFree",
@@ -63,110 +63,120 @@ const routes = [
     },
   },
   {
-    path: '/Order/Select2_PlanFree',
-    component: () => import('@/pages/Order_Select2_PlanFree.vue'),
+    path: "/Order/Select2_PlanFree",
+    component: () => import("@/pages/Order_Select2_PlanFree.vue"),
     meta: {
-      title: '自由搭配 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "自由搭配 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/Order/Select3_PlanFree',
-    component: () => import('@/pages/Order_Select3_PlanFree.vue'),
+    path: "/Order/Select3_PlanFree",
+    component: () => import("@/pages/Order_Select3_PlanFree.vue"),
     meta: {
-      title: '自由搭配 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "自由搭配 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/Order/Loading',
-    component: () => import('@/pages/Order_Loading.vue'),
+    path: "/Order/Loading",
+    component: () => import("@/pages/Order_Loading.vue"),
     meta: {
-      title: '隨機產生 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "隨機產生 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/Order/MessageCards',
-    component: () => import('@/pages/MessageCards.vue'),
+    path: "/Order/MessageCards",
+    component: () => import("@/pages/MessageCards.vue"),
     meta: {
-      title: '編輯留言小卡 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "編輯留言小卡 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/Order/AddCart',
-    component: () => import('@/pages/Order_AddCart.vue'),
+    path: "/Order/AddCart",
+    component: () => import("@/pages/Order_AddCart.vue"),
     meta: {
-      title: '加入購物車 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "加入購物車 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/Check_OrderInfo',
-    component: () => import('@/pages/Check1_OrderInfo.vue'),
+    path: "/Check_OrderInfo",
+    component: () => import("@/pages/Check1_OrderInfo.vue"),
     meta: {
-      title: '訂單資料 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "訂單資料 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/Check_PaymentInfo',
-    component: () => import('@/pages/Check2_PaymentInfo.vue'),
+    path: "/Check_PaymentInfo",
+    component: () => import("@/pages/Check2_PaymentInfo.vue"),
     meta: {
-      title: '付款資料 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "付款資料 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/Check_Complete',
-    component: () => import('@/pages/Check3_Complete.vue'),
+    path: "/Check_Complete",
+    component: () => import("@/pages/Check3_Complete.vue"),
     meta: {
-      title: '完成訂單 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "完成訂單 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/About',
-    component: () => import('@/pages/About.vue'),
+    path: "/About",
+    component: () => import("@/pages/About.vue"),
     meta: {
-      title: '理念及目標 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
+      title: "理念及目標 - TibaEAT 提膳家",
+      requiredLogin: false,
+    },
   },
   {
-    path: '/About/News',
-    component: () => import('@/pages/News.vue'),
+    path: "/About/News",
+    component: () => import("@/pages/News.vue"),
     meta: {
-      title: '最新消息 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
+      title: "最新消息 - TibaEAT 提膳家",
+      requiredLogin: false,
+    },
   },
   {
-    path: '/About/News/Newsitem',
-    component: () => import('@/pages/Newsitem.vue'),
+    path: "/About/News/Newsitem",
+    component: () => import("@/pages/Newsitem.vue"),
     meta: {
-      title: '最新消息 - TibaEAT 提膳家',
-    }
+      title: "最新消息 - TibaEAT 提膳家",
+    },
   },
   {
-    path: '/About/SmallFarmer',
-    component: () => import('@/pages/SmallFarmer.vue'),
+    path: "/About/SmallFarmer",
+    component: () => import("@/pages/SmallFarmer.vue"),
     meta: {
-      title: '配合小農 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
+      title: "配合小農 - TibaEAT 提膳家",
+      requiredLogin: false,
+    },
   },
   {
-    path: '/About/Cooperation',
-    component: () => import('@/pages/Cooperation.vue'),
+    path: "/About/Cooperation",
+    component: () => import("@/pages/Cooperation.vue"),
     meta: {
-      title: '合作夥伴 - TibaEAT 提膳家',
-      requiredLogin: false
-    }
+      title: "合作夥伴 - TibaEAT 提膳家",
+      requiredLogin: false,
+    },
   },
   {
     path: "/Login",
+    name: "Login",
+    beforeEnter: (to, from, next) => {
+      const member = useMemberStore();
+      member.loadFromsessionStorage?.();
+      if (member.id) {
+        next("/home");
+      } else {
+        next();
+      }
+    },
     component: () => import("@/pages/Login.vue"),
     meta: {
       title: "會員登入 - TibaEAT 提膳家",
@@ -190,43 +200,42 @@ const routes = [
     },
   },
   {
-    path: '/MemberCenter',
-    component: () => import('@/pages/MemberCenter.vue'),
+    path: "/MemberCenter",
+    component: () => import("@/pages/MemberCenter.vue"),
     meta: {
-      title: '個人資料 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "個人資料 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
 
   {
-    path: '/MemberCenter/Recipients',
-    component: () => import('@/pages/Recipients.vue'),
+    path: "/MemberCenter/Recipients",
+    component: () => import("@/pages/Recipients.vue"),
     meta: {
-      title: '收件者管理 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "收件者管理 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/MemberCenter/MyCards',
-    component: () => import('@/pages/MyCards.vue'),
+    path: "/MemberCenter/MyCards",
+    component: () => import("@/pages/MyCards.vue"),
     meta: {
-      title: '我的小卡 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "我的小卡 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   {
-    path: '/MemberCenter/MyOrders',
-    component: () => import('@/pages/MyOrders.vue'),
+    path: "/MemberCenter/MyOrders",
+    component: () => import("@/pages/MyOrders.vue"),
     meta: {
-      title: '訂單總覽 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
+      title: "訂單總覽 - TibaEAT 提膳家",
+      requiredLogin: true,
+    },
   },
   // === 後台 ===
   {
-    path: '/adminLogin', // /admin      /admin/users
+    path: "/adminLogin", // /admin      /admin/users
     component: () => import("@/pages/admin/AdminLogin.vue"),
-
   },
   {
     path: "/admin", // /admin      /admin/users
@@ -262,7 +271,7 @@ const router = createRouter({
   routes: routes,
   scrollBehavior(to, from, savedPosition) {
     // always scroll to top
-    return { top: 0 }
+    return { top: 0 };
   },
 });
 
@@ -277,32 +286,30 @@ export default router;
 
 // 全域前置守衛 - 檢查登入狀態
 router.beforeEach((to, from, next) => {
-  const memberStore = useMemberStore()
-  const modalStore = useModalStore()
-  
+  const memberStore = useMemberStore();
+  const modalStore = useModalStore();
+
   // 檢查是否需要登入
-  const requiresAuth = to.meta.requiredLogin
-  
+  const requiresAuth = to.meta.requiredLogin;
+  console.log(memberStore.isAuthenticated);
   // 如果需要登入但使用者未登入
   if (requiresAuth && !memberStore.isAuthenticated) {
-    console.log('需要登入才能進入此頁面:', to.path)
-    
+    console.log("需要登入才能進入此頁面:", to.path);
+
     // 🔔 顯示登入彈窗，並記住要重定向的路徑
     modalStore.openLoginPopup(
-      to.fullPath, 
-      `請先登入才能進入「${to.meta.title || '此頁面'}」`
-    )
-    
+      to.fullPath,
+      `請先登入才能進入「${to.meta.title || "此頁面"}」`
+    );
+
     // 阻止導航，停留在當前頁面
-    next(false)
-    
-  } else if (to.path === '/Login' && memberStore.isAuthenticated) {
+    next(false);
+  } else if (to.path === "/Login" && memberStore.isAuthenticated) {
     // 如果已經登入但試圖進入登入頁面，跳轉到首頁
-    console.log('已登入，跳轉到會員中心')
-    next('/MemberCenter')
-    
+    console.log("已登入，跳轉到會員中心");
+    next("/MemberCenter");
   } else {
     // 正常進入頁面
-    next()
+    next();
   }
-})
+});

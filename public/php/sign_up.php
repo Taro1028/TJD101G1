@@ -37,7 +37,7 @@ try {
 
         $stmt = $pdo->prepare($sql);
 
-        // 綁定參數
+        // 綁定參數陣列關聯式
         $stmt->bindValue(':name', $member['name']);
         $stmt->bindValue(':sex', $member['sex']);
         $stmt->bindValue(':address', $member['address']);
