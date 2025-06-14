@@ -21,11 +21,12 @@
                     <ul class="infotxt">
                         <li>部門營業時間 : 09:30 - 20:30</li>
                         <li>聯絡電話 : 0800-987-123</li>
+                        <li>Email : tibaeat@gmail.com</li>
                         <li>總部地址 : 104 臺北市中山區南京東路三段 219 號 4F </li>
                         <li>
                             <ul class="txtlink">
                                 <li><a href="#">服務條款</a></li>
-                                <li><a href="#">隱私權政策</a></li>
+                                <li><router-link to="/privacy-policy">隱私權政策</router-link></li>
                                 <li><a href="#">門市據點</a></li>
                             </ul>
                         </li>
