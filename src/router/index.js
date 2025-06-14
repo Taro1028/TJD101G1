@@ -293,13 +293,22 @@ router.afterEach((to) => {
 export default router;
 
 // 全域前置守衛 - 檢查登入狀態
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const memberStore = useMemberStore();
   const modalStore = useModalStore();
 
+  // ✨ 確保會員資料已載入（防止重新整理時狀態丟失）
+  if (!memberStore.isLoggedIn && !memberStore.checkAuthStatus()) {
+    // 如果沒有登入狀態且無法從 sessionStorage 恢復，確保狀態是清空的
+    memberStore.logout();
+  }
+
   // 檢查是否需要登入
   const requiresAuth = to.meta.requiredLogin;
-  console.log(memberStore.isAuthenticated);
+  console.log('路由守衛檢查 - 目標頁面:', to.path);
+  console.log('需要登入:', requiresAuth);
+  console.log('是否已認證:', memberStore.isAuthenticated);
+  
   // 如果需要登入但使用者未登入
   if (requiresAuth && !memberStore.isAuthenticated) {
     console.log("需要登入才能進入此頁面:", to.path);

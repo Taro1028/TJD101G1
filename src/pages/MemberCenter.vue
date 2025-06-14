@@ -1,13 +1,13 @@
 <script setup>
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted, reactive, computed } from "vue";
 import FrontLayout from "../layouts/FrontLayout.vue";
 import Gotop from "../components/Gotop.vue";
 import { useMemberStore } from "@/stores/MemberStore";
 import { useRouter } from "vue-router";
 
 const env = import.meta.env.VITE_API_URL;
-const showDefaultAvatar = ref(true);
-const uploadedImageSrc = ref("");
+const showDefaultAvatar = computed(() => !memberStore.hasCustomAvatar);
+const userAvatar = computed(() => memberStore.userAvatar);
 const avatarInput = ref(null);
 const memberStore = useMemberStore();
 const router = useRouter();
@@ -126,7 +126,7 @@ async function update() {
       emergency_contacts_name: ifo.emergency_contacts_name,
       emergency_contacts_phone: ifo.emergency_contacts_phone,
       note: ifo.note,
-      avatar: ifo.avatar,
+      // avatar: ifo.avatar,
     }),
   });
   console.log("response", response);
@@ -194,7 +194,7 @@ onMounted(() => {
                 />
               </div>
 
-              <p class="nickName">阿官</p>
+              <p class="nickName">{{ifo.nickname}}</p>
 
               <!-- 一開始隱藏的登出鈕 -->
               <button class="logout btn" @click="handleLogout">登出</button>

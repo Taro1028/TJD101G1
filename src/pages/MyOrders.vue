@@ -144,7 +144,7 @@
                                 />
                             </div>
 
-                            <p class="nickName">阿官</p>
+                            <p class="nickName">{{ memberStore.nickname }}</p>
                             <!-- 一開始隱藏的登出鈕 -->
                             <button class="logout btn" @click="handleLogout">登出</button>
                         </div>
