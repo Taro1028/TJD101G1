@@ -23,6 +23,14 @@ const routes = [
     },
   },
   {
+    path: "/privacy-policy",
+    component: () => import("@/pages/PrivacyPolicy.vue"),
+    meta: {
+      title: "TibaEAT 提膳家",
+      requiredLogin: false,
+    },
+  },
+  {
     path: "/LunchBox",
     component: () => import("@/pages/LunchBox.vue"),
     meta: {
