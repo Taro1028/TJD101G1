@@ -33,10 +33,10 @@
             </thead>
 
             <tbody>
-              <tr v-for="(tableBody, index) in tableBodys" :key="tableBody.id">
+              <tr v-for="(tableBody, index) in localBodys" :key="tableBody.id">
                 <td v-for="(header, hIndex) in tableHeaders" :key="hIndex">
                   <!-- 特殊欄位處理 -->
-                  <template v-if="header.key === 'avatar'">
+                  <template v-if="header.key === 'AVATAR'">
                     <img
                       :src="tableBody[header.key]"
                       alt="頭像"
@@ -79,9 +79,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import Dailog from "./Dailog.vue";
 import { useRoute } from "vue-router";
+
+const env = import.meta.env.VITE_API_URL;
 
 const route = useRoute();
 const show = ref(false);
@@ -91,6 +93,197 @@ const props = defineProps([
   "formTitle",
   "userData",
 ]);
+
+const localBodys = ref([]);
+localBodys.value = [...props.tableBodys];
+
+watch(
+  () => route.fullPath,
+  (newPath, oldPath) => {
+    console.log("路徑變了！從", oldPath, "變成", newPath);
+    // 在這裡執行你每次切換路由都要做的事情
+    if (newPath === "/admin/member") {
+      //  console.log(newPath)
+      getdata();
+    }
+    if (newPath === "/admin/product") {
+      //  console.log(newPath)
+      Products();
+    }
+    if (newPath === "/admin/order") {
+      //  console.log(newPath)
+
+      order();
+    }
+    // fetchDataByPath(newPath);
+    if (newPath === "/admin/consignees") {
+      //  console.log(newPath)
+
+      consigness();
+    }
+    if (newPath === "/admin/web") {
+      //  console.log(newPath)
+
+      websitedata();
+    }
+  }
+);
+
+//==================以下fetch==========================================================
+async function getdata() {
+  try {
+    console.log("dddd");
+    const response = await fetch(env + "/tjd101/g1/php/AdminMemberSelect.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+    console.log(response);
+    if (response.ok) {
+      const result = await response.json();
+      console.log("載入成功:", result);
+      localBodys.value = result.members;
+      // localBodys.value = result.members.map((row) => ({
+      //   ...row,
+      //   AVATAR: `data:image/png;base64,${row.AVATAR}`, // ← 加 MIME 類型
+      // }));
+    }
+  } catch (error) {
+    console.error("錯誤發生:", error);
+  }
+}
+
+async function Products() {
+  try {
+    const response = await fetch(
+      env + "/tjd101/g1/php/AdminProductSelect.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      }
+    );
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("商品列表載入成功:", result);
+
+      // 類似會員資料那樣處理表格內容
+      localBodys.value = result.members;
+    } else {
+      console.error("載入商品失敗");
+    }
+  } catch (error) {
+    console.error("錯誤發生:", error);
+  }
+}
+
+async function order() {
+  try {
+    const response = await fetch(env + "/tjd101/g1/php/AdminOrderSelect.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("訂單列表載入成功:", result);
+
+      // 類似會員資料那樣處理表格內容
+      localBodys.value = result.members;
+    } else {
+      console.error("載入訂單失敗");
+    }
+  } catch (error) {
+    console.error("錯誤發生:", error);
+  }
+}
+
+async function consigness() {
+  try {
+    const response = await fetch(env + "/tjd101/g1/php/AdminConsignees.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("收貨人資料載入成功:", result);
+
+      // 類似會員資料那樣處理表格內容
+      localBodys.value = result.members;
+    } else {
+      console.error("載入收貨人資料失敗");
+    }
+  } catch (error) {
+    console.error("錯誤發生:", error);
+  }
+}
+
+async function websitedata() {
+  try {
+    const response = await fetch(env + "/tjd101/g1/php/AdminWebsiteData.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("網站資料載入成功:", result);
+
+      // 類似會員資料那樣處理表格內容
+      localBodys.value = result.members;
+    } else {
+      console.error("載入網站資料失敗");
+    }
+  } catch (error) {
+    console.error("錯誤發生:", error);
+  }
+}
+
+onMounted(() => {
+  const newPath = route.fullPath;
+  console.log("目前路徑:", newPath);
+  console.log("xxxxxxxxxxx");
+  if (newPath === "/admin/member") {
+    //  console.log(newPath)
+    getdata();
+  }
+  if (newPath === "/admin/product") {
+    //  console.log(newPath)
+    Products();
+  }
+  if (newPath === "/admin/order") {
+    //  console.log(newPath)
+
+    order();
+  }
+  // fetchDataByPath(newPath);
+  if (newPath === "/admin/consignees") {
+    //  console.log(newPath)
+
+    consigness();
+  }
+  if (newPath === "/admin/web") {
+    //  console.log(newPath)
+
+    websitedata();
+  }
+  console.log("tableBodys:", props.tableBodys);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -163,8 +356,8 @@ const props = defineProps([
   cursor: pointer;
 }
 
-.out button:hover{
-  background-color:$primary_400;
+.out button:hover {
+  background-color: $primary_400;
 }
 .page-item.previous .page-link {
   background-color: $primary_600;
@@ -181,5 +374,4 @@ const props = defineProps([
   border: 1px solid black;
   z-index: 999;
 }
-
 </style>

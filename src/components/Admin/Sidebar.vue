@@ -26,64 +26,66 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
-const userData = ref(""); 
+const userData = ref("");
 const formTitle = ref("");
-const tableHeaders = ref([]);//下面watch
+const tableHeaders = ref([]); //下面watch
 const memberHeaders = [
-  { key: "id", label: "會員編號" },
-  { key: "name", label: "會員名稱" },
-  { key: "gender", label: "會員性別" },
-  { key: "birthday", label: "會員生日" },
-  { key: "address", label: "會員地址" },
-  { key: "email", label: "會員信箱" },
-  { key: "tel", label: "會員市內電話" },
-  { key: "mobile", label: "會員手機" },
-  { key: "emergencyContact", label: "備用聯絡人姓名" },
-  { key: "emergencyPhone", label: "備用聯絡人手機" },
-  { key: "note", label: "會員備註" },
-  { key: "avatar", label: "會員頭貼" },
+  { key: "ID", label: "會員編號" },
+  { key: "M_NAME", label: "會員名稱" },
+  { key: "NICKNAME", label: "暱稱" },
+  { key: "GENDER", label: "會員性別" },
+  { key: "BIRTHDAY", label: "會員生日" },
+  { key: "ADDRESS", label: "會員地址" },
+  { key: "EMAIL", label: "會員信箱" },
+  { key: "PASSWORD", label: "密碼" },
+  { key: "PHONE", label: "會員市內電話" },
+  { key: "TELEPHONE", label: "會員手機" },
+  { key: "EMERGENCY_CONTACTS_NAME", label: "備用聯絡人姓名" },
+  { key: "EMERGENCY_CONTACTS_PHONE", label: "備用聯絡人手機" },
+  { key: "NOTE", label: "會員備註" },
+  { key: "AVATAR", label: "會員頭貼" },
   { key: "actionsmember", label: "操作" },
 ];
 const productHeaders = [
-  { key: "id", label: "商品編號" },
-  { key: "name", label: "商品名稱" },
-  { key: "price", label: "商品價格" },
-  { key: "status", label: "商品上下架狀態" },
-  { key: "createdAt", label: "商品建立日期" },
-//   { key: "actions", label: "操作" },
+  { key: "ID", label: "商品編號" },
+  { key: "P_NAME", label: "商品名稱" },
+  { key: "PRICE", label: "商品價格" },
+  { key: "PRODUCTS_STATE", label: "商品上下架狀態" },
+  { key: "SET_UP_TIME", label: "商品建立日期" },
+  //   { key: "actions", label: "操作" },
 ];
 const orderHeaders = [
-  { key: "orderId", label: "訂單編號" },
-  { key: "memberId", label: "會員編號" },
-  { key: "productId", label: "商品編號" },
-  { key: "orderDate", label: "訂購日期" },
-  { key: "mealDetails", label: "餐點明細" },
-  { key: "mealQuantity", label: "餐點數量" },
-  { key: "totalAmount", label: "訂單金額" },
-  { key: "productStatus", label: "商品上下架狀態" },
-  { key: "orderStatus", label: "訂單狀態" },
-//   { key: "actions", label: "操作" },
+  { key: "ID", label: "訂單編號" },
+  { key: "M_ID", label: "會員編號" },
+  { key: "P_ID", label: "商品編號" },
+  { key: "ORDER_DATE", label: "訂購日期" },
+  { key: "DETAILS", label: "餐點明細" },
+  { key: "COUNT", label: "餐點數量" },
+  { key: "TOTAL", label: "訂單金額" },
+  { key: "ORDER_STATE", label: "商品上下架狀態" },
+  { key: "ORDERS_STATE", label: "訂單狀態" },
+  //   { key: "actions", label: "操作" },
 ];
 const consigneesHeaders = [
-  { key: "recipientId", label: "收貨人編號" },
-  { key: "memberId", label: "會員編號" },
-  { key: "recipientName", label: "收貨人姓名" },
-  { key: "recipientAddress", label: "收貨人地址" },
-  { key: "recipientTel", label: "收貨人市內電話" },
-  { key: "recipientMobile", label: "收貨人手機" },
-  { key: "safetyContactName", label: "送餐安全聯絡人姓名" },
-  { key: "safetyContactPhone", label: "送餐安全聯絡人手機" },
-  { key: "note", label: "備註" },
-//   { key: "actions", label: "操作" },
+  { key: "ID", label: "收貨人編號" },
+  { key: "M_ID", label: "會員編號" },
+  { key: "C_NAME", label: "收貨人姓名" },
+  { key: "C_ADD", label: "收貨人地址" },
+  { key: "C_CONTACTS_PHONE", label: "收貨人市內電話" },
+  { key: "C_TELEPHONE", label: "收貨人手機" },
+  { key: "C_CONTACTS_NAME", label: "送餐安全聯絡人姓名" },
+  { key: "C_CONTACTS_PHONE", label: "送餐安全聯絡人手機" },
+  { key: "C_NOTE", label: "備註" },
+  //   { key: "actions", label: "操作" },
 ];
 const webHeaders = [
-  { key: "dataId", label: "網站資料編號" },
-  { key: "title", label: "標題" },
-  { key: "content", label: "內文" },
-  { key: "image", label: "圖片" },
-  { key: "page", label: "網站頁面" },
-  { key: "city", label: "城市" },
-  { key: "status", label: "消息上下架狀態" },
+  { key: "ID", label: "網站資料編號" },
+  { key: "TITLE", label: "標題" },
+  { key: "CONTENT", label: "內文" },
+  { key: "IMG", label: "圖片" },
+  { key: "PAGE", label: "網站頁面" },
+  //  { key: "city", label: "城市" },
+  { key: "STATE", label: "消息上下架狀態" },
   { key: "actionsweb", label: "操作" },
 ];
 const tableBodys = ref([]);
@@ -215,7 +217,7 @@ div {
   color: white;
 }
 
-.adimnbtn:hover{
-  background-color:$primary_400;
+.adimnbtn:hover {
+  background-color: $primary_400;
 }
 </style>

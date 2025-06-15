@@ -1,7 +1,7 @@
 <script setup>
-import { useRoute } from 'vue-router'
-const route = useRoute()
-console.log(route.path)
+import { useRoute } from "vue-router";
+const route = useRoute();
+console.log(route.path);
 </script>
 
 <template>
@@ -15,27 +15,30 @@ console.log(route.path)
         <router-link to="/Home" class="front">
           <h1>前台</h1>
         </router-link>
-        <router-link to="/admin" class="admin">
+        <router-link to="/adminLogin" class="admin">
           <h1>後台</h1>
         </router-link>
       </div>
       <div class="copyright">
-        <span>本網站為緯育TibaMe前端設計工程師班第 95 期學員專題成果作品，本平台僅供學習、展示之用。<br>
-              若有侵權疑慮，您可以私訊 TibaMe - 前端設計工程師養成班，後續會由專人協助處理。</span>
+        <span
+          >本網站為緯育TibaMe前端設計工程師班第 95
+          期學員專題成果作品，本平台僅供學習、展示之用。<br />
+          若有侵權疑慮，您可以私訊 TibaMe -
+          前端設計工程師養成班，後續會由專人協助處理。</span
+        >
       </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-
-.wrapper{
+.wrapper {
   width: 100%;
   height: 100vh;
   background-color: $primary_100;
 }
 
-.container{
+.container {
   width: 740px;
   position: absolute;
   top: 50%;
@@ -44,17 +47,17 @@ console.log(route.path)
   text-align: center;
 }
 
-.logo img{
+.logo img {
   display: block;
   height: 60px;
   margin: 0 auto;
 }
 
-h1{
+h1 {
   font-size: $font_h1;
 }
 
-.entrance{
+.entrance {
   width: 100%;
   margin-top: 40px;
   display: flex;
@@ -62,11 +65,12 @@ h1{
   gap: 180px;
 }
 
-.entrance a{
+.entrance a {
   text-decoration: none;
 }
 
-.front, .admin{
+.front,
+.admin {
   width: 280px;
   height: 280px;
   border-radius: 50%;
@@ -75,39 +79,39 @@ h1{
   align-items: center;
 }
 
-.front{
+.front {
   background-color: $primary_400;
   border: 6px solid $primary_400;
 
-  &:hover{
-  background-color: transparent;
-  border: 6px solid $primary_400;
+  &:hover {
+    background-color: transparent;
+    border: 6px solid $primary_400;
   }
 }
 
-.admin{
+.admin {
   background-color: $primary_600;
   border: 6px solid $primary_600;
 
-  &:hover{
-  background-color: transparent;
-  border: 6px solid $primary_600;
+  &:hover {
+    background-color: transparent;
+    border: 6px solid $primary_600;
   }
 
-  &:hover h1{
-  color: $neutral_black;
+  &:hover h1 {
+    color: $neutral_black;
   }
 }
 
-.front h1{
+.front h1 {
   color: $neutral_black;
 }
 
-.admin h1{
+.admin h1 {
   color: $neutral_white;
 }
 
-.copyright{
+.copyright {
   margin-top: 80px;
   text-align: center;
   font-size: 12px;
@@ -116,40 +120,37 @@ h1{
 
 // --- RWD ---
 @media screen and (max-width: 800px) {
+  h1 {
+    font-size: $font_h3;
+  }
 
-h1{
-  font-size: $font_h3;
+  .entrance {
+    gap: 48px;
+    align-items: center;
+  }
 
-}
-
-.entrance{
-  gap: 48px;
-  align-items: center;
-}
-
-.front, .admin{
-  width: 160px;
-  height: 160px;
-}
-
+  .front,
+  .admin {
+    width: 160px;
+    height: 160px;
+  }
 }
 
 @media screen and (max-width: 550px) {
+  .entrance {
+    gap: 32px;
+    align-items: center;
+  }
 
-.entrance{
-  gap: 32px;
-  align-items: center;
-}
+  .front,
+  .admin {
+    width: 140px;
+    height: 140px;
+  }
 
-.front, .admin{
-  width: 140px;
-  height: 140px;
-}
-
-.copyright{
-  margin: 80px auto 0;
-  width: 343px;
-}
-
+  .copyright {
+    margin: 80px auto 0;
+    width: 343px;
+  }
 }
 </style>

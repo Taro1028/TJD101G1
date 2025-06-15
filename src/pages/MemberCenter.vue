@@ -126,7 +126,7 @@ async function update() {
       emergency_contacts_name: ifo.emergency_contacts_name,
       emergency_contacts_phone: ifo.emergency_contacts_phone,
       note: ifo.note,
-      // avatar: ifo.avatar,
+      avatar: ifo.avatar,
     }),
   });
   console.log("response", response);
@@ -194,7 +194,7 @@ onMounted(() => {
                 />
               </div>
 
-              <p class="nickName">{{ifo.nickname}}</p>
+              <p class="nickName">{{ ifo.nickname }}</p>
 
               <!-- 一開始隱藏的登出鈕 -->
               <button class="logout btn" @click="handleLogout">登出</button>

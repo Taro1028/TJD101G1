@@ -9,4 +9,7 @@ $db_pass = "password";
 // $db_select = "tibamefe_tjd101g1";
 $db_select = "tibaeat";
 $dsn = "mysql:host=" . $db_host . ";dbname=" . $db_select . ";charset=utf8";
-$pdo = new PDO($dsn, $db_user, $db_pass);
+$pdo = new PDO($dsn, $db_user, $db_pass, [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_STRINGIFY_FETCHES => true, // ⭐ 關鍵！讓 BLOB 當字串取出
+]);

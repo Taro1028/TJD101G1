@@ -20,7 +20,62 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAdminMemberStore } from "../../stores/AdminMemberStore";
+
+const router = useRouter();
+const username = ref("");
+const password = ref("");
+const Adminmember = useAdminMemberStore();
+const env = import.meta.env.VITE_API_URL;
+
+const handleLogin = async () => {
+  // 驗證輸入
+  if (!username.value) {
+    alert("請輸入使用者email");
+    return;
+  }
+
+  if (!password.value) {
+    alert("請輸入使用者密碼");
+    return;
+  }
+
+  try {
+    const response = await fetch(env + "/tjd101/g1/php/AdminLogin.php", {
+      //response接收php echo回傳值
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+      }),
+    });
+
+    if (response.ok) {
+      //ok http state狀態
+      const result = await response.json();
+      console.log("登入成功:", result);
+
+      if (result.success) {
+        //設定會員資料到 store
+        Adminmember.setAdminMember(result.adminMember);
+        console.log("會員 ID:", Adminmember.id);
+        router.push("/admin/member");
+      } else {
+        alert("帳密有誤");
+      }
+    }
+  } catch (error) {
+    console.error("網路錯誤:", error);
+    alert("網路連線錯誤，請稍後再試");
+  }
+};
+</script>
 
 <style lang="scss" scoped>
 .wrapper {

@@ -73,9 +73,11 @@ export const useMemberStore = defineStore("member", {
   },
 
   actions: {
-    // ✅ 修改：設定會員資料（登入時呼叫）
+    // 設定會員資料（登入時呼叫）
     setMember(member) {
       console.log("member", member);
+
+      
 
       // 檢查登入是否成功
       if (member.success) {
@@ -144,7 +146,7 @@ export const useMemberStore = defineStore("member", {
       this.isLoggedIn = true;
 
       // ✅ 存入 sessionStorage（讓資料刷新也還在）
-      this.saveToStorage();
+      this.saveTosessionStorage(); //改
     },
 
     // ✨ 新增：更新會員資料
@@ -154,7 +156,7 @@ export const useMemberStore = defineStore("member", {
           this[key] = updatedData[key];
         }
       });
-      this.saveToStorage();
+      this.saveTosessionStorage(); //改
     },
 
     // ✨ 修正：重置頭像為預設（完全響應式）
