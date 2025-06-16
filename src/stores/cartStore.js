@@ -1,4 +1,4 @@
-// stores/cartStore.js - 整合 MemberStore 版本
+// stores/cartStore.js - 修正多日計算問題
 import { defineStore } from 'pinia'
 import { useMemberStore } from './MemberStore'
 
@@ -23,15 +23,15 @@ export const useCartStore = defineStore('cart', {
 
     // 計算購物車總數量
     totalQuantity(state) {
-      return state.items.reduce((total, item) => total + item.quantity, 0)
+      return state.items.reduce((total, item) => total + (parseInt(item.quantity) || 0), 0)
     },
 
     // 計算購物車總金額
     totalAmount(state) {
-      return state.items.reduce((total, item) => total + item.dailyTotalAmount, 0)
+      return state.items.reduce((total, item) => total + (parseFloat(item.dailyTotalAmount) || 0), 0)
     },
 
-    // 獲取購物車群組（按 cart_id 分組）
+    // 獲取購物車群組（按 cart_id 分組）- 修正版本
     cartGroups(state) {
       const groups = {}
       
@@ -44,16 +44,40 @@ export const useCartStore = defineStore('cart', {
             order_start_date: item.order_start_date,
             order_end_date: item.order_end_date,
             total_days: item.total_days,
+            message_card_id: item.message_card_id || null,
             total_meal_count: 0,
             total_amount: 0,
             items: []
           }
         }
         
-        groups[cartId].total_meal_count += item.quantity
-        groups[cartId].total_amount += item.dailyTotalAmount
+        // 確保數據類型正確並累加
+        const quantity = parseInt(item.quantity) || 0
+        const amount = parseFloat(item.dailyTotalAmount) || 0
+        
+        groups[cartId].total_meal_count += quantity
+        groups[cartId].total_amount += amount
         groups[cartId].items.push(item)
       })
+      
+      // 調試輸出
+      console.log('=== cartGroups 計算結果 ===')
+      Object.values(groups).forEach((group, index) => {
+        console.log(`Group ${index + 1}:`, {
+          cart_id: group.cart_id,
+          plan_type: group.plan_type,
+          total_days: group.total_days,
+          items_count: group.items.length,
+          total_meal_count: group.total_meal_count,
+          total_amount: group.total_amount,
+          individual_items: group.items.map(item => ({
+            date: item.date,
+            quantity: item.quantity,
+            dailyTotalAmount: item.dailyTotalAmount
+          }))
+        })
+      })
+      console.log('========================')
       
       return Object.values(groups)
     }
@@ -136,7 +160,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     /**
-     * 從後端獲取購物車資料
+     * 從後端獲取購物車資料 - 修正版本
      */
     async fetchCartItemsFromBackend() {
       try {
@@ -162,25 +186,33 @@ export const useCartStore = defineStore('cart', {
           // 清空現有資料
           this.items = [];
           
+          console.log('=== 後端返回的原始數據 ===')
+          console.log('result.data:', result.data)
+          
           // 轉換後端資料為前端格式
           result.data.forEach(cartGroup => {
+            console.log('處理 cartGroup:', cartGroup)
+            
             cartGroup.items.forEach(item => {
+              console.log('處理 item:', item)
+              
               this.addItemToLocalCart({
                 cart_id: cartGroup.cart_id,
                 plan_type: cartGroup.plan_type,
                 date: item.meal_date,
-                quantity: item.count,
-                dailyTotalAmount: item.total_amount,
+                quantity: parseInt(item.count) || 0, // 確保轉換為數字
+                dailyTotalAmount: parseFloat(item.total_amount) || 0, // 確保轉換為數字
                 meal_items: item.meal_items,
                 order_start_date: cartGroup.order_start_date,
                 order_end_date: cartGroup.order_end_date,
-                total_days: cartGroup.total_days,
+                total_days: parseInt(cartGroup.total_days) || 0, // 確保轉換為數字
                 message_card_id: cartGroup.message_card_id
               });
             });
           });
           
           console.log(`✅ 會員 ${memberId} 的購物車資料載入成功:`, this.items);
+          console.log('==========================================')
         } else {
           throw new Error(result.message || '獲取購物車資料失敗');
         }
@@ -191,7 +223,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     /**
-     * 將單個商品添加到前端本地購物車
+     * 將單個商品添加到前端本地購物車 - 修正版本
      */
     addItemToLocalCart(item) {
       if (!item || !item.quantity || item.quantity <= 0 || !item.date || !item.dailyTotalAmount) {
@@ -199,18 +231,22 @@ export const useCartStore = defineStore('cart', {
         return;
       }
       
-      this.items.push({
+      // 確保所有數值都是正確的類型
+      const cartItem = {
         cart_id: item.cart_id,
         plan_type: item.plan_type,
         date: item.date,
-        quantity: item.quantity,
-        dailyTotalAmount: item.dailyTotalAmount,
+        quantity: parseInt(item.quantity) || 0,
+        dailyTotalAmount: parseFloat(item.dailyTotalAmount) || 0,
         meal_items: item.meal_items,
         order_start_date: item.order_start_date,
         order_end_date: item.order_end_date,
-        total_days: item.total_days,
+        total_days: parseInt(item.total_days) || 0,
         message_card_id: item.message_card_id || null
-      });
+      }
+      
+      console.log('添加到本地購物車:', cartItem)
+      this.items.push(cartItem);
     },
 
     /**

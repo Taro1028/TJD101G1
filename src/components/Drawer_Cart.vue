@@ -21,38 +21,34 @@ function closePopup() {
   }
 }
 
-// 計算購物車群組（與之前的邏輯相同）
-const cartGroups = computed(() => {
-  const groups = {}
-  
-  cartStore.items.forEach(item => {
-    const cartId = item.cart_id
-    if (!groups[cartId]) {
-      groups[cartId] = {
-        cart_id: cartId,
-        plan_type: item.plan_type,
-        order_start_date: item.order_start_date,
-        order_end_date: item.order_end_date,
-        total_days: item.total_days,
-        total_meal_count: 0,
-        total_amount: 0,
-        items: [],
-        message_card_id: item.message_card_id || null // 從資料庫取得留言小卡 ID
-      }
-    }
-    
-    groups[cartId].total_meal_count += item.quantity
-    groups[cartId].total_amount += item.dailyTotalAmount
-    groups[cartId].items.push(item)
-  })
-  
-  return Object.values(groups)
+// 使用 cartStore 的 cartGroups getter，保持一致性
+const cartGroups = computed(() => cartStore.cartGroups)
+
+// 計算總金額 - 修正版本
+const totalAmount = computed(() => {
+  return cartGroups.value.reduce((sum, group) => {
+    // 確保 total_amount 是數字
+    const amount = parseFloat(group.total_amount) || 0
+    return sum + amount
+  }, 0)
 })
 
-// 計算總金額
-const totalAmount = computed(() => {
-  return cartGroups.value.reduce((sum, group) => sum + group.total_amount, 0)
-})
+// 安全的數字格式化函數
+const formatPrice = (price) => {
+  const num = parseFloat(price)
+  
+  if (isNaN(num) || !isFinite(num)) {
+    console.warn('Invalid price value:', price)
+    return '0'
+  }
+  
+  if (num > 999999999) {
+    console.warn('Price value too large:', num)
+    return '999,999,999+'
+  }
+  
+  return Math.round(num).toLocaleString()
+}
 
 // 格式化日期範圍顯示
 const formatDateRange = (startDate, endDate, totalDays) => {
@@ -103,7 +99,6 @@ async function removeCartGroup(cartId, planType) {
 }
 
 function goNext() {
-  
   // 導向結帳頁面
   router.push('/Check_OrderInfo')
 }
@@ -122,6 +117,13 @@ onMounted(async () => {
     // 獲取購物車資料
     if (typeof cartStore.fetchCartItemsFromBackend === 'function') {
       await cartStore.fetchCartItemsFromBackend()
+      
+      // 調試輸出
+      console.log('=== Drawer_Cart 調試資訊 ===')
+      console.log('cartStore.items:', cartStore.items)
+      console.log('cartGroups:', cartGroups.value)
+      console.log('totalAmount:', totalAmount.value)
+      console.log('========================')
     } else {
       console.error('fetchCartItemsFromBackend 不是一個函數')
     }
@@ -177,9 +179,9 @@ onUnmounted(() => {
                         <div class="period">
                           {{ formatDateRange(group.order_start_date, group.order_end_date, group.total_days) }}
                         </div>
-                        <div class="count">{{ group.total_meal_count }} 份餐盒</div>
+                        <div class="count">{{ group.total_meal_count || 0 }} 份餐盒</div>
                     </div>
-                    <div class="price">${{ group.total_amount.toLocaleString() }}</div>
+                    <div class="price">${{ formatPrice(group.total_amount) }}</div>
                     <button 
                       class="btn-delete" 
                       @click="removeCartGroup(group.cart_id, group.plan_type)"
@@ -194,7 +196,7 @@ onUnmounted(() => {
         <div class="gopay">
             <div class="subtotal">
                 <span>小計</span>
-                <span>${{ totalAmount.toLocaleString() }}</span>
+                <span>${{ formatPrice(totalAmount) }}</span>
             </div>
             <button 
               class="btn-2" 
