@@ -4,6 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { newsApi, newsUtils } from '@/services/newsApi'
 
+const baseUrl = ref(import.meta.env.BASE_URL);
+
 const route = useRoute()
 const router = useRouter()
 
@@ -115,7 +117,7 @@ watch(() => route.params.id, (newId) => {
                     <h5>最後更新 {{ formattedDate }}</h5>
                     
                     <!-- 新聞封面圖 -->
-                    <img v-if="newsDetail.IMG" :src="newsDetail.IMG" :alt="newsDetail.TITLE">
+                    <img v-if="newsDetail.IMG" :src="baseUrl+newsDetail.IMG" :alt="newsDetail.TITLE">
                 </div>
 
                 <div class="newscontent">
@@ -249,8 +251,9 @@ watch(() => route.params.id, (newId) => {
     display: block;
     margin: auto;
     width: 780px;
-    height: auto;
+    height: 560px;
     object-fit: cover;
+    object-position: 50% 25%;
     border-radius: 8px;
 }
 

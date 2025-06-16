@@ -5,6 +5,8 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
 import Gotop from "../components/Gotop.vue"
 import { newsApi, newsUtils } from '@/services/newsApi'
 
+const baseUrl = ref(import.meta.env.BASE_URL);
+
 const router = useRouter()
 
 // 響應式資料
@@ -99,7 +101,7 @@ onMounted(() => {
                             @click="goToNewsDetail(mainFocusNews.ID)"
                         >
                             <div class="newstag">焦點</div>
-                            <img :src="mainFocusNews.IMG" :alt="mainFocusNews.TITLE">
+                            <img :src="baseUrl+mainFocusNews.IMG" :alt="mainFocusNews.TITLE">
                             <div class="block-overlay"></div>
                             <h4>{{ mainFocusNews.TITLE }}</h4>
                         </div>
@@ -138,7 +140,7 @@ onMounted(() => {
                             style="cursor: pointer;"
                         >
                             <div class="projectitem">
-                                <img :src="news.IMG" :alt="news.TITLE">
+                                <img :src="baseUrl+news.IMG" :alt="news.TITLE">
                                 <div class="itemtxt">
                                     <h4>{{ news.TITLE }}</h4>
                                     <h6>{{ news.SUMMARY }}</h6>
@@ -165,7 +167,7 @@ onMounted(() => {
                             style="cursor: pointer;"
                         >
                             <div class="newscard">
-                                <img :src="news.IMG" :alt="news.TITLE">
+                                <img :src="baseUrl+news.IMG" :alt="news.TITLE">
                                 <div class="newsinfo">
                                     <h4>{{ news.TITLE }}</h4>
                                     <h6>{{ news.SUMMARY }}</h6>
