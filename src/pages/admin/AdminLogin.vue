@@ -45,6 +45,8 @@ const handleLogin = async () => {
 
   try {
     const response = await fetch(env + "/tjd101/g1/php/AdminLogin.php", {
+    
+      //FTP
       //response接收php echo回傳值
       method: "POST",
       headers: {

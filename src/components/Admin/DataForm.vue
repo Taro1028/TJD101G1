@@ -134,6 +134,8 @@ async function getdata() {
   try {
     console.log("dddd");
     const response = await fetch(env + "/tjd101/g1/php/AdminMemberSelect.php", {
+    
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -160,6 +162,8 @@ async function Products() {
     const response = await fetch(
       env + "/tjd101/g1/php/AdminProductSelect.php",
       {
+    
+      
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -185,6 +189,8 @@ async function Products() {
 async function order() {
   try {
     const response = await fetch(env + "/tjd101/g1/php/AdminOrderSelect.php", {
+    
+      
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -209,6 +215,8 @@ async function order() {
 async function consigness() {
   try {
     const response = await fetch(env + "/tjd101/g1/php/AdminConsignees.php", {
+    
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -233,6 +241,8 @@ async function consigness() {
 async function websitedata() {
   try {
     const response = await fetch(env + "/tjd101/g1/php/AdminWebsiteData.php", {
+   
+
       method: "POST",
       headers: {
         "Content-Type": "application/json",

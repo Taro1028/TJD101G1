@@ -39,6 +39,7 @@ const handleSubmit = async () => {
   try {
     console.log(JSON.stringify(form));
     const response = await fetch(env + "/tjd101/g1/php/sign_up.php", {
+   
       method: "POST",
       headers: {
         "Content-Type": "application/json",
