@@ -111,6 +111,14 @@ const routes = [
     },
   },
   {
+    path: '/Cart',
+    component: () => import('@/components/Drawer_Cart.vue'),
+    meta: {
+      title: '購物車 - TibaEAT 提膳家',
+      requiredLogin: true
+    }
+  },
+  {
     path: "/Check_OrderInfo",
     component: () => import("@/pages/Check1_OrderInfo.vue"),
     meta: {
@@ -151,8 +159,10 @@ const routes = [
     },
   },
   {
-    path: "/About/News/Newsitem",
+    path: "/About/News/Newsitem/:id",
+    name: 'NewsDetail',
     component: () => import("@/pages/Newsitem.vue"),
+    props: true,
     meta: {
       title: "最新消息 - TibaEAT 提膳家",
     },

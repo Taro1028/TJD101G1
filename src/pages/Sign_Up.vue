@@ -1,9 +1,15 @@
 <script setup>
-import { reactive } from "vue";
+import { ref, reactive,onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from "vue-router";
+import flatpickr from 'flatpickr'
+import 'flatpickr/dist/flatpickr.min.css'
+import { Mandarin } from 'flatpickr/dist/l10n/zh.js'
+
 
 const router = useRouter();
 const env = import.meta.env.VITE_API_URL;
+const birthdayInput = ref(null)
+let birthdayPicker = null
 // const env = "";
 const form = reactive({
   name: "",
@@ -18,6 +24,26 @@ const form = reactive({
   contactsPhone: "",
   birthday: "",
 });
+
+    onMounted(() => {
+    birthdayPicker = flatpickr(birthdayInput.value, {
+      locale: Mandarin,
+      dateFormat: 'Y-m-d',
+      maxDate: new Date(), // 限制不能選擇未來日期
+      yearDropdown: true,
+      monthDropdown: true,
+      placeholder: '請選擇生日',
+      onChange: (selectedDates, dateStr) => {
+        form.birthday = dateStr
+      }
+    })
+  })
+
+  onBeforeUnmount(() => {
+    if (birthdayPicker) {
+      birthdayPicker.destroy()
+    }
+  })
 
 const handleSubmit = async () => {
   if (
@@ -138,10 +164,12 @@ const handleSubmit = async () => {
           <div class="signup_form_component">
             <label for="birthday">生日</label>
             <input
+              ref="birthdayInput"
               type="text"
               id="birthday"
               v-model="form.birthday"
-              placeholder="請輸入生日 (例如 YYYYMMDD)"
+              placeholder="請選擇生日"
+              readonly
               required
             />
           </div>

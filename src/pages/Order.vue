@@ -16,9 +16,7 @@ const dateRangeStore = useDateRangeStore()
 dateRangeStore.setDates(startDate, endDate)
 
 // 在頁面載入時，將日期設定到共用 store 中
-// 這裡很重要，確保日期已儲存，其他 store 才能從這裡讀取
-// 請確保 dateRangeStore 有 setDates 這個 action，否則請檢查 dateRangeStore.js
-dateRangeStore.setDates(startDate, endDate) // <-- 確保你的 dateRangeStore 有 setDates 這個方法
+dateRangeStore.setDates(startDate, endDate) // <-- 確保你的 dateRangeStore.js 有 setDates 這個方法
 
 onMounted(() => {
   document.body.classList.add('custom-bg')

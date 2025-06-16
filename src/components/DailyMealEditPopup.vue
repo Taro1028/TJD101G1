@@ -12,14 +12,19 @@
             <h6>🍱 主菜</h6>
             <button @click="openMainCoursePicker"><i class="bi bi-arrow-repeat"></i></button>
           </div>
-          <span>{{ localMainCourse }}</span>
+          <span>{{ localMainCourse ? localMainCourse.name : '未選擇主菜' }}</span>
         </div>
         <div class="section">
           <div class="title">
             <h6>🥬 副菜</h6>
             <button @click="openSideDishPicker"><i class="bi bi-arrow-repeat"></i></button>
           </div>
-          <span>{{ localSideDishes.join(' / ') }}</span>
+          <span>
+            <template v-if="localSelectedSideDishGroup && localSelectedSideDishGroup.dishes && localSelectedSideDishGroup.dishes.length > 0">
+              {{ localSelectedSideDishGroup.dishes.map(d => d.name).join(' / ') }}
+            </template>
+            <template v-else>未選擇副菜</template>
+          </span>
         </div>
       </div>
     </div>
@@ -37,29 +42,41 @@ const planCustomStore = usePlanCustomStore();
 
 const props = defineProps({
   dayMeal: {
-    type: Object,
+    type: Object, // dayMeal 應該是包含 mainCourse 和 sideDishes 物件的完整數據
     required: true
   }
 });
 
 const emit = defineEmits(['close', 'update-meal']);
 
-const localMainCourse = ref('');
-const localSideDishes = ref([]);
+// !!! 修正點 1: 統一變數名稱為 localSelectedSideDishGroup !!!
+const localMainCourse = ref(null);
+const localSelectedSideDishGroup = ref(null); // 現在儲存副菜組合物件
 
+// 從 store 獲取所有可能的主菜 (物件陣列)
 const possibleMainDishesBasedOnTypes = computed(() => planCustomStore.possibleMainDishesBasedOnTypes);
+// 從 store 獲取所有已選的副菜組合 (物件陣列)
+// selectedSideDishGroups 現在就是副菜組合物件的陣列了
+const selectedSideDishGroups = computed(() => planCustomStore.selectedSideDishGroups);
 
-// 這個就是儲存副菜組合「索引」的 computed 屬性
-const selectedSideDishGroups = computed(() => planCustomStore.selectedSideDishGroups); // <-- 這裡就是 selectedSideDishGroups
-
-// 這個是包含所有副菜組合選項的列表，從 store 取得
-const availableSideDishOptions = computed(() => planCustomStore.availableSideDishOptions);
+// 不再需要 availableSideDishOptions，因為 selectedSideDishGroups 已經是物件了
+// const availableSideDishOptions = computed(() => planCustomStore.availableSideDishOptions);
 
 
+// 監聽 props.dayMeal 的變化來初始化 local 狀態
 watch(() => props.dayMeal, (newVal) => {
+  console.log('DailyMealEditPopup: dayMeal prop changed:', newVal);
   if (newVal) {
-    localMainCourse.value = newVal.mainCourse;
-    localSideDishes.value = [...newVal.sideDishes];
+    // 複製物件以確保響應性獨立且不會直接修改 props
+    localMainCourse.value = newVal.mainCourse ? { ...newVal.mainCourse } : null;
+    localSelectedSideDishGroup.value = newVal.sideDishes ? { ...newVal.sideDishes } : null;
+
+    console.log('DailyMealEditPopup: localMainCourse after watch:', localMainCourse.value);
+    console.log('DailyMealEditPopup: localSelectedSideDishGroup after watch:', localSelectedSideDishGroup.value);
+  } else {
+    console.warn('DailyMealEditPopup: dayMeal prop is null or undefined.');
+    localMainCourse.value = null;
+    localSelectedSideDishGroup.value = null;
   }
 }, { immediate: true });
 
@@ -69,11 +86,16 @@ const getDayOfWeekShort = (dateStr) => {
   return weekdayShort;
 };
 
+// 傳遞完整的物件給父組件
 const saveChanges = () => {
+  if (!localMainCourse.value || !localSelectedSideDishGroup.value) {
+    alert('主菜或副菜未選擇！');
+    return;
+  }
   emit('update-meal', {
     date: props.dayMeal.date,
-    mainCourse: localMainCourse.value,
-    sideDishes: localSideDishes.value
+    mainCourse: localMainCourse.value, // <-- 傳遞完整物件
+    sideDishes: localSelectedSideDishGroup.value // <-- 傳遞完整物件
   });
 };
 
@@ -87,49 +109,31 @@ const openMainCoursePicker = () => {
     return;
   }
   const randomIndex = Math.floor(Math.random() * possibleMainDishesBasedOnTypes.value.length);
-  localMainCourse.value = possibleMainDishesBasedOnTypes.value[randomIndex];
-  console.log('新主菜:', localMainCourse.value);
+  // 複製物件以確保響應性獨立
+  localMainCourse.value = { ...possibleMainDishesBasedOnTypes.value[randomIndex] };
+  console.log('新主菜物件:', localMainCourse.value);
 };
 
 const openSideDishPicker = () => {
   console.log('--- 開始偵錯副菜隨機選擇 (DailyMealEditPopup) ---');
-  // 請注意，這裡的 selectedSideDishGroups 就是選中的索引陣列
-  console.log('來自 store 的 selectedSideDishGroups.value (選中的索引):', selectedSideDishGroups.value); // <-- 使用 selectedSideDishGroups
-  console.log('來自 store 的 availableSideDishOptions.value (所有副菜組合選項):', availableSideDishOptions.value);
+  // selectedSideDishGroups 現在已經是副菜組合物件的陣列了
+  console.log('來自 store 的 selectedSideDishGroups.value (選中的副菜組合物件):', selectedSideDishGroups.value);
 
-  // 確保 selectedSideDishGroups.value 和 availableSideDishOptions.value 有值
-  if (!selectedSideDishGroups.value || selectedSideDishGroups.value.length === 0) { // <-- 使用 selectedSideDishGroups
+  // 確保 selectedSideDishGroups.value 有值
+  if (!selectedSideDishGroups.value || selectedSideDishGroups.value.length === 0) {
     alert('無可選副菜組合，請先回到 Step 2 選擇副菜組合！');
-    console.warn('selectedSideDishGroups 為空或未定義:', selectedSideDishGroups.value); // <-- 使用 selectedSideDishGroups
+    console.warn('selectedSideDishGroups 為空或未定義:', selectedSideDishGroups.value);
     return;
   }
-  if (!availableSideDishOptions.value || availableSideDishOptions.value.length === 0) {
-      alert('副菜選項數據未載入，請檢查 PlanCustomStore。');
-      console.error('availableSideDishOptions 為空或未定義:', availableSideDishOptions.value);
-      return;
-  }
 
+  // !!! 修正點 2: 移除混淆的第二套邏輯，只保留正確的隨機選擇副菜組合物件的邏輯 !!!
+  const randomIndex = Math.floor(Math.random() * selectedSideDishGroups.value.length);
+  // 隨機選取的是一個副菜組合物件，並複製物件以確保響應性獨立
+  localSelectedSideDishGroup.value = { ...selectedSideDishGroups.value[randomIndex] };
 
-  // 從已選的索引中隨機選擇一個索引
-  const randomSelectedGroupIndexInIndicesArray = Math.floor(Math.random() * selectedSideDishGroups.value.length); // <-- 使用 selectedSideDishGroups
-  const actualDishOptionIndex = selectedSideDishGroups.value[randomSelectedGroupIndexInIndicesArray]; // <-- 使用 selectedSideDishGroups
-
-  // 根據這個索引從 availableSideDishOptions 獲取完整的副菜組合物件
-  const selectedGroupObject = availableSideDishOptions.value[actualDishOptionIndex];
-
-  console.log('隨機選擇到的索引:', actualDishOptionIndex);
-  console.log('對應的副菜組合物件:', selectedGroupObject);
-
-  if (selectedGroupObject && Array.isArray(selectedGroupObject.text)) {
-    localSideDishes.value = [...selectedGroupObject.text]; // 複製該組合的 text 陣列
-    console.log('新副菜:', localSideDishes.value);
-  } else {
-    console.error('錯誤：無法從選定的副菜索引獲取有效的副菜組合陣列。檢查 availableSideDishOptions 或 selectedSideDishGroups 的數據。'); // <-- 這裡也改為 selectedSideDishGroups
-    alert('副菜數據結構錯誤，請檢查 PlanCustomStore 中的副菜數據！');
-  }
+  console.log('新副菜組合物件:', localSelectedSideDishGroup.value);
 };
 </script>
-
 <style scoped lang="scss">
 
 .daily-meal-edit-popup {

@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, computed } from 'vue';
+    import { ref, computed, reactive } from 'vue';
     import FrontLayout from '../layouts/FrontLayout.vue';
     import Gotop from "../components/Gotop.vue"
     import { useMemberStore } from '@/stores/MemberStore'
@@ -11,6 +11,28 @@
     const activeTab = ref('Recipients1');
     const memberStore = useMemberStore()
     const router = useRouter()
+
+    // 電話欄位驗證狀態
+const phoneValidation = reactive({
+  recipient_telephone: true,     // 收件人市內電話驗證狀態
+  recipient_mobile: true,        // 收件人行動電話驗證狀態
+  safety_contact_phone: true     // 送餐安全聯絡人電話驗證狀態
+});
+
+    // 數字驗證函數
+    const validatePhoneNumber = (value, field) => {
+    // 允許空值、數字、短橫線、空格、括號
+    const phoneRegex = /^[0-9\s\-\(\)]*$/;
+    const isValid = phoneRegex.test(value);
+    phoneValidation[field] = isValid;
+    return isValid;
+    };
+
+    // 電話輸入處理函數
+    const handlePhoneInput = (event, field) => {
+    const value = event.target.value;
+    validatePhoneNumber(value, field);
+    };
 
     // 點擊大頭照區域觸發檔案選擇
     const handleAvatarClick = () => {
@@ -191,22 +213,72 @@
                                         <label class="form-label">收件人地址</label>
                                         <input type="text" class="form-input" value="臺北市中山區南京東路三段" />
                                     </div>
-                                    <div class="form-group">
+
+                                    <div class="form-group" :class="{ 'phone-error': !phoneValidation.recipient_telephone }">
                                         <label class="form-label">收件人市內電話</label>
-                                        <input type="text" class="form-input" value="02-2312-3456" />
+                                        <div class="phone-input-container">
+                                            <input 
+                                                type="tel" 
+                                                class="form-input" 
+                                                :class="{ 'error': !phoneValidation.recipient_telephone }"
+                                                value="02-2312-3456"
+                                                @input="handlePhoneInput($event, 'recipient_telephone')"
+                                                placeholder="請輸入數字"
+                                            />
+                                            <span class="error-icon" v-show="!phoneValidation.recipient_telephone">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                            </span>
+                                        </div>
+                                        <span class="error-message" v-show="!phoneValidation.recipient_telephone">
+                                            請只輸入數字、空格、短橫線或括號
+                                        </span>
                                     </div>
-                                    <div class="form-group">
+
+                                    <div class="form-group" :class="{ 'phone-error': !phoneValidation.recipient_mobile }">
                                         <label class="form-label">收件人行動電話</label>
-                                        <input type="text" class="form-input" value="0987 078 587" />
+                                        <div class="phone-input-container">
+                                            <input 
+                                                type="tel" 
+                                                class="form-input" 
+                                                :class="{ 'error': !phoneValidation.recipient_mobile }"
+                                                value="0987 078 587"
+                                                @input="handlePhoneInput($event, 'recipient_mobile')"
+                                                placeholder="請輸入數字"
+                                            />
+                                            <span class="error-icon" v-show="!phoneValidation.recipient_mobile">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                            </span>
+                                        </div>
+                                        <span class="error-message" v-show="!phoneValidation.recipient_mobile">
+                                            請只輸入數字、空格、短橫線或括號
+                                        </span>
                                     </div>
+
                                     <div class="form-group">
                                         <label class="form-label">送餐安全聯絡人－姓名</label>
                                         <input type="text" class="form-input" value="林榮杰" />
                                     </div>
-                                    <div class="form-group">
+
+                                    <div class="form-group" :class="{ 'phone-error': !phoneValidation.safety_contact_phone }">
                                         <label class="form-label">送餐安全聯絡人－電話</label>
-                                        <input type="text" class="form-input" value="0987 078 875" />
+                                        <div class="phone-input-container">
+                                            <input 
+                                                type="tel" 
+                                                class="form-input" 
+                                                :class="{ 'error': !phoneValidation.safety_contact_phone }"
+                                                value="0987 078 875"
+                                                @input="handlePhoneInput($event, 'safety_contact_phone')"
+                                                placeholder="請輸入數字"
+                                            />
+                                            <span class="error-icon" v-show="!phoneValidation.safety_contact_phone">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                            </span>
+                                        </div>
+                                        <span class="error-message" v-show="!phoneValidation.safety_contact_phone">
+                                            請只輸入數字、空格、短橫線或括號
+                                        </span>
                                     </div>
+
                                     <div class="form-group">
                                         <label class="form-label">備註</label>
                                         <textarea class="form-textarea">罹有糖尿病、三高、重聽、牙口尚可、茹素、喜清淡</textarea>
@@ -471,6 +543,49 @@
                 border: 1px solid $primary_600; 
             }
         }
+        /* 電話輸入框容器 */
+        .phone-input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        }
+
+        /* 錯誤狀態的輸入框 */
+        .form-input.error {
+        border: 2px solid #dc3545;
+        background-color: #ffeaa7;
+        
+        &:focus {
+            outline: none;
+            border: 2px solid #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        }
+
+        /* 錯誤圖示 */
+        .error-icon {
+        position: absolute;
+        right: 15px;
+        color: #dc3545;
+        font-size: 16px;
+        pointer-events: none;
+        z-index: 1;
+        }
+
+        /* 錯誤訊息文字 */
+        .error-message {
+        display: block;
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 5px;
+        font-weight: 500;
+        }
+
+        /* 錯誤狀態的表單群組 */
+        .form-group.phone-error .form-label {
+        color: #dc3545;
+        }
+
 
         /* 表單文字顯示 */
         .form-text {

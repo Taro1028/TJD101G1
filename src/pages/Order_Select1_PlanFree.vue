@@ -95,7 +95,8 @@ function closePopup() {
 // 清除原本選擇的選項
 function handleLeaveConfirmed() {
   planCustomStore.resetMainCourseSelection(); 
-  localSelectedMeats.value = []; // 同步清除組件內部的狀態
+  planCustomStore.setSelectedSideDishGroups([]); // 清除副菜組合選擇
+  planCustomStore.customMealsByDate = []; // 清除已生成的每日菜單
 
   router.push('/Order/Select'); 
 

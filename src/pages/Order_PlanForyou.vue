@@ -50,7 +50,7 @@ const router = useRouter()
 
 function handleNextClick() {
   if (isAllDatesSelected.value) {
-    openPopup('msgcard')
+    openPopup('message')
   } else {
     goNextDate()
   }
@@ -137,6 +137,10 @@ function hasSelectedMeal(index) {
   })
 }
 
+const formatNumber = (number) => {
+  return number.toLocaleString('zh-TW')
+}
+
 // Popup
 const showPopup = ref(null)
 const selectedMenu = ref(null)
@@ -215,7 +219,7 @@ const isNextDisabled = computed(() => {
                                     <div class="date">{{ formatDate(date) }}</div>
                                     <div class="lunchboxtxt">
                                         <template v-if="getTotalCount(date) > 0">
-                                            訂 {{ getTotalCount(date) }} 份餐盒 · ${{ getTotalPrice(date) }}
+                                            訂 {{ getTotalCount(date) }} 份餐盒 · ${{ getTotalPrice(date).toLocaleString('zh-TW') }}
                                         </template>
                                         <template v-else>
                                             請選擇餐點
@@ -253,7 +257,7 @@ const isNextDisabled = computed(() => {
                                         </div>
                                         <div class="detail-price">
                                             <div class="detail"><a @click="openPopup('content', menuitem)">詳細內容</a></div>
-                                            <div class="price">${{ menuitem.price }}</div>
+                                            <div class="price">${{ menuitem.price.toLocaleString('zh-TW') }}</div>
                                         </div>
                                         <div class="quantity-selector">
                                             <button
@@ -283,11 +287,11 @@ const isNextDisabled = computed(() => {
                     </div>
                     <div class="ordertxt">
                         <h5 class="boxitem">餐盒項目：{{ getMealSummary(deliveryDates[selectedIndex]) }}</h5>
-                        <h5 class="subtotal">小計：${{ getTotalPrice(deliveryDates[selectedIndex]) }}</h5>
+                        <h5 class="subtotal">小計：${{ getTotalPrice(deliveryDates[selectedIndex]).toLocaleString('zh-TW') }}</h5>
                     </div>
                     <div class="total_option-btn">
                         <div class="total">
-                            <h5>總計金額：<br>${{ getTotalAllDates }}</h5>
+                            <h5>總計金額：<br>${{ getTotalAllDates.toLocaleString('zh-TW') }}</h5>
                         </div>
                         <div class="option-btn">
                             <button class="prevbtn"
@@ -304,12 +308,15 @@ const isNextDisabled = computed(() => {
                                     @click="handleNextClick">
                                     {{ isAllDatesSelected ? '訂購餐點' : '下一步' }}
                             </button>
-                            <MessageCard v-if="showPopup === 'msgcard'" @close="closePopup" />
                         </div>
                     </div>
                 </div>
-
             </div>
+            <MessageCard 
+            v-if="showPopup === 'message'" 
+            :plan-type="'為你搭配'" 
+            @close="closePopup" 
+            />
         </div>
     </FrontLayout>
 </template>

@@ -29,7 +29,7 @@ function goNext() {
     <div class="wrapper">
         <div class="messageCard">
             <img src="../assets/images/Order/cart_bag.svg" alt="">
-            <h3>預約訂餐成功</h3>
+            <h3>加入購物車</h3>
             <h5>您預約的餐點已添加至購物車</h5>
             <div class="btnblock">
             <router-link to="/Order/Select" class="btn-1">繼續訂餐</router-link>
@@ -91,7 +91,6 @@ h5{
 
     &:hover{
     background-color: transparent;
-    transition: 0.3s ease;
     color: $neutral_black;
     }
 }
@@ -103,11 +102,10 @@ h5{
     border-radius: 24px;
     border: 2px solid $neutral_black;
     transition: 0.3s ease;
-
+    cursor: pointer;
 
     &:hover{
     background-color: transparent;
-    transition: 0.3s ease;
     color: $neutral_black;
     }
 }
