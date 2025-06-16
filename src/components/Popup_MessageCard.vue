@@ -1,41 +1,71 @@
 <script setup>
-// import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
+import { useOrderStore } from '@/stores/orderStore';
+import { usePlanCustomStore } from '@/stores/planCustomStore';
 
-const router = useRouter()
+const router = useRouter();
+const orderStore = useOrderStore();
+const planCustomStore = usePlanCustomStore();
 
-function goNext() {
-//   if (!canProceed.value) return
+// 定義 props 來接收當前是哪種方案
+const props = defineProps({
+  planType: {
+    type: String,
+    required: true,
+    validator: (value) => ['為你搭配', '自由搭配'].includes(value)
+  }
+});
 
-//   // 把資料存在 localStorage（或改用 pinia）
-//   localStorage.setItem('selectedDishes', JSON.stringify(selectedDishes.value))
+const emit = defineEmits(['close']);
 
-  // 導向下一頁
-  router.push('/Order/AddCart')
+// 當用戶選擇「不用，謝謝」時
+async function goNext() {
+  console.log(`點擊「不用，謝謝」：準備將 ${props.planType} 訂單資料加入購物車`);
+  
+  try {
+    if (props.planType === '為你搭配') {
+      // 為你搭配：不需要留言小卡
+      await orderStore.addPlanForYouToCart(); // 這裡也需要更新為不傳 messageCardId
+    } else if (props.planType === '自由搭配') {
+      // 自由搭配：不需要留言小卡
+      await planCustomStore.addAllCustomMealsToCart(null); // 明確傳入 null
+    }
+    
+    // 關閉彈窗
+    emit('close');
+    router.push('/Order/AddCart');
+  } catch (error) {
+    console.error('加入購物車失敗:', error);
+    alert('加入購物車失敗，請稍後再試。');
+  }
 }
 
+// 當用戶選擇「我要留言」時
 function goMessage() {
-//   if (!canProceed.value) return
-
-//   // 把資料存在 localStorage（或改用 pinia）
-//   localStorage.setItem('selectedDishes', JSON.stringify(selectedDishes.value))
-
-  // 導向下一頁
-  router.push('/Order/MessageCards')
+  console.log(`點擊「我要留言」：導向留言卡頁面 (${props.planType})`);
+  
+  // 關閉彈窗
+  emit('close');
+  
+  // 導向到留言小卡頁面，並傳遞方案類型
+  router.push({
+    path: '/Order/MessageCards',
+    query: { planType: props.planType }
+  });
 }
-
 </script>
+
 <template>
 <div class="overlay">
-    <div class="messageCard">
-        <img src="../assets/images/Order/card.svg" alt="">
-        <h3>需要留言小卡嗎?</h3>
-        <h5>會與配送餐點一併送達</h5>
-        <div class="btnblock">
-        <button class="btn-1" @click="goNext">不用，謝謝</button>
-        <button class="btn-2" @click="goMessage">我要留言</button>
-        </div>
+  <div class="messageCard">
+    <img src="../assets/images/Order/card.svg" alt="">
+    <h3>需要留言小卡嗎?</h3>
+    <h5>會與配送餐點一併送達</h5>
+    <div class="btnblock">
+      <button class="btn-1" @click="goNext">不用，謝謝</button>
+      <button class="btn-2" @click="goMessage">我要留言</button>
     </div>
+  </div>
 </div>
 </template>
 
@@ -115,5 +145,4 @@ h5{
     color: $neutral_black;
     }
 }
-
 </style>

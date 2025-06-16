@@ -1,69 +1,214 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-
+import { useCartStore } from '@/stores/cartStore'
 
 const router = useRouter()
+const cartStore = useCartStore()
 
-// 關閉視窗
+const loading = ref(true)
+
+// 關閉視窗 - 當作為路由使用時直接導航
 const emit = defineEmits(['close'])
 
 function closePopup() {
-  emit('close')
+  // 如果是作為路由組件使用，直接導航回上一頁
+  if (router.currentRoute.value.path === '/Cart') {
+    router.go(-1) // 或者 router.push('/') 導回首頁
+  } else {
+    // 如果是作為彈窗組件使用，發送關閉事件
+    emit('close')
+  }
+}
+
+// 計算購物車群組（與之前的邏輯相同）
+const cartGroups = computed(() => {
+  const groups = {}
+  
+  cartStore.items.forEach(item => {
+    const cartId = item.cart_id
+    if (!groups[cartId]) {
+      groups[cartId] = {
+        cart_id: cartId,
+        plan_type: item.plan_type,
+        order_start_date: item.order_start_date,
+        order_end_date: item.order_end_date,
+        total_days: item.total_days,
+        total_meal_count: 0,
+        total_amount: 0,
+        items: [],
+        message_card_id: item.message_card_id || null // 從資料庫取得留言小卡 ID
+      }
+    }
+    
+    groups[cartId].total_meal_count += item.quantity
+    groups[cartId].total_amount += item.dailyTotalAmount
+    groups[cartId].items.push(item)
+  })
+  
+  return Object.values(groups)
+})
+
+// 計算總金額
+const totalAmount = computed(() => {
+  return cartGroups.value.reduce((sum, group) => sum + group.total_amount, 0)
+})
+
+// 格式化日期範圍顯示
+const formatDateRange = (startDate, endDate, totalDays) => {
+  if (!startDate) return ''
+  
+  // 如果只有1日，只顯示開始日期
+  if (totalDays === 1) {
+    const startDateObj = new Date(startDate)
+    const year = startDateObj.getFullYear()
+    const month = String(startDateObj.getMonth() + 1).padStart(2, '0')
+    const day = String(startDateObj.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day} (共 1 日)`
+  }
+  
+  // 多日顯示範圍
+  const startDateObj = new Date(startDate)
+  const endDateObj = new Date(endDate)
+  
+  const startYear = startDateObj.getFullYear()
+  const startMonth = String(startDateObj.getMonth() + 1).padStart(2, '0')
+  const startDay = String(startDateObj.getDate()).padStart(2, '0')
+  
+  const endYear = endDateObj.getFullYear()
+  const endMonth = String(endDateObj.getMonth() + 1).padStart(2, '0')
+  const endDay = String(endDateObj.getDate()).padStart(2, '0')
+  
+  const startFormatted = `${startYear}-${startMonth}-${startDay}`
+  
+  // 如果是同一年，結束日期不顯示年份
+  const endFormatted = (startYear === endYear) 
+    ? `${endMonth}-${endDay}` 
+    : `${endYear}-${endMonth}-${endDay}`
+  
+  return `${startFormatted} — ${endFormatted} (共 ${totalDays} 日)`
+}
+
+// 刪除購物車群組
+async function removeCartGroup(cartId, planType) {
+  if (!confirm(`確定要刪除「${planType}」訂單嗎？`)) {
+    return
+  }
+  
+  try {
+    await cartStore.removeCartItem(cartId)
+  } catch (error) {
+    alert('刪除失敗：' + error.message)
+  }
 }
 
 function goNext() {
-//   if (!canProceed.value) return
-
-//   // 把資料存在 localStorage（或改用 pinia）
-//   localStorage.setItem('selectedDishes', JSON.stringify(selectedDishes.value))
-
-  // 導向下一頁
+  
+  // 導向結帳頁面
   router.push('/Check_OrderInfo')
 }
 
-// 防止背景滾動
-onMounted(() => {
-  document.body.style.overflow = 'hidden'
+// 載入購物車資料
+onMounted(async () => {
+  try {
+    loading.value = true
+    // 防止背景滾動
+    document.body.style.overflow = 'hidden'
+    
+    // 檢查 cartStore 是否正確載入
+    console.log('cartStore:', cartStore)
+    console.log('fetchCartItemsFromBackend 函數:', cartStore.fetchCartItemsFromBackend)
+    
+    // 獲取購物車資料
+    if (typeof cartStore.fetchCartItemsFromBackend === 'function') {
+      await cartStore.fetchCartItemsFromBackend()
+    } else {
+      console.error('fetchCartItemsFromBackend 不是一個函數')
+    }
+  } catch (error) {
+    console.error('載入購物車失敗:', error)
+  } finally {
+    loading.value = false
+  }
 })
 
 onUnmounted(() => {
   document.body.style.overflow = ''
 })
-
 </script>
+
 <template>
 <div class="overlay" @click="closePopup">
     <div class="shopCart" @click.stop>
-        <button class="closebtn"  @click="closePopup"><i class="bi bi-x-circle"></i></button>
+        <button class="closebtn" @click="closePopup">
+          <i class="bi bi-x-circle"></i>
+        </button>
+        
         <div class="orderitem">
-            <div class="title"><h3>購物車</h3></div>
-            <div class="itemlist">
-                <div class="item">
+            <div class="title">
+              <h3>購物車</h3>
+            </div>
+            
+            <!-- 載入中狀態 -->
+            <div v-if="loading" class="loading">
+              載入中...
+            </div>
+            
+            <!-- 空購物車狀態 -->
+            <div v-else-if="cartGroups.length === 0" class="empty-cart">
+                <div class="empty-icon">
+                    <i class="bi bi-cart-x"></i>
+                </div>
+              <h5>購物車是空的</h5>
+              <span>快去選擇您喜歡的餐點吧！</span>
+            </div>
+            
+            <!-- 購物車項目列表 -->
+            <div v-else class="itemlist">
+                <div 
+                  v-for="group in cartGroups" 
+                  :key="group.cart_id"
+                  class="item"
+                >
                     <div class="iteminfo">
-                        <div class="infotitle"><h4>為你搭配 + 小卡</h4></div>
-                        <div class="period">2025-06-07—06-13 (共 7 日)</div>
-                        <div class="count">50 份餐盒</div>
+                        <div class="infotitle">
+                          <h4>{{ group.plan_type }}{{ group.message_card_id ? ' + 小卡' : '' }}</h4>
+                        </div>
+                        <div class="period">
+                          {{ formatDateRange(group.order_start_date, group.order_end_date, group.total_days) }}
+                        </div>
+                        <div class="count">{{ group.total_meal_count }} 份餐盒</div>
                     </div>
-                    <div class="price">$17,450</div>
-                    <button class="btn-delete"><i class="bi bi-trash3"></i></button>
+                    <div class="price">${{ group.total_amount.toLocaleString() }}</div>
+                    <button 
+                      class="btn-delete" 
+                      @click="removeCartGroup(group.cart_id, group.plan_type)"
+                      title="刪除此訂單"
+                    >
+                      <i class="bi bi-trash3"></i>
+                    </button>
                 </div>
             </div>
-        
         </div>
+        
         <div class="gopay">
             <div class="subtotal">
                 <span>小計</span>
-                <span>$17,450</span>
+                <span>${{ totalAmount.toLocaleString() }}</span>
             </div>
-            <button class="btn-2" @click="goNext">前往結帳</button>
+            <button 
+              class="btn-2" 
+              @click="goNext"
+              :disabled="cartGroups.length === 0 || loading"
+            >
+              前往結帳
+            </button>
         </div>
     </div>
 </div>
 </template>
 
 <style scoped lang="scss">
-
 .overlay{
     position: fixed;
     top: 0;
@@ -130,37 +275,96 @@ h3{
     padding-bottom: 8px;
 }
 
+.loading {
+  text-align: center;
+  padding: 40px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 40px 0;
+  color: $neutral_700;
+  
+  h5 {
+    margin-bottom: 8px;
+    font-size: $font_h4;
+  }
+  
+  span {
+    font-size: $font_h6;
+    opacity: 0.7;
+  }
+}
+
+.empty-icon {
+    font-size: $font_h1;
+    color: $neutral_300;
+    margin-bottom: 24px;
+  }
+
 .itemlist{
     display: flex;
     flex-direction: column;
     gap: 24px;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .item{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    
+    &:last-child {
+      border-bottom: none;
+    }
 }
 
 .iteminfo{
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
+    flex: 1;
+    margin-right: 16px;
 }
 
 .infotitle h4{
     font-size: $font_h4;
+    margin: 0;
+}
+
+.period, .count {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.price {
+  font-weight: 600;
+  margin-right: 12px;
+  white-space: nowrap;
 }
 
 .btn-delete{
     background-color: transparent;
     border: none;
     cursor: pointer;
+    padding: 4px;
+    
+    &:hover i {
+      opacity: 0.7;
+      color: #ff4444;
+    }
 }
 
 .btn-delete i{
     font-size: $font_h4;
     opacity: .5;
+    transition: all 0.2s ease;
 }
 
 .gopay{
@@ -174,7 +378,7 @@ h3{
 }
 
 .subtotal span{
-    font-size: $font_h5 ;
+    font-size: $font_h5;
     font-weight: bold;
 }
 
@@ -189,10 +393,14 @@ h3{
     border: 2px solid $neutral_black;
     transition: 0.3s ease;
 
-
-    &:hover{
-    background-color: transparent;
-    color: $neutral_black;
+    &:hover:not(:disabled){
+      background-color: transparent;
+      color: $neutral_black;
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 }
 
@@ -223,6 +431,9 @@ h3{
     font-size: $font_h5;
 }
 
+.itemlist{
+    max-height: 300px;
 }
 
+}
 </style>

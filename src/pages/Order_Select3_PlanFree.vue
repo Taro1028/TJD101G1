@@ -3,12 +3,12 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
-import MessageCard from '@/components/Popup_MessageCard.vue' // 注意這裡應該是 MessageCard
+import MessageCard from '@/components/Popup_MessageCard.vue' 
 import { usePlanCustomStore } from '@/stores/planCustomStore.js' // 引入 planCustomStore
 import { useDateRangeStore } from '@/stores/dateRangeStore.js';
-import dayjs from 'dayjs' // 引入 dayjs
-import 'dayjs/locale/zh-tw' // 引入中文語系
-dayjs.locale('zh-tw') // 設定 dayjs 語系
+import dayjs from 'dayjs' 
+import 'dayjs/locale/zh-tw' 
+dayjs.locale('zh-tw')
 import SettingActionMenu from '@/components/SettingActionMenu.vue'; // 新增的全局選單組件
 import DailyMealEditPopup from '@/components/DailyMealEditPopup.vue'; // 新增的當日菜單編輯彈窗組件
 
@@ -84,13 +84,15 @@ onMounted(() => {
 
     // 在此步驟初始化每天的菜單
     // 只有在確保前一步的選擇都完成時才執行初始化
-    if (planCustomStore.selectedMainCourseTypes.length === 2 && planCustomStore.selectedSideDishGroups.length === 5 && planCustomStore.deliveryDates.length > 0) {
+    if (planCustomStore.selectedMainCourseTypes.length === 2 && 
+        planCustomStore.selectedSideDishGroups.length === 5 && 
+        planCustomStore.deliveryDates.length > 0) {
         planCustomStore.initializeCustomMealsByDate()
     } else {
         // 如果沒有完成前置選擇，導回 Step 2 (或 Step 1)
-        alert('請先完成主菜、副菜組合選擇及日期選擇！');
+        alert('請先完成日期選擇、主菜及副菜組合！');
         // router.replace('/Order/PlanFree/Step2'); // 如果是 Step2 是進入點，則導回
-        router.replace('/Order/PlanFree/Step1'); // 更安全的做法，導回 Step1 讓使用者重新選擇
+        router.replace('/Order/Select'); // 更安全的做法，導回 選擇期間 讓使用者重新選擇
     }
 })
 
@@ -129,7 +131,7 @@ const formatDateWithOptions = (dateStr, { showYear = false, showWeekday = false 
     const weekday = ['日', '一', '二', '三', '四', '五', '六'][d.day()]
     const formatStr = showYear ? 'YYYY.MM.DD' : 'MM.DD'
     const base = d.format(formatStr)
-    return showWeekday ? `${base}（${weekday}）` : base
+    return showWeekday ? `${base} (${weekday})` : base
 }
 
 // 顯示期間範圍（例如「06.07(六) - 06.13(五)」）
@@ -174,6 +176,8 @@ const totalMealsCount = computed(() => {
 
 // 計算總計金額
 const getTotalAllDatesPrice = computed(() => {
+    // return planCustomStore.getTotalAllCustomDatesPrice;
+    // 直接從 store 獲取總金額，因為 store 已經根據主菜價格計算
     return planCustomStore.getTotalAllCustomDatesPrice;
 });
 
@@ -235,13 +239,18 @@ function handleOrderClick() {
                         <div class="item">
                             <h6>{{ getDayOfWeekShort(dayMeal.date) }}</h6>
                             <div class="meal">
-                                <div class="mealname">🍱 {{ dayMeal.mainCourse }}餐食</div>
+                                <div class="mealname">🍱 {{ dayMeal.mainCourse.name }}餐食</div>
                                 <div class="mealinfo">
-                                    <span id="mainmeal">{{ dayMeal.mainCourse }} / </span>
-                                    <span id="sidemeal">{{ dayMeal.sideDishes.join(' / ') }}</span>
+                                    <span id="mainmeal">{{ dayMeal.mainCourse.name }} / </span>
+                                    <span id="sidemeal">
+                                        <template v-for="(dish, index) in dayMeal.sideDishes.dishes" :key="dish.id">
+                                            {{ dish.name }}
+                                            <template v-if="index < dayMeal.sideDishes.dishes.length - 1"> / </template>
+                                        </template>
+                                    </span>
                                 </div>
                             </div>
-                            <div class="price">${{ CUSTOM_MEAL_PRICE }}</div>
+                            <div class="price">${{ CUSTOM_MEAL_PRICE.toLocaleString() }}</div>
                         </div>
 
                         <div class="action-area">
@@ -287,9 +296,9 @@ function handleOrderClick() {
                 <div class="priceinfo">
                     <span class="perblock">訂購期間：&nbsp;<span>{{ customPeriodDisplay }}<br>(共 {{ totalDeliveryDays }} 天)</span>
                     </span>
-                    <span>餐盒金額： ${{ CUSTOM_MEAL_PRICE }} 元</span>
+                    <span>餐盒金額： ${{ CUSTOM_MEAL_PRICE.toLocaleString() }} 元</span>
                     <span>數量合計： {{ totalMealsCount }} 份</span>
-                    <span>總計金額： ${{ getTotalAllDatesPrice }}</span>
+                    <span>總計金額： ${{ getTotalAllDatesPrice.toLocaleString() }}</span>
                 </div>
                 <img src="../assets/images/Order/box-complete.png" alt="">
                 <div class="btnblock">
@@ -298,7 +307,11 @@ function handleOrderClick() {
                         <button class="btn-2" @click="handleOrderClick" :disabled="isOrderButtonDisabled">
                             訂購餐點
                         </button>
-                        <MessageCard v-if="showPopup === 'message'" @close="closePopup" />
+                        <MessageCard 
+                            v-if="showPopup === 'message'" 
+                            :plan-type="'自由搭配'" 
+                            @close="closePopup" 
+                            />
                     </div>
                 </div>
             </div>
@@ -424,6 +437,7 @@ h1 {
 
 .titletxt {
     display: flex;
+    align-items: center;
     gap: 16px;
 }
 
@@ -450,6 +464,7 @@ h1 {
     border: none;
     color: $neutral_black;
     font-size: $font_h5;
+    font-weight: bold;
 
     &:hover {
         cursor: pointer;
@@ -486,7 +501,7 @@ h1 {
     display: flex;
     gap: 16px;
     align-items: center;
-    padding: 12px 16px 12px 0;
+    padding: 12px 20px 12px 0;
 }
 
 .item h6 {
@@ -496,7 +511,7 @@ h1 {
 }
 
 .meal {
-    width: 370px;
+    width: 368px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -511,9 +526,8 @@ h1 {
 }
 
 .quantity-selector {
-    // min-width: 116px; // 可以根據實際內容調整，但保持 flex 布局良好
     display: flex;
-    gap: 16px;
+    gap: 12px;
     justify-content: space-evenly;
     align-items: center;
 }
@@ -567,17 +581,16 @@ h1 {
 .edit-content-action button{
     border: 1px solid transparent;
     background-color: transparent;
-    font-size: 32px;
+    font-size: 24px;
     border-radius: 8px;
-    width: 42px; /* 確保按鈕大小一致 */
-    height: 42px; /* 確保按鈕大小一致 */
+    width: 40px; /* 確保按鈕大小一致 */
+    height: 40px; /* 確保按鈕大小一致 */
     display: flex;
     align-items: center;
     justify-content: center;
 
     &:hover{
         cursor: pointer;
-        // border: 1px solid $neutral_black;
         background-color: $neutral_100;
     }
 }
@@ -774,6 +787,28 @@ h3 {
 
 .operate {
     width: 340px;
+}
+
+.complete-btn{
+    width: 48px;
+    font-size: $font_h6;
+}
+
+.titletxt{
+    gap: 8px;
+}
+
+.action-area{
+    min-width: auto;
+}
+
+.move-order-action button,
+.edit-content-action button{
+    font-size: 20px;
+    border-radius: 8px;
+    width: 40px; 
+    height: 40px; 
+
 }
 
 .menubox{

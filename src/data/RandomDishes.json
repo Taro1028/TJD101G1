@@ -1,98 +1,130 @@
 {
-    "mainCourses": {
-        "pork": [
-            "薑燒豬肉",
-            "味噌豚骨",
-            "梅干控肉",
-            "糖醋里肌",
-            "蒜香豬五花"
-        ],
-        "beef": [
-            "鐵板牛柳",
-            "清燉牛腱",
-            "紅燒牛腩",
-            "牛肉漢堡",
-            "青椒炒牛肉"
-        ],
-        "chicken": [
-            "三杯雞",
-            "香草烤雞腿",
-            "宮保雞丁",
-            "鹽酥雞",
-            "泰式椰奶雞"
-        ],
-        "fish": [
-            "清蒸鱸魚",
-            "味噌鯖魚",
-            "紅燒鮭魚",
-            "酥炸鱈魚排",
-            "蒜烤秋刀魚"
-        ]
-    },
-    "sideDishes": [
-        {
-            "img": "sidedish1.jpg",
-            "text": [
-                "蒜蓉花椰菜",
-                "炒高麗菜",
-                "醋拌黑木耳"
-            ]
-        },
-        {
-            "img": "sidedish2.jpg",
-            "text": [
-                "蕃茄炒蛋",
-                "金沙南瓜",
-                "蒜炒空心菜"
-            ]
-        },
-        {
-            "img": "sidedish3.jpg",
-            "text": [
-                "鐵板豆芽菜",
-                "蔥花炒蛋",
-                "川燙青江菜"
-            ]
-        },
-        {
-            "img": "sidedish4.jpg",
-            "text": [
-                "川燙地瓜葉",
-                "乾煸四季豆",
-                "紅蘿蔔炒蛋"
-            ]
-        },
-        {
-            "img": "sidedish5.jpg",
-            "text": [
-                "香滷筍絲",
-                "豆干炒芹菜",
-                "炒三色椒"
-            ]
-        },
-        {
-            "img": "sidedish6.jpg",
-            "text": [
-                "醋拌小黃瓜",
-                "蒜香薯丁",
-                "椒鹽杏鮑菇"
-            ]
-        },
-        {
-            "img": "sidedish7.jpg",
-            "text": [
-                "酥炸豆腐",
-                "涼拌海帶絲",
-                "蒜炒菠菜"
-            ]
-        },
-        {
-            "img": "sidedish8.jpg",
-            "text": [
-                "麻婆豆腐",
-                "香滷白菜",
-                "玉米粒炒蛋"
-            ]
-        }
+  "mainCourses": {
+    "pork": [
+      { "id": "MC-P001", "name": "薑燒豬肉", "price": 390, "category": "main_course", "subCategory": "pork" },
+      { "id": "MC-P002", "name": "味噌豚骨", "price": 390, "category": "main_course", "subCategory": "pork" },
+      { "id": "MC-P003", "name": "梅干控肉", "price": 390, "category": "main_course", "subCategory": "pork" },
+      { "id": "MC-P004", "name": "糖醋里肌", "price": 390, "category": "main_course", "subCategory": "pork" },
+      { "id": "MC-P005", "name": "蒜香豬五花", "price": 390, "category": "main_course", "subCategory": "pork" }
+    ],
+    "beef": [
+      { "id": "MC-B001", "name": "鐵板牛柳", "price": 390, "category": "main_course", "subCategory": "beef" },
+      { "id": "MC-B002", "name": "清燉牛腱", "price": 390, "category": "main_course", "subCategory": "beef" },
+      { "id": "MC-B003", "name": "紅燒牛腩", "price": 390, "category": "main_course", "subCategory": "beef" },
+      { "id": "MC-B004", "name": "牛肉漢堡", "price": 390, "category": "main_course", "subCategory": "beef" },
+      { "id": "MC-B005", "name": "青椒炒牛肉", "price": 390, "category": "main_course", "subCategory": "beef" }
+    ],
+    "chicken": [
+      { "id": "MC-C001", "name": "三杯雞", "price": 390, "category": "main_course", "subCategory": "chicken" },
+      { "id": "MC-C002", "name": "香草烤雞腿", "price": 390, "category": "main_course", "subCategory": "chicken" },
+      { "id": "MC-C003", "name": "宮保雞丁", "price": 390, "category": "main_course", "subCategory": "chicken" },
+      { "id": "MC-C004", "name": "鹽酥雞", "price": 390, "category": "main_course", "subCategory": "chicken" },
+      { "id": "MC-C005", "name": "泰式椰奶雞", "price": 390, "category": "main_course", "subCategory": "chicken" }
+    ],
+    "fish": [
+      { "id": "MC-F001", "name": "清蒸鱸魚", "price": 390, "category": "main_course", "subCategory": "fish" },
+      { "id": "MC-F002", "name": "味噌鯖魚", "price": 390, "category": "main_course", "subCategory": "fish" },
+      { "id": "MC-F003", "name": "紅燒鮭魚", "price": 390, "category": "main_course", "subCategory": "fish" },
+      { "id": "MC-F004", "name": "酥炸鱈魚排", "price": 390, "category": "main_course", "subCategory": "fish" },
+      { "id": "MC-F005", "name": "蒜烤秋刀魚", "price": 390, "category": "main_course", "subCategory": "fish" }
     ]
+  },
+  "sideDishes": [
+    {
+      "id": "SDG-001", 
+      "img": "sidedish1.jpg",
+      "groupName": "副菜A", 
+      "price": 0, 
+      "category": "side_dish_group",
+      "dishes": [ 
+        { "id": "SD-001-1", "name": "蒜蓉花椰菜", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-001-2", "name": "炒高麗菜", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-001-3", "name": "醋拌黑木耳", "price": 0, "category": "side_dish_single" }
+      ]
+    },
+    {
+      "id": "SDG-002",
+      "img": "sidedish2.jpg",
+      "groupName": "副菜B",
+      "price": 0,
+      "category": "side_dish_group",
+      "dishes": [
+        { "id": "SD-002-1", "name": "蕃茄炒蛋", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-002-2", "name": "金沙南瓜", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-002-3", "name": "蒜炒空心菜", "price": 0, "category": "side_dish_single" }
+      ]
+    },
+        {
+      "id": "SDG-003",
+      "img": "sidedish3.jpg",
+      "groupName": "副菜C",
+      "price": 0,
+      "category": "side_dish_group",
+      "dishes": [
+        { "id": "SD-003-1", "name": "鐵板豆芽菜", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-003-2", "name": "蔥花炒蛋", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-003-3", "name": "川燙青江菜", "price": 0, "category": "side_dish_single" }
+      ]
+    },
+        {
+      "id": "SDG-004",
+      "img": "sidedish4.jpg",
+      "groupName": "副菜D",
+      "price": 0,
+      "category": "side_dish_group",
+      "dishes": [
+        { "id": "SD-004-1", "name": "川燙地瓜葉", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-004-2", "name": "乾煸四季豆", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-004-3", "name": "紅蘿蔔炒蛋", "price": 0, "category": "side_dish_single" }
+      ]
+    },
+        {
+      "id": "SDG-005",
+      "img": "sidedish5.jpg",
+      "groupName": "副菜E",
+      "price": 0,
+      "category": "side_dish_group",
+      "dishes": [
+        { "id": "SD-005-1", "name": "香滷筍絲", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-005-2", "name": "豆干炒芹菜", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-005-3", "name": "炒三色椒", "price": 0, "category": "side_dish_single" }
+      ]
+    },
+        {
+      "id": "SDG-006",
+      "img": "sidedish6.jpg",
+      "groupName": "副菜F",
+      "price": 0,
+      "category": "side_dish_group",
+      "dishes": [
+        { "id": "SD-006-1", "name": "醋拌小黃瓜", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-006-2", "name": "蒜香薯丁", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-006-3", "name": "椒鹽杏鮑菇", "price": 0, "category": "side_dish_single" }
+      ]
+    },
+        {
+      "id": "SDG-007",
+      "img": "sidedish7.jpg",
+      "groupName": "副菜G",
+      "price": 0,
+      "category": "side_dish_group",
+      "dishes": [
+        { "id": "SD-007-1", "name": "酥炸豆腐", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-007-2", "name": "涼拌海帶絲", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-007-3", "name": "蒜炒菠菜", "price": 0, "category": "side_dish_single" }
+      ]
+    },
+    {
+      "id": "SDG-008",
+      "img": "sidedish8.jpg",
+      "groupName": "副菜H",
+      "price": 0,
+      "category": "side_dish_group",
+      "dishes": [
+        { "id": "SD-008-1", "name": "麻婆豆腐", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-008-2", "name": "香滷白菜", "price": 0, "category": "side_dish_single" },
+        { "id": "SD-008-3", "name": "玉米粒炒蛋", "price": 0, "category": "side_dish_single" }
+      ]
+    }
+  ]
 }

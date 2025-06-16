@@ -5,6 +5,8 @@ import { useRouter } from 'vue-router'
 import { usePlanCustomStore } from '@/stores/planCustomStore.js'; // 引入 Pinia Store
 import LeaveDialog from '@/components/Popup_OrderLeaveDialog.vue'
 
+const baseUrl = ref(import.meta.env.BASE_URL);
+
 // 引入 Pinia Store
 const planCustomStore = usePlanCustomStore();
 const router = useRouter();
@@ -30,39 +32,36 @@ onUnmounted(() => {
 
 const localSelectedSideDishGroups = ref([]);
 
-// 副菜組合作為 computed 屬性從 store 獲取
-// 假設 planCustomStore 有一個 getter 叫做 availableSideDishOptions，提供所有可選的副菜組合
-// 且其數據結構與您之前 local 的 dishes 相同，例如：
-// availableSideDishOptions: [ { img: '...', text: [...] }, { img: '...', text: [...] }, ... ]
 const availableSideDishOptions = computed(() => planCustomStore.availableSideDishOptions);
 
-function toggleDish(index) {
-    const i = localSelectedSideDishGroups.value.indexOf(index);
-    if (i > -1) {
+function toggleDish(item) {
+    const existingItemIndex = localSelectedSideDishGroups.value.findIndex(selectedItem => selectedItem.id === item.id);
+    if (existingItemIndex > -1) {
         // 如果已選中，則移除
-        localSelectedSideDishGroups.value.splice(i, 1);
+        localSelectedSideDishGroups.value.splice(existingItemIndex, 1);
     } else if (localSelectedSideDishGroups.value.length < 5) {
-        // 如果未選中且數量小於 5，則新增
-        localSelectedSideDishGroups.value.push(index);
+        // 如果未選中且數量小於 5，則新增 (新增的是整個物件)
+        localSelectedSideDishGroups.value.push(item); // <-- 新增的是整個物件
     } else {
         // 如果已滿 5 個，則提示
         alert('最多只能選擇 5 組副菜喔！');
         return; // 不更新選擇
     }
     // 同步更新 Pinia Store 中的 selectedSideDishGroups
-    planCustomStore.setSelectedSideDishGroups(localSelectedSideDishGroups.value);
+    planCustomStore.setSelectedSideDishGroups(localSelectedSideDishGroups.value); // <-- 傳遞物件陣列
     console.log('Pinia store selectedSideDishGroups updated:', [...planCustomStore.selectedSideDishGroups]);
 }
 
+
 // 判斷是否選中（UI 狀態）
-function isSelected(index) {
-    return localSelectedSideDishGroups.value.includes(index);
+function isSelected(item) {
+    return localSelectedSideDishGroups.value.some(selectedItem => selectedItem.id === item.id);
 }
 
 // 判斷是否禁用（UI 狀態）
-function isDisabled(index) {
+function isDisabled(item) {
     // 當前項目未選中，且已選項目數量達到上限時禁用
-    return !isSelected(index) && localSelectedSideDishGroups.value.length >= 5;
+    return !isSelected(item) && localSelectedSideDishGroups.value.length >= 5;
 }
 
 // 判斷符合 下一步 條件
@@ -83,7 +82,7 @@ function goNext() {
 
 // 上一步邏輯 (返回 Step 1)
 function goPrevious() {
-    router.push('/Order/PlanFree/Step1'); // 或者 router.back()
+    router.push('/Order/Select1_PlanFree'); 
 }
 
 // Popup
@@ -131,14 +130,14 @@ function handleLeaveConfirmed() {
                 <div class="selectblock">
                     <button
                         v-for="(item, index) in availableSideDishOptions"
-                        :key="index"
+                        :key="item.id"
                         class="dish-button"
-                        :class="{ selected: isSelected(index), disabled: isDisabled(index) }"
-                        @click="toggleDish(index)"
-                        :disabled="isDisabled(index) && !isSelected(index)"
+                        :class="{ selected: isSelected(item), disabled: isDisabled(item) }"
+                        @click="toggleDish(item)"
+                        :disabled="isDisabled(item) && !isSelected(item)"
                     >
-                        <img :src="item.img" :alt="item.name" />
-                        <h5 v-for="line in item.text" :key="line">{{ line }}</h5>
+                        <img :src="baseUrl+'images/Order/'+item.img" :alt="item.groupName || item.name" />
+                        <h5 v-for="dish in item.dishes" :key="dish.id">{{ dish.name }}</h5>
                     </button>
                 </div>
                 <img class="mainbox" src="../assets/images/Order/mainbox2.png" alt="mainbox2">
