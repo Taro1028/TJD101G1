@@ -24,7 +24,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
   // 收貨人資訊
   const consigneeInfo = ref({
-    isSameAsOrderer: true, // 是否同訂購人
+    isSameAsOrderer: false, // 預設為不同訂購人
     name: '',
     phone: '',
     address: ''
@@ -33,13 +33,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
   // 常用收貨人列表
   const savedConsignees = ref([])
 
-  // 發票資訊
+  // 發票資訊 - 簡化版本，只需要選擇類型
   const invoiceInfo = ref({
-    type: 'member', // member, company, donation, mobile
-    companyTitle: '',
-    taxId: '',
-    donationCode: '',
-    mobileBarcode: ''
+    type: 'member' // member, company, donation, mobile
   })
 
   // 付款資訊
@@ -121,7 +117,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }
   })
 
-  // 檢查 Step 2 表單是否有效
+  // 檢查 Step 2 表單是否有效 - 簡化版本
   const isStep2Valid = computed(() => {
     // 檢查訂購人必填欄位
     const ordererValid = ordererInfo.value.name &&
@@ -136,15 +132,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
         consigneeInfo.value.address
     }
 
-    // 檢查發票資訊
-    let invoiceValid = true
-    if (invoiceInfo.value.type === 'company') {
-      invoiceValid = invoiceInfo.value.companyTitle && invoiceInfo.value.taxId
-    } else if (invoiceInfo.value.type === 'mobile') {
-      invoiceValid = invoiceInfo.value.mobileBarcode
-    } else if (invoiceInfo.value.type === 'donation') {
-      invoiceValid = invoiceInfo.value.donationCode
-    }
+    // 發票資訊只需要選擇類型即可，不需要額外驗證
+    const invoiceValid = invoiceInfo.value.type !== ''
 
     return ordererValid && consigneeValid && invoiceValid
   })
@@ -291,34 +280,60 @@ export const useCheckoutStore = defineStore('checkout', () => {
       consigneeInfo.value.name = ordererInfo.value.name
       consigneeInfo.value.phone = ordererInfo.value.phone
       consigneeInfo.value.address = ordererInfo.value.address
+    } else {
+      // 清空收貨人資料
+      consigneeInfo.value.name = ''
+      consigneeInfo.value.phone = ''
+      consigneeInfo.value.address = ''
     }
   }
 
-  // 設定發票資訊
+  // 設定發票資訊 - 簡化版本
   const setInvoiceInfo = (info) => {
     invoiceInfo.value = { ...invoiceInfo.value, ...info }
   }
 
-  // 載入常用收貨人列表 (模擬)
+  // 載入常用收貨人列表 - 改為真實 API 調用
   const loadSavedConsignees = async () => {
     try {
-      // 模擬資料，之後串接 API
-      savedConsignees.value = [
-        {
-          id: 1,
-          name: '林榮傑',
-          phone: '0987-078-587',
-          address: '104 臺北市中山區南京東路三段'
-        },
-        {
-          id: 2,
-          name: '王小明',
-          phone: '0912-345-678',
-          address: '110 臺北市信義區市府路1號'
-        }
-      ]
+      const memberStore = useMemberStore()
+      
+      if (!memberStore.memberId) {
+        throw new Error('無會員ID')
+      }
+
+      const env = import.meta.env.VITE_API_URL || 'http://localhost'
+      const baseUrl = env.endsWith('/') ? env : env + '/'
+      const apiUrl = `${baseUrl}tjd101/g1/php/getConsignees.php?member_id=${memberStore.memberId}`
+      
+      console.log('🔍 載入常用收貨人列表，API URL:', apiUrl)
+      
+      const response = await fetch(apiUrl)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
+      const result = await response.json()
+      
+      if (!result.success) {
+        throw new Error(result.message || '載入常用收貨人失敗')
+      }
+      
+      // 轉換 API 資料格式為前端使用的格式
+      savedConsignees.value = (result.data || []).map(item => ({
+        id: item.ID,
+        name: item.C_NAME,
+        phone: item.C_PHONE || item.C_TELEPHONE,
+        address: item.C_ADD
+      }))
+      
+      console.log('✅ 常用收貨人列表載入完成:', savedConsignees.value)
+      
     } catch (error) {
-      console.error('載入常用收貨人失敗:', error)
+      console.error('❌ 載入常用收貨人失敗:', error)
+      // 載入失敗時使用空陣列
+      savedConsignees.value = []
     }
   }
 
@@ -330,6 +345,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       phone: consignee.phone,
       address: consignee.address
     }
+    console.log('✅ 已選擇常用收貨人:', consignee)
   }
 
   // 提交訂單
@@ -356,7 +372,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
       console.log('準備提交訂單:', orderData)
 
-      // 模擬 API 呼叫
+      // 模擬 API 呼叫 - 之後改為真實 API
       const mockResult = {
         success: true,
         order_id: 'ORD' + Date.now(),
@@ -386,23 +402,20 @@ export const useCheckoutStore = defineStore('checkout', () => {
       address: ''
     }
     consigneeInfo.value = {
-      isSameAsOrderer: true,
+      isSameAsOrderer: false,
       name: '',
       phone: '',
       address: ''
     }
     invoiceInfo.value = {
-      type: 'member',
-      companyTitle: '',
-      taxId: '',
-      donationCode: '',
-      mobileBarcode: ''
+      type: 'member'
     }
     paymentInfo.value = {
       method: 'ecpay'
     }
     orderResult.value = null
     validationErrors.value = {}
+    savedConsignees.value = []
   }
 
   // 返回所有狀態和方法
@@ -442,6 +455,6 @@ export const useCheckoutStore = defineStore('checkout', () => {
     selectSavedConsignee,
     submitOrder,
     resetCheckout,
-    debugCartData // 新增調試方法
+    debugCartData
   }
 })

@@ -171,7 +171,7 @@ function goPrev(){
 // 下一步--結帳
 function goNext() {
     if (!checkoutStore.canProceedToNextStep) {
-        alert('請完整填寫必填資訊')
+        alert('請完整填寫收貨人資訊')
         return
     }
     
@@ -315,6 +315,7 @@ const handleConsigneeSelected = (consignee) => {
                 <!-- 發票資訊 -->
                 <div class="invoice">
                     <h5 class="title">發票資訊</h5>
+                    
                     <label class="checkedItem">
                         <input 
                           type="radio" 
@@ -325,6 +326,7 @@ const handleConsigneeSelected = (consignee) => {
                         >
                         <h6>會員載具</h6>
                     </label>
+                    
                     <label class="checkedItem">
                         <input 
                           type="radio" 
@@ -335,6 +337,7 @@ const handleConsigneeSelected = (consignee) => {
                         >
                         <h6>公司發票</h6>
                     </label>
+                    
                     <label class="checkedItem">
                         <input 
                           type="radio" 
@@ -345,6 +348,7 @@ const handleConsigneeSelected = (consignee) => {
                         >
                         <h6>捐贈發票</h6>
                     </label>
+                    
                     <label class="checkedItem">
                         <input 
                           type="radio" 
@@ -355,6 +359,7 @@ const handleConsigneeSelected = (consignee) => {
                         >
                         <h6>手機載具</h6>
                     </label>
+                    
                     <h6 class="notice">
                       <i class="bi bi-info-circle-fill"></i>
                       依統一發票使用辦法規定：發票一經開立不得任意更改或改開發票。
@@ -593,6 +598,7 @@ input[type="radio"]{
     border: none;
     padding: 4px 0;
     background-color: transparent;
+    border-radius: 4px;
     flex: 1;
     
     &:disabled {

@@ -41,18 +41,20 @@ if (!$data) {
 
 // 驗證必填欄位 - 修正參數名稱對應
 $memberId = isset($data['member_id']) ? (int)$data['member_id'] : 0;
-$contactsName = isset($data['contacts_name']) ? trim($data['contacts_name']) : '';
-$contactsPhone = isset($data['contacts_phone']) ? trim($data['contacts_phone']) : '';
+$name = isset($data['name']) ? trim($data['name']) : '';
+$phone = isset($data['phone']) ? trim($data['phone']) : '';
 $address = isset($data['address']) ? trim($data['address']) : '';
 $telephone = isset($data['telephone']) ? trim($data['telephone']) : '';
 $note = isset($data['note']) ? trim($data['note']) : '';
+$contactsName = isset($data['contacts_name']) ? trim($data['contacts_name']) : '';
+$contactsPhone = isset($data['contacts_phone']) ? trim($data['contacts_phone']) : '';
 $consigneeId = isset($data['id']) ? (int)$data['id'] : 0; // 用於更新
 
-if ($memberId <= 0 || empty($contactsName) || empty($contactsPhone) || empty($address)) {
+if ($memberId <= 0 || empty($name) || empty($phone) || empty($address) || empty($contactsName) || empty($contactsPhone)) {
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => '請填寫完整的收貨人資料（姓名、電話、地址為必填）'
+        'message' => '請填寫完整的收貨人資料（收貨人姓名、手機、地址、緊急聯絡人姓名、緊急聯絡人電話為必填）'
     ]);
     exit;
 }
@@ -62,21 +64,25 @@ try {
         // 更新現有收貨人
         $stmt = $pdo->prepare("
             UPDATE CONSIGNEES SET 
-                C_CONTACTS_NAME = :contacts_name,
-                C_CONTACTS_PHONE = :contacts_phone,
+                C_NAME = :name,
+                C_PHONE = :phone,
                 C_ADD = :address,
                 C_TELEPHONE = :telephone,
-                C_NOTE = :note
+                C_NOTE = :note,
+                C_CONTACTS_NAME = :contacts_name,
+                C_CONTACTS_PHONE = :contacts_phone
             WHERE ID = :id AND M_ID = :member_id
         ");
         
         $stmt->bindParam(':id', $consigneeId, PDO::PARAM_INT);
         $stmt->bindParam(':member_id', $memberId, PDO::PARAM_INT);
-        $stmt->bindParam(':contacts_name', $contactsName, PDO::PARAM_STR);
-        $stmt->bindParam(':contacts_phone', $contactsPhone, PDO::PARAM_STR);
+        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':phone', $phone, PDO::PARAM_STR);
         $stmt->bindParam(':address', $address, PDO::PARAM_STR);
         $stmt->bindParam(':telephone', $telephone, PDO::PARAM_STR);
         $stmt->bindParam(':note', $note, PDO::PARAM_STR);
+        $stmt->bindParam(':contacts_name', $contactsName, PDO::PARAM_STR);
+        $stmt->bindParam(':contacts_phone', $contactsPhone, PDO::PARAM_STR);
         
         $stmt->execute();
         
@@ -98,27 +104,33 @@ try {
         $stmt = $pdo->prepare("
             INSERT INTO CONSIGNEES (
                 M_ID, 
-                C_CONTACTS_NAME, 
-                C_CONTACTS_PHONE, 
+                C_NAME, 
+                C_PHONE, 
                 C_ADD, 
                 C_TELEPHONE,
-                C_NOTE
+                C_NOTE,
+                C_CONTACTS_NAME,
+                C_CONTACTS_PHONE
             ) VALUES (
                 :member_id, 
-                :contacts_name, 
-                :contacts_phone, 
+                :name, 
+                :phone, 
                 :address, 
                 :telephone,
-                :note
+                :note,
+                :contacts_name,
+                :contacts_phone
             )
         ");
         
         $stmt->bindParam(':member_id', $memberId, PDO::PARAM_INT);
-        $stmt->bindParam(':contacts_name', $contactsName, PDO::PARAM_STR);
-        $stmt->bindParam(':contacts_phone', $contactsPhone, PDO::PARAM_STR);
+        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':phone', $phone, PDO::PARAM_STR);
         $stmt->bindParam(':address', $address, PDO::PARAM_STR);
         $stmt->bindParam(':telephone', $telephone, PDO::PARAM_STR);
         $stmt->bindParam(':note', $note, PDO::PARAM_STR);
+        $stmt->bindParam(':contacts_name', $contactsName, PDO::PARAM_STR);
+        $stmt->bindParam(':contacts_phone', $contactsPhone, PDO::PARAM_STR);
         
         $stmt->execute();
         
