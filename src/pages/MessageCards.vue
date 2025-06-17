@@ -27,6 +27,7 @@ import color4 from '@/assets/images/MessageCards/color_4.svg'
 import color5 from '@/assets/images/MessageCards/color_5.svg'
 import color6 from '@/assets/images/MessageCards/color_6.svg'
 
+const env = import.meta.env.VITE_API_URL || 'http://localhost'
 const router = useRouter()
 
 // 響應式資料
@@ -227,7 +228,7 @@ async function captureCard() {
   }
 }
 
-// 【簡化版】測試用的 saveCardState 函數（移除訂單ID）
+
 async function saveCardState() {
   // 檢查是否有內容需要儲存
   if (!messageText.value.trim() && addedStickers.value.length === 0) {
@@ -267,9 +268,11 @@ async function saveCardState() {
     formData.append('cardData', JSON.stringify(cardData))
     formData.append('cardImage', imageBlob, `card_${Date.now()}.png`)
 
-    // 發送到後端 API
-    console.log('發送請求到 PHP...')
-    const response = await fetch('http://localhost/tjd101/g1/php/save-message-card.php', {
+   
+    const apiUrl = env + '/tjd101/g1/php/save-message-card.php'
+    console.log('發送請求到 PHP:', apiUrl)
+    
+    const response = await fetch(apiUrl, {
       method: 'POST',
       body: formData
     })
@@ -296,7 +299,6 @@ async function saveCardState() {
     localStorage.setItem('savedCardImagePath', result.imagePath)
     localStorage.setItem('savedCardId', result.cardId)
     
-
     // 回傳成功狀態，讓 finishMessage 知道可以跳轉
     return true
 

@@ -4,6 +4,8 @@ import FrontLayout from "../layouts/FrontLayout.vue";
 import Gotop from "../components/Gotop.vue";
 import { useMemberStore } from "@/stores/MemberStore";
 import { useRouter } from "vue-router";
+import { useModalStore } from "@/stores/ModalStore";
+import Popup_success from "../components/Popup_success.vue";
 
 const env = import.meta.env.VITE_API_URL;
 const showDefaultAvatar = computed(() => !memberStore.hasCustomAvatar);
@@ -11,6 +13,7 @@ const userAvatar = computed(() => memberStore.userAvatar);
 const avatarInput = ref(null);
 const memberStore = useMemberStore();
 const router = useRouter();
+const modalStore = useModalStore();
 const ifo = reactive({
   id: "",
   name: "",
@@ -188,33 +191,7 @@ const handleLogout = () => {
   }
 };
 async function update() {
-  const response = await fetch(env + "/tjd101/g1/php/MemberCenter.php", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      id: ifo.id,
-      gender: ifo.gender,
-      nickname: ifo.nickname,
-      password: ifo.password,//password: passwordFields.newPassword || ifo.password,
-      address: ifo.address,
-      email: ifo.email,
-      phone: ifo.phone,
-      telephone: ifo.telephone,
-      emergency_contacts_name: ifo.emergency_contacts_name,
-      emergency_contacts_phone: ifo.emergency_contacts_phone,
-      note: ifo.note,
-      avatar: ifo.avatar,
-    }),
-  });
-  console.log("response", response);
-  if (response.ok) {
-    const result = await response.json();
-    console.log("更新成功:", result);
-    memberStore.setMember(result.member);
-  }
-    // 驗證密碼邏輯
+  // 密碼驗證邏輯
   if (passwordFields.newPassword) {
     validateNewPassword();
     validateConfirmPassword();
@@ -227,6 +204,68 @@ async function update() {
     }
   }
 
+  // 電話驗證
+  if (!phoneValidation.telephone || !phoneValidation.phone || !phoneValidation.emergency_contacts_phone) {
+    alert('請檢查電話號碼格式');
+    return;
+  }
+
+  try {
+    const response = await fetch(env + "/tjd101/g1/php/MemberCenter.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: ifo.id,
+        gender: ifo.gender,
+        nickname: ifo.nickname,
+        password: passwordFields.newPassword || ifo.password, 
+        address: ifo.address,
+        email: ifo.email,
+        phone: ifo.phone,
+        telephone: ifo.telephone,
+        emergency_contacts_name: ifo.emergency_contacts_name,
+        emergency_contacts_phone: ifo.emergency_contacts_phone,
+        note: ifo.note,
+        avatar: ifo.avatar,
+      }),
+    });
+
+    console.log("response", response);
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log("更新成功:", result);
+      
+      // 檢查後端回傳是否真的成功
+      if (result.success === true || result.status === 'success') {
+        // 更新 memberStore
+        memberStore.setMember(result.member);
+        
+        // 如果有新密碼，清空密碼欄位
+        if (passwordFields.newPassword) {
+          passwordFields.newPassword = '';
+          passwordFields.confirmPassword = '';
+          // 更新本地的密碼資料
+          ifo.password = passwordFields.newPassword || ifo.password;
+        }
+        
+        // 顯示成功彈窗
+        modalStore.openSuccessPopup('修改成功！');
+        
+      } else {
+        // 後端回傳失敗
+        alert('修改失敗：' + (result.message || '未知錯誤'));
+      }
+    } else {
+      // HTTP 狀態碼不是 200
+      alert('修改失敗，請稍後再試');
+    }
+  } catch (error) {
+    console.error("修改時發生錯誤:", error);
+    alert('網路錯誤，請稍後再試');
+  }
 }
 
 onMounted(() => {
@@ -549,6 +588,7 @@ onMounted(() => {
       </div>
     </section>
     <Gotop></Gotop>
+    <Popup_success />
   </FrontLayout>
 </template>
 
