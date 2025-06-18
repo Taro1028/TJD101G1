@@ -8,8 +8,8 @@ const handleClose = () => {
   modalStore.closeSuccessPopup()
 }
 
-// 返回會員中心（點擊按鈕時關閉彈窗）
-const handleGoToMemberCenter = () => {
+// 返回收件者管理（點擊按鈕時關閉彈窗）
+const handleGoToRecipients = () => {
   // 點擊按鈕時立即關閉彈窗
   modalStore.closeSuccessPopup()
 }
@@ -20,7 +20,7 @@ const handleGoToMemberCenter = () => {
     <div class="alertlogin" @click.stop>
       <img src="../assets/images/Logo_L.svg" alt="">
       <h5>{{ modalStore.successMessage }}</h5>
-      <router-link to="/MemberCenter" class="btn" @click="handleGoToMemberCenter">返回會員中心</router-link>
+      <router-link to="/MemberCenter/Recipients" class="btn" @click="handleGoToRecipients">返回收件者管理</router-link>
     </div>
   </div>
 </template>
