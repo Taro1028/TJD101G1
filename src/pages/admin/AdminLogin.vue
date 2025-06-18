@@ -45,7 +45,6 @@ const handleLogin = async () => {
 
   try {
     const response = await fetch(env + "/tjd101/g1/php/AdminLogin.php", {
-    
       //FTP
       //response接收php echo回傳值
       method: "POST",
@@ -77,10 +76,15 @@ const handleLogin = async () => {
     alert("網路連線錯誤，請稍後再試");
   }
 };
+
 </script>
 
 <style lang="scss" scoped>
+* {
+  box-sizing: border-box;
+}
 .wrapper {
+  max-width: 1440px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -90,7 +94,10 @@ const handleLogin = async () => {
 }
 
 .wrapper img {
-  width: 200px;
+  max-width: 200px;
+  width: 15%;
+  display: block;
+  height: auto;
 }
 .wrapper p {
   padding: 20px;
@@ -123,7 +130,7 @@ label {
 }
 
 input {
-  width: 95%;
+  width: 100%;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #aaa;

@@ -266,48 +266,62 @@ const totalProduct = ref([
 </script>
 
 <style scoped lang="scss">
-
-.outwrap{
+.outwrap {
   margin-bottom: 80px;
 }
 img {
+  display: block;
   width: 100%;
 }
 
 .allbutton {
   // border: 1px solid red;
-  max-width: 1200px;
+   max-width: 1200px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   padding: 20px;
+  background-color: $primary_50;
+  position: sticky;       
+  top: 0px;              
+  z-index: 10; 
 }
 
 .fbutton {
-  display: block;
-  width: 150px;
-  height: 50px;
-  border-radius: 10px;
-  border: none;
-  padding: 10px;
+   display: block;
+
+
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 20px;
   background-color: $primary_600;
   color: $neutral_white;
-
-  margin: 0 auto;
-
+  border: none;
   cursor: pointer;
+  transition: 0.2s;
+  width: auto;
+  min-width: 120px;
+  margin: 0 auto;
+  font-size: $font_h5;
+  // margin: 5px;
+}
+.fbutton:hover {
+  background-color:$primary_400;
 }
 // ===================RWD=====================
 @media (max-width: 650px) {
   .allbutton {
-    display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    
+   
   }
 
   .fbutton {
-    display: block;
-    width: 100%;
-    margin-top: 20px;
+    width: 33%;
+    margin-top: 10px;
+    font-size: $font_h6;
   }
 }
 </style>

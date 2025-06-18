@@ -205,6 +205,10 @@ function toggleAccordion(index) {
   margin-right: 20px;
 }
 
+.b button:hover{
+  background-color:$primary_400;
+}
+
 //
 .ingredients {
   max-height: 0;

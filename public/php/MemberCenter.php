@@ -12,7 +12,7 @@ include_once 'cors.php';
 try {
         // 查詢該帳號是否存在
 
-        $sql = "UPDATE members
+        $sql = "UPDATE MEMBERS
                 SET NICKNAME =:nickname,
                 GENDER =:gender,
                 ADDRESS =:address,
@@ -42,7 +42,7 @@ try {
         $stmt->bindValue(':avatar', $memberCenter['avatar']);
         $stmt->execute();
 
-        $selectStmt = $pdo->prepare("SELECT * FROM members WHERE id = :id");
+        $selectStmt = $pdo->prepare("SELECT * FROM MEMBERS WHERE id = :id");
         $selectStmt->bindValue(':id', $memberCenter['id']);
         $selectStmt->execute();
         $updatedMember = $selectStmt->fetch(PDO::FETCH_ASSOC);

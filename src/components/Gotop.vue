@@ -42,4 +42,8 @@ onUnmounted(() => {
   z-index: 999;
   transition: opacity 0.3s ease;
 }
+
+.gotop-icon:hover{
+  color:$primary_400;
+}
 </style>

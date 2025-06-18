@@ -22,7 +22,8 @@ const Adminmember = useAdminMemberStore();
 
 function logoutadmember() {
   Adminmember.logout();
-  router.push("/adminLogin");
+  // router.push("/adminLogin");
+  window.location.href = "/tjd101/g1/adminLogin"; //修復字體重新載入
 }
 
 onMounted(() => {
@@ -35,7 +36,7 @@ section {
   display: flex;
 
   background-color: $primary_100;
-  padding: 0px 10px 0px 30px;
+  padding: 4px 10px 4px 30px;
 }
 // section img{
 //   width: 10%;
@@ -60,6 +61,21 @@ section img:nth-of-type(2) {
   justify-content: end;
   align-items: center;
   gap: 20px;
+}
+
+.s2 button {
+  display: block;
+  width: 80px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  // padding: 10px;
+  background-color: $primary_600;
+  color: $neutral_white;
+
+  // margin: 0 auto;
+
+  cursor: pointer;
 }
 section .sname {
   // border: 1px solid blue;

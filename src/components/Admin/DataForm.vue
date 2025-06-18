@@ -313,11 +313,12 @@ onMounted(() => {
 }
 .mid .searchi {
   font-size: $font_h5;
-
+ position: absolute;
   cursor: pointer;
 }
 .mid .input {
   display: flex;
+  position: relative;
   align-items: center;
   justify-content: flex-end;
   margin-right: 20px;
