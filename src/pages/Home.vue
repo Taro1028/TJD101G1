@@ -1,11 +1,109 @@
 <script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import Carousel from '../components/Carousel.vue'
 import Marquree from '../components/Marquee.vue'
-import Gotop from "../components/Gotop.vue";
-// import Marquree from '../components/TestMarquee.vue'
+import Gotop from "../components/Gotop.vue"
+import { newsApi, newsUtils } from '@/services/newsApi'
 
+const router = useRouter()
 
+// 新聞資料
+const homeNews = ref({
+  cover: null,
+  list: []
+})
+const loading = ref(false)
+const error = ref(null)
+
+// 載入首頁新聞資料
+const loadHomeNews = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    
+    // 並行載入所有分類的新聞
+    const [focusResponse, depthResponse, lunchResponse] = await Promise.all([
+      newsApi.getNewsByTag('焦點計畫', 6),
+      newsApi.getNewsByTag('深度專題', 6), 
+      newsApi.getNewsByTag('誰來午餐', 6)
+    ])
+    
+    // 合併所有新聞
+    const allNews = [
+      ...focusResponse.data,
+      ...depthResponse.data, 
+      ...lunchResponse.data
+    ]
+    
+    // 篩選出精選新聞 (TINYINT: 1 表示精選)
+    const featuredNews = allNews.filter(news => news.IS_FEATURED === 1 || news.IS_FEATURED === '1')
+    
+    // 選擇封面新聞：優先使用精選新聞
+    let coverNews = null
+    if (featuredNews.length > 0) {
+      coverNews = featuredNews[0] // 第一篇精選新聞（任何分類）
+    } else if (focusResponse.data.length > 0) {
+      coverNews = focusResponse.data[0] // 沒有精選就用焦點計畫第一篇
+    }
+    
+    // 列表新聞：優先精選，然後補充焦點計畫，取前3篇
+    const listNews = [
+      ...featuredNews.slice(0, 2), // 前2篇精選新聞
+      ...focusResponse.data.slice(0, 3) // 焦點計畫新聞
+    ]
+      .filter((news, index, arr) => 
+        // 去除重複（如果精選新聞也是焦點計畫）
+        arr.findIndex(item => item.ID === news.ID) === index
+      )
+      .slice(0, 3) // 最終只取3篇
+    
+    homeNews.value = {
+      cover: coverNews,
+      list: listNews
+    }
+
+    console.log('首頁新聞載入成功:', {
+      封面新聞: coverNews?.TITLE,
+      封面分類: getNewsCategory(coverNews),
+      是否精選: coverNews?.IS_FEATURED == 1, 
+      列表新聞數量: listNews.length,
+      總精選新聞數量: featuredNews.length,
+      各分類精選數量: {
+        焦點計畫: focusResponse.data.filter(n => n.IS_FEATURED == 1).length,
+        深度專題: depthResponse.data.filter(n => n.IS_FEATURED == 1).length,
+        誰來午餐: lunchResponse.data.filter(n => n.IS_FEATURED == 1).length
+      }
+    })
+
+  } catch (err) {
+    console.error('載入首頁新聞失敗:', err)
+    error.value = newsUtils.getErrorMessage(err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 輔助函數：判斷新聞分類
+const getNewsCategory = (news) => {
+  if (!news) return '未知'
+  // 可以根據你的資料結構調整
+  return news.TAG || news.CATEGORY || '焦點計畫'
+}
+
+// 導航到新聞詳情頁
+const goToNewsDetail = (newsId) => {
+  router.push(`/About/News/Newsitem/${newsId}`)
+}
+
+// 格式化日期
+const formatDate = newsUtils.formatDate
+
+// 組件掛載時載入資料
+onMounted(() => {
+  loadHomeNews()
+})
 </script>
 
 <template>
@@ -68,14 +166,6 @@ import Gotop from "../components/Gotop.vue";
         <h5>—每口都帶來味蕾的滿足感—</h5>
       </div>
       <Marquree />
-      <!-- <div class="marquee">
-        <div class="upper">
-          <img src="" alt="">
-        </div>
-        <div class="lower">
-          <img src="" alt="">
-        </div>
-      </div> -->
       <div class="sec2-linkblock">
         <router-link to="/LunchBox" class="btn">瞭解更多</router-link>
       </div>
@@ -130,45 +220,56 @@ import Gotop from "../components/Gotop.vue";
         <h3>📰 最新消息</h3>
         <h5>News</h5>
       </div>
-      <div class="news-container">
-        <div class="main-news">
-          <router-link to="/About/News/Newsitem">
-            <div class="newstag">焦點</div>
-            <img src="../assets/images/Home/news_1.png" alt="news_1">
-            <div class="block-overlay"></div>
-            <h4>緯藝基金會助力 攜手推動長者營養餐計畫</h4>
-          </router-link>
-        </div>
-        <div class="news-list">
-          <router-link to="/About/News/Newsitem">
-            <div class="news-item">
-              <h4 class="title">緯藝基金會助力 攜手推動長者營養餐計畫</h4>
-              <h6 class="contxt">
-                在緯藝基金會的溫暖支持下，提膳家得以擴大「長者營養餐計畫」服務範圍，幫助更多需要照護的長輩每日獲得均衡飲食。基金會的資助不僅讓服務持續穩定，也強化了在地照護網絡的連結，將營養、愛與陪伴送進每一位長者的生活中。公益結合專業，為高齡社會注入可長可久的照顧力量。
-              </h6>
-              <p class="date">最後更新 2025.05.10</p>
-            </div>
-          </router-link>
-          <a href="#">
-            <div class="news-item">
-              <h4 class="title">送餐到府服務 提膳家關懷長者健康飲食不打烊</h4>
-              <h6 class="contxt">
-                隨著高齡化社會來臨，長者的飲食照護成為家庭與社會的重要課題。提膳家推出長者到府送餐服務，結合營養師專業配餐，依個人健康狀況調整菜色，從每日三餐出發，守護長輩的健康與尊嚴。無論居住於都會或偏鄉地區，提膳家都致力讓每一份熱騰騰的飯菜，準時送達、安心入口。
-              </h6>
-              <p class="date">最後更新 2025.05.08</p>
-            </div>
-          </a>
-          <a href="#">
-            <div class="news-item">
-              <h4 class="title">提膳家與在地小農協力將養生食材直送長者餐桌</h4>
-              <h6 class="contxt">
-                為了讓長者吃得更安心、也更支持本地農業，提膳家啟動「在地小農合作計畫」，選用當季新鮮蔬果與無毒作物入菜，打造兼顧美味與健康的送餐服務。這項合作不僅縮短食物里程、減少碳足跡，也創造農民與長者雙贏的關係。提膳家相信，一份好餐點的背後，是整個在地支持系統的溫柔串聯。
-              </h6>
-              <p class="date">最後更新 2025.05.03</p>
-            </div>
-          </a>
-        </div>
+
+      <!-- 載入狀態 -->
+      <div v-if="loading" class="news-loading">
+        <p>載入新聞中...</p>
       </div>
+
+      <!-- 錯誤狀態 -->
+      <div v-else-if="error" class="news-error">
+        <p>{{ error }}</p>
+        <button @click="loadHomeNews()" class="retry-btn">重新載入</button>
+      </div>
+
+      <!-- 新聞內容 -->
+      <template v-else-if="homeNews.cover || homeNews.list.length > 0">
+        <div class="news-container">
+          <!-- 主要新聞（封面） -->
+          <div 
+            v-if="homeNews.cover" 
+            class="main-news" 
+            @click="goToNewsDetail(homeNews.cover.ID)"
+          >
+            <div class="newstag">焦點</div>
+            <img :src="homeNews.cover.IMG" :alt="homeNews.cover.TITLE">
+            <div class="block-overlay"></div>
+            <h4>{{ homeNews.cover.TITLE }}</h4>
+          </div>
+
+          <!-- 新聞列表（3篇） -->
+          <div class="news-list">
+            <div 
+              v-for="news in homeNews.list" 
+              :key="news.ID"
+              @click="goToNewsDetail(news.ID)"
+              style="cursor: pointer;"
+            >
+              <div class="news-item">
+                <h4 class="title">{{ news.TITLE }}</h4>
+                <h6 class="contxt">{{ news.SUMMARY }}</h6>
+                <p class="date">最後更新 {{ formatDate(news.UPDATED_AT) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- 沒有新聞資料 -->
+      <div v-else class="no-news">
+        <p>目前沒有新聞資料</p>
+      </div>
+
       <div class="linkblock">
         <router-link to="/About/News" class="btn">瞭解更多</router-link>
       </div>
@@ -180,6 +281,32 @@ import Gotop from "../components/Gotop.vue";
 <style scoped lang="scss">
 body {
   background-color: $primary_50;
+}
+
+// 新聞載入狀態樣式
+.news-loading, .news-error, .no-news {
+  text-align: center;
+  padding: 40px 20px;
+  
+  p {
+    font-size: $font_h5;
+    color: $neutral_700;
+    margin-bottom: 16px;
+  }
+}
+
+.retry-btn {
+  padding: 8px 16px;
+  background-color: $primary_600;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  
+  &:hover {
+    background-color: $primary_400;
+  }
 }
 
 // --- 主視覺 start ---
@@ -373,33 +500,6 @@ h6 {
   margin: 0 auto;
 }
 
-// --- 餐點料理跑馬 start ---
-// .marquee {
-//   overflow: hidden;
-//   width: 100%;
-//   position: relative;
-//   margin: 48px 0;
-// }
-
-
-// .upper,
-// .lower {
-//   display: flex;
-//   gap: 24px;
-//   white-space: nowrap;
-//   margin-bottom: 24px;
-// }
-
-// .upper img,
-// .lower img {
-//   width: 160px;
-//   height: 160px;
-//   border-radius: 8px;
-//   object-fit: cover;
-// }
-
-// --- 餐點料理跑馬 end ---
-
 // --- 餐友心得 start ---
 .video {
   display: flex;
@@ -492,11 +592,14 @@ p {
   width: 480px;
   flex-shrink: 0;
   position: relative;
+  cursor: pointer;
 }
 
 .main-news img {
   display: block;
   width: 100%;
+  max-height: 390px;
+  object-fit: cover;
   border-radius: 8px;
 }
 
@@ -542,12 +645,11 @@ p {
   gap: 48px;
 }
 
-.news-list a {
-  text-decoration: none;
+.news-list > div {
+  cursor: pointer;
   border-bottom: 1px solid transparent;
   padding-bottom: 8px;
   transition: 0.3s ease;
-
 
   &:hover {
     border-bottom: 1px solid $neutral_300;
@@ -567,7 +669,7 @@ p {
   transition: 0.3s ease;
 }
 
-a:hover .title {
+.news-list > div:hover .title {
   color: $primary_600;
   transition: 0.3s ease;
 }

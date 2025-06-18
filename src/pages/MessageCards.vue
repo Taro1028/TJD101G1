@@ -5,6 +5,10 @@ import Gotop from "../components/Gotop.vue"
 import { ref, reactive, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { useOrderStore } from '@/stores/orderStore'
+import { usePlanCustomStore } from '@/stores/planCustomStore'
+import { useCartStore } from '@/stores/cartStore'
+
 import html2canvas from 'html2canvas'
 
 // 背景圖片
@@ -27,7 +31,13 @@ import color4 from '@/assets/images/MessageCards/color_4.svg'
 import color5 from '@/assets/images/MessageCards/color_5.svg'
 import color6 from '@/assets/images/MessageCards/color_6.svg'
 
+const baseUrl = ref(import.meta.env.BASE_URL);
+
+const env = import.meta.env.VITE_API_URL || 'http://localhost'
 const router = useRouter()
+const orderStore = useOrderStore()
+const planCustomStore = usePlanCustomStore()
+const cartStore = useCartStore()
 
 // 響應式資料
 const selectedColor = ref('')
@@ -233,7 +243,7 @@ async function saveCardState() {
   if (!messageText.value.trim() && addedStickers.value.length === 0) {
     console.log('沒有內容需要儲存')
     alert('請先輸入留言或添加貼紙')
-    return
+    return null
   }
 
   try {
@@ -291,35 +301,98 @@ async function saveCardState() {
 
     // 成功處理
     console.log('卡片儲存成功:', result)
-    
+    return result.cardId // 回傳卡片ID
+
     // 儲存回傳的資料到 localStorage（可選）
     localStorage.setItem('savedCardImagePath', result.imagePath)
     localStorage.setItem('savedCardId', result.cardId)
     
 
     // 回傳成功狀態，讓 finishMessage 知道可以跳轉
-    return true
+    // return true
 
   } catch (error) {
     console.error('儲存卡片失敗:', error)
     alert(`儲存失敗：${error.message}`)
+    return null
   }
 }
 
+// function goNext() {
+//   saveCardState().then(() => {
+//     router.push('/Order/AddCart')  
+//   })
+// }
 
-function goNext() {
-  saveCardState().then(() => {
-    router.push('/Order/AddCart')  
-  })
-}
+// async function finishMessage() {
+//   if (messageText.value.trim() || addedStickers.value.length > 0) {
+//     await saveCardState()
+//   }
+//   router.push('/Order/AddCart') 
+// }
 
-
+// 【新】完成留言的邏輯：先加入購物車，再關聯留言小卡
 async function finishMessage() {
-  if (messageText.value.trim() || addedStickers.value.length > 0) {
-    await saveCardState()
+  try {
+    // Step 1: 儲存留言小卡
+    console.log('Step 1: 儲存留言小卡...')
+    const cardId = await saveCardState()
+    
+    if (!cardId) {
+      alert('儲存留言小卡失敗，請重試')
+      return
+    }
+
+    // Step 2: 根據 query 參數決定調用哪個 store 加入購物車
+    const planType = router.currentRoute.value.query.planType
+    console.log('Step 2: 準備加入購物車，方案類型:', planType)
+    
+    let cartResult = null
+    
+    if (planType === '為你搭配') {
+      cartResult = await orderStore.addPlanForYouToCart(cardId)
+    } else if (planType === '自由搭配') {
+      cartResult = await planCustomStore.addAllCustomMealsToCart(cardId)
+    } else {
+      throw new Error('未知的方案類型: ' + planType)
+    }
+
+    if (!cartResult || !cartResult.cart_id) {
+      throw new Error('加入購物車失敗，未獲得購物車ID')
+    }
+
+    // Step 3: 成功完成，導向購物車頁面
+    console.log('✅ 所有步驟完成，導向購物車頁面')
+    alert('留言小卡已成功加入訂單！')
+    router.push('/Order/AddCart')
+
+  } catch (error) {
+    console.error('完成留言失敗:', error)
+    alert('操作失敗：' + error.message)
   }
-  router.push('/Order/AddCart') 
 }
+
+// 不留言，直接加入購物車
+async function goNext() {
+  try {
+    const planType = router.currentRoute.value.query.planType
+    console.log('不留言，直接加入購物車，方案類型:', planType)
+    
+    if (planType === '為你搭配') {
+      await orderStore.addPlanForYouToCart()
+    } else if (planType === '自由搭配') {
+      await planCustomStore.addAllCustomMealsToCart()
+    } else {
+      throw new Error('未知的方案類型: ' + planType)
+    }
+
+    router.push('/Order/AddCart')
+  } catch (error) {
+    console.error('加入購物車失敗:', error)
+    alert('加入購物車失敗：' + error.message)
+  }
+}
+
 </script>
 
 <template>

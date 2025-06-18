@@ -24,10 +24,10 @@ async function goNext() {
   
   try {
     if (props.planType === '為你搭配') {
-      // 為你搭配：不需要留言小卡
-      await orderStore.addPlanForYouToCart(); // 這裡也需要更新為不傳 messageCardId
+      
+      await orderStore.addPlanForYouToCart(); 
     } else if (props.planType === '自由搭配') {
-      // 自由搭配：不需要留言小卡
+      
       await planCustomStore.addAllCustomMealsToCart(null); // 明確傳入 null
     }
     

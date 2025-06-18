@@ -111,14 +111,6 @@ const routes = [
     },
   },
   {
-    path: '/Cart',
-    component: () => import('@/components/Drawer_Cart.vue'),
-    meta: {
-      title: '購物車 - TibaEAT 提膳家',
-      requiredLogin: true
-    }
-  },
-  {
     path: "/Check_OrderInfo",
     component: () => import("@/pages/Check1_OrderInfo.vue"),
     meta: {

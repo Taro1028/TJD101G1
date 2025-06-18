@@ -51,15 +51,30 @@ onMounted(async () => {
 // 直接用 PHP API 獲取會員資料
 const fetchMemberDataFromAPI = async () => {
   try {
-    if (!memberStore.memberId) {
-      throw new Error('無會員ID')
+    // 🔥 修正：多重方式取得會員ID
+    let memberId = null
+    
+    if (memberStore.memberId) {
+      memberId = memberStore.memberId
+    } else if (memberStore.id) {
+      memberId = memberStore.id
+    } else {
+      // 嘗試重新從 sessionStorage 載入
+      const loaded = memberStore.loadFromsessionStorage()
+      if (loaded && memberStore.id) {
+        memberId = memberStore.id
+      }
     }
     
-    console.log('🔍 使用 PHP API 獲取會員資料，會員ID:', memberStore.memberId)
+    if (!memberId) {
+      throw new Error('無會員ID，請重新登入')
+    }
+    
+    console.log('🔍 使用會員ID:', memberId)
     
     // 修改 API 路徑，使用完整路徑
     const env = import.meta.env.VITE_API_URL || 'http://localhost'
-    const apiUrl = env + `/tjd101/g1/php/getMemberInfo.php?member_id=${memberStore.memberId}`
+    const apiUrl = env + `/tjd101/g1/php/getMemberInfo.php?member_id=${memberId}`
     console.log('📡 API URL:', apiUrl)
     
     const response = await fetch(apiUrl)
@@ -79,27 +94,25 @@ const fetchMemberDataFromAPI = async () => {
     
     console.log('✅ PHP API 會員資料:', result.data)
     
+    // 🔥 重要：同步更新 memberStore 的會員資料
+    memberStore.updateMember({
+      id: result.data.ID,
+      name: result.data.M_NAME,
+      phone: result.data.PHONE,
+      address: result.data.ADDRESS,
+      email: result.data.EMAIL
+    })
+    
     // 設定 checkoutStore 的訂購人資訊
     checkoutStore.ordererInfo.name = result.data.M_NAME || ''
     checkoutStore.ordererInfo.phone = result.data.PHONE || ''
     checkoutStore.ordererInfo.address = result.data.ADDRESS || ''
     
-    // 也可以更新 memberStore 的會員資料
-    memberStore.member = result.data
-    
     console.log('✅ 訂購人資料設定完成:', checkoutStore.ordererInfo)
     
   } catch (error) {
     console.error('❌ 獲取會員資料失敗:', error)
-    
-    // 如果 API 失敗，使用測試資料
-    console.log('🧪 使用測試會員資料')
-    checkoutStore.ordererInfo.name = '測試用戶'
-    checkoutStore.ordererInfo.phone = '0912-345-678'
-    checkoutStore.ordererInfo.address = '台北市信義區市府路1號'
-    
-    // 不要拋出錯誤，讓頁面繼續運行
-    console.log('✅ 使用測試資料設定完成:', checkoutStore.ordererInfo)
+    throw error // 讓上層處理錯誤
   }
 }
 
@@ -141,10 +154,10 @@ const orderSummary = computed(() => {
   
   if (items.length === 1) {
     const item = items[0]
-    return `${item.plan_type}${item.message_card_id ? ' + 小卡' : ''}`
+    return `${item.display_title}`
   }
   
-  return `${items[0].plan_type}${items[0].message_card_id ? ' + 小卡' : ''} 等 ${items.length} 項`
+  return `${items[0].display_title} 等 ${items.length} 項`
 })
 
 // 監聽同訂購人切換
@@ -171,7 +184,7 @@ function goPrev(){
 // 下一步--結帳
 function goNext() {
     if (!checkoutStore.canProceedToNextStep) {
-        alert('請完整填寫必填資訊')
+        alert('請完整填寫收貨人資訊')
         return
     }
     
@@ -315,6 +328,7 @@ const handleConsigneeSelected = (consignee) => {
                 <!-- 發票資訊 -->
                 <div class="invoice">
                     <h5 class="title">發票資訊</h5>
+                    
                     <label class="checkedItem">
                         <input 
                           type="radio" 
@@ -325,6 +339,7 @@ const handleConsigneeSelected = (consignee) => {
                         >
                         <h6>會員載具</h6>
                     </label>
+                    
                     <label class="checkedItem">
                         <input 
                           type="radio" 
@@ -335,6 +350,7 @@ const handleConsigneeSelected = (consignee) => {
                         >
                         <h6>公司發票</h6>
                     </label>
+                    
                     <label class="checkedItem">
                         <input 
                           type="radio" 
@@ -345,6 +361,7 @@ const handleConsigneeSelected = (consignee) => {
                         >
                         <h6>捐贈發票</h6>
                     </label>
+                    
                     <label class="checkedItem">
                         <input 
                           type="radio" 
@@ -355,6 +372,7 @@ const handleConsigneeSelected = (consignee) => {
                         >
                         <h6>手機載具</h6>
                     </label>
+                    
                     <h6 class="notice">
                       <i class="bi bi-info-circle-fill"></i>
                       依統一發票使用辦法規定：發票一經開立不得任意更改或改開發票。
@@ -593,6 +611,7 @@ input[type="radio"]{
     border: none;
     padding: 4px 0;
     background-color: transparent;
+    border-radius: 4px;
     flex: 1;
     
     &:disabled {

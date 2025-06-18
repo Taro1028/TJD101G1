@@ -110,9 +110,8 @@ export const useOrderStore = defineStore('order', () => {
     return deliveryDates.value.length; // 這是總天數
   });
 
-
-  // 新增 Action: 將所有為你搭配餐點加入購物車 (在確認訂單時呼叫)
-  async function addPlanForYouToCart(messageCardId = null) { // 允許傳入留言小卡內容
+  // orderStore.js - 支援留言小卡參數
+  async function addPlanForYouToCart(messageCardId = null) {
     if (!cartStore) {
       console.error("Cart store not available.");
       return;
@@ -170,13 +169,20 @@ export const useOrderStore = defineStore('order', () => {
 
     console.log('orderStore: 準備發送訂單項目給 cartStore (為你搭配):', orderItems);
 
+    if (messageCardId) {
+    console.log('包含留言小卡 ID:', messageCardId);
+  }
+
     try {
-      await cartStore.addOrderToBackendAndLocalCart(orderItems, messageCardId);
-      alert('所有為您搭配餐點已成功加入購物車！');
-    } catch (error) {
-      console.error('將為你搭配餐點加入購物車失敗:', error);
-      alert('加入購物車失敗，請稍後再試。');
-    }
+    // 傳入 messageCardId 參數
+    const result = await cartStore.addOrderToBackendAndLocalCart(orderItems, messageCardId);
+    return result;
+  } catch (error) {
+    console.error('將為你搭配餐點加入購物車失敗:', error);
+    alert('加入購物車失敗，請稍後再試。');
+    throw error;
+  }
+  
   }
 
   // 可選：重置整個 orderStore 狀態的方法
@@ -196,10 +202,10 @@ export const useOrderStore = defineStore('order', () => {
     updateMealCount,
     getTotalCountForDate,
     getTotalPriceForDate,
-    totalMealCount, // 新增的 Getter
-    totalPrice,     // 新增的 Getter
-    totalDays,      // 新增的 Getter
-    addPlanForYouToCart, // 新增的 Action
-    resetOrderState // 新增的 Action
+    totalMealCount,
+    totalPrice,
+    totalDays,
+    addPlanForYouToCart,
+    resetOrderState
   };
 });

@@ -11,13 +11,11 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
   // Step 1: 用戶選擇的 2 種主菜類型 (e.g., ['pork', 'chicken'])
   const selectedMainCourseTypes = ref([]);
   // Step 2: 用戶選擇的 5 個副菜組合的索引
-  const selectedSideDishGroups = ref([]); 
+  const selectedSideDishGroups = ref([]);
   // Step 3: 每天實際隨機生成的菜單及數量
-  const customMealsByDate = ref([]);       
+  const customMealsByDate = ref([]);
 
   const CUSTOM_MEAL_PRICE = 390; // 自由搭配餐盒統一價格
-
-
 
   // --- Getters (計算屬性) ---
   const dateRangeStore = useDateRangeStore();
@@ -59,10 +57,9 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
   // 計算所有日期的總餐盒數量
   const getTotalAllCustomDatesCount = computed(() => {
     return customMealsByDate.value.reduce((sum, day) => {
-        return sum + day.count;
+      return sum + day.count;
     }, 0);
   });
-
 
   // --- Actions (動作) ---
 
@@ -164,7 +161,6 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
     }
   }
 
-
   const menuMode = ref('quantity'); // 'quantity' (預設), 'moveOrder', 'editContent'
   const isEditingModeActive = computed(() => menuMode.value !== 'quantity');
 
@@ -189,7 +185,7 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
         price: newSideDishGroup.price,
         category: newSideDishGroup.category,
         dishes: newSideDishGroup.dishes.map(d => ({
-            id: d.id, name: d.name, price: d.price, category: d.category
+          id: d.id, name: d.name, price: d.price, category: d.category
         }))
       };
       console.log(`更新了 ${date} 的餐盒內容:`, customMealsByDate.value[index]);
@@ -210,55 +206,59 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
     return CUSTOM_MEAL_PRICE * day.count;
   }
 
-  // 新增 Action: 將所有 customMealsByDate 內容加入購物車
-async function addAllCustomMealsToCart(messageCardId = null) {
-  if (customMealsByDate.value.length === 0) {
-    alert('請先生成自由搭配餐點！');
-    return;
-  }
+  // planCustomStore.js - 支援留言小卡參數
+  async function addAllCustomMealsToCart(messageCardId = null) {
+    if (customMealsByDate.value.length === 0) {
+      alert('請先生成自由搭配餐點！');
+      return;
+    }
 
-  try {
-    const orderItems = [];
 
-    // 將每一天的餐點轉換為後端所需格式
-    customMealsByDate.value.forEach(mealDay => {
-      if (mealDay.count > 0) {
-        // 簡化的 meal_items 格式，與為你搭配保持一致
-        const mealItemsContent = [{
-          name: `${mealDay.mainCourse.name}餐食`,
-          price: CUSTOM_MEAL_PRICE,
-          quantity: mealDay.count
-        }];
+    try {
+      const orderItems = [];
 
-        orderItems.push({
-          plan_type: '自由搭配',
-          meal_date: mealDay.date,
-          meal_items: JSON.stringify(mealItemsContent),
-          count: mealDay.count,
-          total_amount: CUSTOM_MEAL_PRICE * mealDay.count,
-          order_start_date: deliveryDates.value[0],
-          order_end_date: deliveryDates.value[deliveryDates.value.length - 1],
-          total_days: deliveryDates.value.length
-        });
+      // 將每一天的餐點轉換為後端所需格式
+      customMealsByDate.value.forEach(mealDay => {
+        if (mealDay.count > 0) {
+          // 簡化的 meal_items 格式，與為你搭配保持一致
+          const mealItemsContent = [{
+            name: `${mealDay.mainCourse.name}餐食`,
+            price: CUSTOM_MEAL_PRICE,
+            quantity: mealDay.count
+          }];
+
+          orderItems.push({
+            plan_type: '自由搭配',
+            meal_date: mealDay.date,
+            meal_items: JSON.stringify(mealItemsContent),
+            count: mealDay.count,
+            total_amount: CUSTOM_MEAL_PRICE * mealDay.count,
+            order_start_date: deliveryDates.value[0],
+            order_end_date: deliveryDates.value[deliveryDates.value.length - 1],
+            total_days: deliveryDates.value.length
+          });
+        }
+      });
+
+      // === 除錯資訊 ===
+      console.log('=== 自由搭配 - 準備傳送的資料 ===');
+      console.log('orderItems:', JSON.stringify(orderItems, null, 2));
+      if (messageCardId) {
+        console.log('包含留言小卡 ID:', messageCardId);
       }
-    });
+      console.log('================================');
 
-    // === 除錯資訊 ===
-    console.log('=== 自由搭配 - 準備傳送的資料 ===');
-    console.log('orderItems:', JSON.stringify(orderItems, null, 2));
-    console.log('messageCardId:', messageCardId);
-    console.log('================================');
+      // 傳入 messageCardId 參數
+      const cartStore = useCartStore();
+      const result = await cartStore.addOrderToBackendAndLocalCart(orderItems, messageCardId);
 
-    // 直接傳送 orderItems 和 messageCardId，與為你搭配的格式一致
-    const cartStore = useCartStore();
-    await cartStore.addOrderToBackendAndLocalCart(orderItems, messageCardId);
-    
-    console.log('自由搭配餐點已成功加入購物車');
-  } catch (error) {
-    console.error('新增自由搭配餐點到購物車失敗:', error);
-    throw error; // 重新拋出錯誤，讓上層處理
+      console.log('自由搭配餐點已成功加入購物車');
+      return result; // 回傳結果，包含 cart_id 等資訊
+    } catch (error) {
+      console.error('新增自由搭配餐點到購物車失敗:', error);
+      throw error; // 重新拋出錯誤，讓上層處理
+    }
   }
-}
 
   // 可選：重置整個 planCustomStore 狀態的方法
   function resetPlanCustomState() {
@@ -269,21 +269,19 @@ async function addAllCustomMealsToCart(messageCardId = null) {
     console.log('PlanCustomStore 狀態已重置。');
   }
 
-
   return {
     // 狀態
-    selectedMainCourseTypes, // 儲存用戶選擇的「類型」
+    selectedMainCourseTypes,
     selectedSideDishGroups,
     customMealsByDate,
 
     // Getter
     deliveryDates,
-    availableMainCourseOptions, // 原始的主菜類型選項
-    possibleMainDishesBasedOnTypes, // 根據選定類型過濾出的實際主菜清單
+    availableMainCourseOptions,
+    possibleMainDishesBasedOnTypes,
     availableSideDishOptions,
-    getTotalAllCustomDatesPrice, // 新增的 Getter
-    getTotalAllCustomDatesCount, // 新增的 Getter
-
+    getTotalAllCustomDatesPrice,
+    getTotalAllCustomDatesCount,
 
     // Action
     resetMainCourseSelection,
@@ -299,7 +297,7 @@ async function addAllCustomMealsToCart(messageCardId = null) {
     isEditingModeActive,
     setMenuMode,
     updateCustomMeal,
-    addAllCustomMealsToCart, 
+    addAllCustomMealsToCart,
     resetPlanCustomState
   };
 });

@@ -172,7 +172,7 @@ const removeCartItem = async (cartId, planType) => {
 
 // 返回編輯（導向點餐頁面）
 const goBackToOrder = () => {
-  router.push('/Order')
+  router.push('/Order/Select')
 }
 
 // 檢查是否可以繼續
@@ -254,7 +254,7 @@ const goNext = () => {
                           @change="toggleSelectItem(group.cart_id)"
                         >
                         <h5 class="Itemtitle">
-                          {{ group.plan_type }}{{ group.message_card_id ? ' + 小卡' : '' }}
+                          {{ group.display_title }}
                         </h5>
                       </label>
                       <div class="period_toggle">
@@ -666,7 +666,7 @@ button{
 }
 
 .btn-2{
-    width: 92px;
+    width: fit-content;
     background-color: $neutral_black;
     color: $neutral_white;
     padding: 12px 20px;

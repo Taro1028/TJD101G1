@@ -1,5 +1,5 @@
 <?php
-// getConsignees.php - 獲取會員的常用收貨人
+// getConsignees.php
 include_once 'cors_1.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

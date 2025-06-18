@@ -1,5 +1,5 @@
 <?php
-// deleteConsignee.php - 刪除常用收貨人
+// deleteConsignee.php
 include_once 'cors_1.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -16,8 +16,8 @@ ob_start();
 
 include_once 'connection.php';
 
-// 檢查請求方法
-if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+// 檢查請求方法 - 改為支援 POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode([
         'success' => false,
@@ -26,15 +26,29 @@ if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
     exit;
 }
 
-// 獲取參數
-$consigneeId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$memberId = isset($_GET['member_id']) ? (int)$_GET['member_id'] : 0;
+// 獲取 JSON 資料
+$json = file_get_contents('php://input');
+$data = json_decode($json, true);
 
-if ($consigneeId <= 0 || $memberId <= 0) {
+if (!$data) {
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => '無效的收貨人ID或會員ID'
+        'message' => '無效的 JSON 資料'
+    ]);
+    exit;
+}
+
+// 獲取參數
+$consigneeId = isset($data['id']) ? (int)$data['id'] : 0;
+$memberId = isset($data['member_id']) ? (int)$data['member_id'] : 0;
+$action = isset($data['action']) ? trim($data['action']) : '';
+
+if ($consigneeId <= 0 || $memberId <= 0 || $action !== 'delete') {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => '無效的收貨人ID、會員ID或操作類型'
     ]);
     exit;
 }

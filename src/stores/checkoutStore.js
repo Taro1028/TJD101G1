@@ -24,7 +24,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
   // 收貨人資訊
   const consigneeInfo = ref({
-    isSameAsOrderer: true, // 是否同訂購人
+    isSameAsOrderer: false, // 預設為不同訂購人
     name: '',
     phone: '',
     address: ''
@@ -33,13 +33,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
   // 常用收貨人列表
   const savedConsignees = ref([])
 
-  // 發票資訊
+  // 發票資訊 - 簡化版本，只需要選擇類型
   const invoiceInfo = ref({
-    type: 'member', // member, company, donation, mobile
-    companyTitle: '',
-    taxId: '',
-    donationCode: '',
-    mobileBarcode: ''
+    type: 'member' // member, company, donation, mobile
   })
 
   // 付款資訊
@@ -52,6 +48,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
   // 表單驗證錯誤
   const validationErrors = ref({})
+
+  // 載入狀態
+  const isSubmitting = ref(false)
 
   // ================================
   // 計算屬性
@@ -121,7 +120,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }
   })
 
-  // 檢查 Step 2 表單是否有效
+  // 檢查 Step 2 表單是否有效 - 簡化版本
   const isStep2Valid = computed(() => {
     // 檢查訂購人必填欄位
     const ordererValid = ordererInfo.value.name &&
@@ -136,15 +135,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
         consigneeInfo.value.address
     }
 
-    // 檢查發票資訊
-    let invoiceValid = true
-    if (invoiceInfo.value.type === 'company') {
-      invoiceValid = invoiceInfo.value.companyTitle && invoiceInfo.value.taxId
-    } else if (invoiceInfo.value.type === 'mobile') {
-      invoiceValid = invoiceInfo.value.mobileBarcode
-    } else if (invoiceInfo.value.type === 'donation') {
-      invoiceValid = invoiceInfo.value.donationCode
-    }
+    // 發票資訊只需要選擇類型即可，不需要額外驗證
+    const invoiceValid = invoiceInfo.value.type !== ''
 
     return ordererValid && consigneeValid && invoiceValid
   })
@@ -182,6 +174,18 @@ export const useCheckoutStore = defineStore('checkout', () => {
       }
     })
     console.log('==================')
+  }
+
+  // 🔥 新增：會員資料調試方法
+  const debugMemberData = () => {
+    const memberStore = useMemberStore()
+    console.log('=== 會員資料調試資訊 ===')
+    console.log('memberStore.isAuthenticated:', memberStore.isAuthenticated)
+    console.log('memberStore.memberId:', memberStore.memberId)
+    console.log('memberStore.id:', memberStore.id)
+    console.log('memberStore.member:', memberStore.member)
+    console.log('SessionStorage memberData:', sessionStorage.getItem('memberData'))
+    console.log('========================')
   }
 
   // 設定當前步驟
@@ -291,34 +295,66 @@ export const useCheckoutStore = defineStore('checkout', () => {
       consigneeInfo.value.name = ordererInfo.value.name
       consigneeInfo.value.phone = ordererInfo.value.phone
       consigneeInfo.value.address = ordererInfo.value.address
+    } else {
+      // 清空收貨人資料
+      consigneeInfo.value.name = ''
+      consigneeInfo.value.phone = ''
+      consigneeInfo.value.address = ''
     }
   }
 
-  // 設定發票資訊
+  // 設定發票資訊 - 簡化版本
   const setInvoiceInfo = (info) => {
     invoiceInfo.value = { ...invoiceInfo.value, ...info }
   }
 
-  // 載入常用收貨人列表 (模擬)
+  // 載入常用收貨人列表 - 改為真實 API 調用
   const loadSavedConsignees = async () => {
     try {
-      // 模擬資料，之後串接 API
-      savedConsignees.value = [
-        {
-          id: 1,
-          name: '林榮傑',
-          phone: '0987-078-587',
-          address: '104 臺北市中山區南京東路三段'
-        },
-        {
-          id: 2,
-          name: '王小明',
-          phone: '0912-345-678',
-          address: '110 臺北市信義區市府路1號'
-        }
-      ]
+      const memberStore = useMemberStore()
+
+      // 🔥 修正：多重方式取得會員ID
+      let memberId = null
+      if (memberStore.memberId) {
+        memberId = memberStore.memberId
+      } else if (memberStore.id) {
+        memberId = memberStore.id
+      } else {
+        throw new Error('無會員ID')
+      }
+
+      const env = import.meta.env.VITE_API_URL || 'http://localhost'
+      const baseUrl = env.endsWith('/') ? env : env + '/'
+      const apiUrl = `${baseUrl}tjd101/g1/php/getConsignees.php?member_id=${memberId}`
+
+      console.log('🔍 載入常用收貨人列表，API URL:', apiUrl)
+
+      const response = await fetch(apiUrl)
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.message || '載入常用收貨人失敗')
+      }
+
+      // 轉換 API 資料格式為前端使用的格式
+      savedConsignees.value = (result.data || []).map(item => ({
+        id: item.ID,
+        name: item.C_NAME,
+        phone: item.C_PHONE || item.C_TELEPHONE,
+        address: item.C_ADD
+      }))
+
+      console.log('✅ 常用收貨人列表載入完成:', savedConsignees.value)
+
     } catch (error) {
-      console.error('載入常用收貨人失敗:', error)
+      console.error('❌ 載入常用收貨人失敗:', error)
+      // 載入失敗時使用空陣列
+      savedConsignees.value = []
     }
   }
 
@@ -330,20 +366,78 @@ export const useCheckoutStore = defineStore('checkout', () => {
       phone: consignee.phone,
       address: consignee.address
     }
+    console.log('✅ 已選擇常用收貨人:', consignee)
   }
 
-  // 提交訂單
+  // 🔥 核心修改：提交訂單並處理購物車刪除
   const submitOrder = async () => {
+    if (isSubmitting.value) {
+      console.log('⚠️ 正在提交中，請勿重複操作')
+      return
+    }
+
     try {
+      isSubmitting.value = true
       const memberStore = useMemberStore()
+      const cartStore = useCartStore()
+
+      // 🔥 新增：調試會員資料
+      debugMemberData()
 
       if (!memberStore.isAuthenticated) {
         throw new Error('請先登入才能提交訂單')
       }
 
+      if (selectedCartIds.value.length === 0) {
+        throw new Error('請選擇要結帳的項目')
+      }
+
+      // 🔥 修正：多重方式取得會員ID
+      let memberId = null
+
+      // 方法1: 從 memberStore.memberId (getter)
+      if (memberStore.memberId) {
+        memberId = memberStore.memberId
+        console.log('✅ 使用 memberStore.memberId:', memberId)
+      }
+      // 方法2: 從 memberStore.id (state)
+      else if (memberStore.id) {
+        memberId = memberStore.id
+        console.log('✅ 使用 memberStore.id:', memberId)
+      }
+      // 方法3: 如果有 member 物件，從中取得
+      else if (memberStore.member && memberStore.member.M_ID) {
+        memberId = memberStore.member.M_ID
+        console.log('✅ 使用 memberStore.member.M_ID:', memberId)
+      }
+      else if (memberStore.member && memberStore.member.ID) {
+        memberId = memberStore.member.ID
+        console.log('✅ 使用 memberStore.member.ID:', memberId)
+      }
+      // 方法4: 如果上述都失敗，嘗試重新載入會員資料
+      else {
+        console.log('⚠️ 無法取得會員ID，嘗試重新載入會員資料...')
+
+        // 嘗試從 sessionStorage 載入
+        const loaded = memberStore.loadFromsessionStorage()
+        if (loaded && memberStore.id) {
+          memberId = memberStore.id
+          console.log('✅ 從 sessionStorage 重新載入會員ID:', memberId)
+        } else {
+          throw new Error('無法取得會員ID，請重新登入')
+        }
+      }
+
+      // 最終檢查
+      if (!memberId || memberId <= 0) {
+        throw new Error('會員ID無效，請重新登入')
+      }
+
+      console.log('🔍 最終使用的會員ID:', memberId)
+
       // 準備訂單資料
       const orderData = {
-        m_id: memberStore.member.M_ID,
+        m_id: parseInt(memberId), // 確保是整數
         cart_ids: selectedCartIds.value,
         orderer_info: ordererInfo.value,
         consignee_info: consigneeInfo.value.isSameAsOrderer ? ordererInfo.value : consigneeInfo.value,
@@ -354,26 +448,193 @@ export const useCheckoutStore = defineStore('checkout', () => {
         total_amount: finalTotalAmount.value
       }
 
-      console.log('準備提交訂單:', orderData)
+      console.log('🚀 準備提交訂單:', orderData)
 
-      // 模擬 API 呼叫
-      const mockResult = {
-        success: true,
-        order_id: 'ORD' + Date.now(),
-        order_number: '2506' + String(Date.now()).slice(-3),
-        message: '訂單提交成功',
-        ...orderData
+      // 調用結帳 API
+      const env = import.meta.env.VITE_API_URL || 'http://localhost'
+      const baseUrl = env.endsWith('/') ? env : env + '/'
+      const apiUrl = `${baseUrl}tjd101/g1/php/checkout.php`
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      })
+
+      // 🔥 先檢查回應的原始內容
+      const responseText = await response.text()
+      console.log('🔍 API 原始回應:', responseText)
+      console.log('🔍 回應狀態:', response.status, response.statusText)
+      console.log('🔍 回應標頭:', Object.fromEntries(response.headers.entries()))
+
+      if (!response.ok) {
+        console.error('❌ HTTP 狀態錯誤:', response.status, response.statusText)
+        console.error('❌ 回應內容:', responseText)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 
-      orderResult.value = mockResult
+      // 🔥 檢查回應是否為有效 JSON
+      let result
+      try {
+        result = JSON.parse(responseText)
+        console.log('✅ JSON 解析成功:', result)
+      } catch (jsonError) {
+        console.error('❌ JSON 解析失敗:', jsonError)
+        console.error('❌ 回應前100字元:', responseText.substring(0, 100))
+        console.error('❌ 回應後100字元:', responseText.substring(responseText.length - 100))
+
+        // 檢查是否包含 PHP 錯誤或額外輸出
+        if (responseText.includes('=== 緊湊型時間戳')) {
+          throw new Error('PHP 檔案包含測試程式碼，請移除所有 echo 和測試輸出')
+        } else if (responseText.includes('<?php') || responseText.includes('?>')) {
+          throw new Error('PHP 檔案有語法錯誤或額外輸出')
+        } else if (responseText.includes('Warning:') || responseText.includes('Error:')) {
+          throw new Error('PHP 執行錯誤: ' + responseText.substring(0, 200))
+        } else {
+          throw new Error('API 回應不是有效的 JSON 格式')
+        }
+      }
+
+      if (!result.success) {
+        throw new Error(result.message || '結帳失敗')
+      }
+
+      console.log('✅ 結帳成功:', result)
+
+      // 🔥 結帳成功後的處理
+      orderResult.value = {
+        success: true,
+        message: result.message,
+        created_at: new Date().toISOString(),
+
+        // 🔥 重要：保持 API 回傳的完整 data 結構
+        data: {
+          order_ids: result.data.order_ids,
+          order_numbers: result.data.order_numbers, // 🔥 時間+ID格式陣列 (如: ["250618152315"])
+          orders: result.data.orders,
+          total_orders: result.data.total_orders,
+          total_amount: result.data.total_amount,
+          total_meal_count: result.data.total_meal_count,
+          final_total: result.data.final_total,
+          shipping_fee: result.data.shipping_fee,
+          consignee_info: result.data.consignee_info,
+          order_time: result.data.order_time,
+          deleted_cart_count: result.data.deleted_cart_count,
+          deleted_items_count: result.data.deleted_items_count,
+          migrated_cards_count: result.data.migrated_cards_count,
+          cart_to_order_mapping: result.data.cart_to_order_mapping
+        },
+
+        // 🔥 為了相容性，也在頂層放一份（但主要使用 data 內的）
+        order_ids: result.data.order_ids,
+        order_numbers: result.data.order_numbers,
+        total_orders: result.data.total_orders,
+        total_amount: result.data.total_amount,
+        total_meal_count: result.data.total_meal_count,
+        final_total: result.data.final_total
+      }
+
+      // 🔥 除錯輸出（確認資料結構）
+      console.log('✅ 結帳成功，orderResult 結構:', {
+        success: orderResult.value.success,
+        hasData: !!orderResult.value.data,
+        orderNumbers: orderResult.value.data?.order_numbers,
+        orderNumbersType: typeof orderResult.value.data?.order_numbers,
+        orderNumbersLength: orderResult.value.data?.order_numbers?.length,
+        firstOrderNumber: orderResult.value.data?.order_numbers?.[0],
+        orderIds: orderResult.value.data?.order_ids,
+        totalOrders: orderResult.value.data?.total_orders,
+        totalMealCount: orderResult.value.data?.total_meal_count,
+        finalTotal: orderResult.value.data?.final_total
+      })
+
+      // 🔥 特別檢查訂單編號格式
+      if (orderResult.value.data?.order_numbers && Array.isArray(orderResult.value.data.order_numbers)) {
+        orderResult.value.data.order_numbers.forEach((num, index) => {
+          const numStr = String(num)
+          console.log(`訂單編號 ${index + 1}: ${numStr} (長度: ${numStr.length})`)
+
+          // 解析時間+ID格式
+          if (numStr.length === 12) {
+            const year = 2000 + parseInt(numStr.substring(0, 2))
+            const month = parseInt(numStr.substring(2, 4))
+            const day = parseInt(numStr.substring(4, 6))
+            const hour = parseInt(numStr.substring(6, 8))
+            const minute = parseInt(numStr.substring(8, 10))
+            const id = parseInt(numStr.substring(10, 12))
+
+            console.log(`  解析: ${year}-${month}-${day} ${hour}:${minute} (ID: ${id})`)
+          }
+        })
+      }
+
+      // 🔥 重要：重新載入購物車資料
+      await cartStore.fetchCartItemsFromBackend()
+
+      // 清空已選擇的項目
+      selectedCartIds.value = []
+
+      // 進入完成步驟
       currentStep.value = 3
 
-      return mockResult
+      console.log('✅ 結帳流程完成，購物車已更新')
+
+      return orderResult.value
 
     } catch (error) {
-      console.error('提交訂單失敗:', error)
+      console.error('❌ 提交訂單失敗:', error)
+
+      // 🔥 詳細錯誤資訊
+      if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
+        console.error('💡 這是 JSON 解析錯誤，通常是因為:')
+        console.error('   1. PHP 檔案包含額外的輸出（echo, var_dump, 測試程式碼）')
+        console.error('   2. PHP 語法錯誤')
+        console.error('   3. 伺服器錯誤頁面')
+        console.error('請檢查 PHP 檔案是否只輸出純 JSON')
+      }
+
+      // 設定錯誤狀態
+      orderResult.value = {
+        success: false,
+        message: error.message || '結帳失敗，請稍後再試',
+        error: error
+      }
+
       throw error
+    } finally {
+      isSubmitting.value = false
     }
+  }
+
+  // 🔥 新增：重新載入購物車數據（結帳後使用）
+  const refreshCartAfterCheckout = async () => {
+    try {
+      const cartStore = useCartStore()
+      console.log('🔄 結帳後重新載入購物車...')
+      await cartStore.fetchCart()
+      console.log('✅ 購物車數據已更新')
+    } catch (error) {
+      console.error('❌ 重新載入購物車失敗:', error)
+    }
+  }
+
+  // 🔥 新增：檢查所選項目是否還有效（防止併發問題）
+  const validateSelectedItems = () => {
+    const cartStore = useCartStore()
+    const validCartIds = cartStore.cartGroups.map(group => group.cart_id)
+
+    // 過濾掉無效的選擇項目
+    const filteredIds = selectedCartIds.value.filter(id => validCartIds.includes(id))
+
+    if (filteredIds.length !== selectedCartIds.value.length) {
+      console.log('⚠️ 部分選擇項目已失效，自動更新選擇')
+      selectedCartIds.value = filteredIds
+      return false // 有項目被過濾
+    }
+
+    return true // 所有項目都有效
   }
 
   // 重置結帳流程
@@ -386,23 +647,41 @@ export const useCheckoutStore = defineStore('checkout', () => {
       address: ''
     }
     consigneeInfo.value = {
-      isSameAsOrderer: true,
+      isSameAsOrderer: false,
       name: '',
       phone: '',
       address: ''
     }
     invoiceInfo.value = {
-      type: 'member',
-      companyTitle: '',
-      taxId: '',
-      donationCode: '',
-      mobileBarcode: ''
+      type: 'member'
     }
     paymentInfo.value = {
       method: 'ecpay'
     }
     orderResult.value = null
     validationErrors.value = {}
+    savedConsignees.value = []
+    isSubmitting.value = false
+
+    console.log('🔄 結帳流程已重置')
+  }
+
+  // 🔥 新增：處理結帳成功後的跳轉
+  const handleCheckoutComplete = async (redirectToOrders = true) => {
+    try {
+      // 可以在這裡加入額外的後處理邏輯
+      console.log('✅ 結帳完成後處理...')
+
+      if (redirectToOrders) {
+        // 這裡可以使用 router 跳轉到訂單頁面
+        // 由於是 store，需要在 component 中處理路由跳轉
+        return { shouldRedirect: true, path: '/orders' }
+      }
+
+      return { shouldRedirect: false }
+    } catch (error) {
+      console.error('❌ 結帳完成後處理失敗:', error)
+    }
   }
 
   // 返回所有狀態和方法
@@ -417,6 +696,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     paymentInfo,
     orderResult,
     validationErrors,
+    isSubmitting,
 
     // 計算屬性
     selectedCartItems,
@@ -442,6 +722,12 @@ export const useCheckoutStore = defineStore('checkout', () => {
     selectSavedConsignee,
     submitOrder,
     resetCheckout,
-    debugCartData // 新增調試方法
+    debugCartData,
+    debugMemberData, // 🔥 新增
+
+    // 🔥 新增的方法
+    refreshCartAfterCheckout,
+    validateSelectedItems,
+    handleCheckoutComplete
   }
 })

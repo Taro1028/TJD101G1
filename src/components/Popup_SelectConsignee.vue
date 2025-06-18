@@ -13,11 +13,13 @@ const env = import.meta.env.VITE_API_URL || 'http://localhost'
 
 // 新增收貨人表單
 const newConsignee = ref({
-  contacts_name: '',
-  contacts_phone: '',
+  name: '',
+  phone: '',
   address: '',
   telephone: '',
-  note: ''
+  note: '',
+  contacts_name: '',
+  contacts_phone: ''
 })
 
 onMounted(async () => {
@@ -85,10 +87,19 @@ const deleteConsignee = async (consigneeId) => {
   
   try {
     const baseUrl = env.endsWith('/') ? env : env + '/'
-    const apiUrl = `${baseUrl}tjd101/g1/php/deleteConsignee.php?id=${consigneeId}&member_id=${memberStore.memberId}`
+    const apiUrl = `${baseUrl}tjd101/g1/php/deleteConsignee.php`
     
+    // 改用 POST 方法避免 CORS 問題
     const response = await fetch(apiUrl, {
-      method: 'DELETE'
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: consigneeId,
+        member_id: memberStore.memberId,
+        action: 'delete'
+      })
     })
     
     const result = await response.json()
@@ -111,8 +122,10 @@ const deleteConsignee = async (consigneeId) => {
 // 新增收貨人
 const saveNewConsignee = async () => {
   try {
-    if (!newConsignee.value.contacts_name || !newConsignee.value.contacts_phone || !newConsignee.value.address) {
-      alert('請填寫姓名、電話和地址')
+    // 修正驗證邏輯：收貨人資料 + 緊急聯絡人資料都是必填
+    if (!newConsignee.value.name || !newConsignee.value.phone || !newConsignee.value.address || 
+        !newConsignee.value.contacts_name || !newConsignee.value.contacts_phone) {
+      alert('請填寫完整資料：收貨人姓名、手機、地址、緊急聯絡人姓名、緊急聯絡人電話為必填')
       return
     }
     
@@ -126,11 +139,13 @@ const saveNewConsignee = async () => {
       },
       body: JSON.stringify({
         member_id: memberStore.memberId,
-        contacts_name: newConsignee.value.contacts_name,
-        contacts_phone: newConsignee.value.contacts_phone,
+        name: newConsignee.value.name,
+        phone: newConsignee.value.phone,
         address: newConsignee.value.address,
         telephone: newConsignee.value.telephone,
-        note: newConsignee.value.note
+        note: newConsignee.value.note,
+        contacts_name: newConsignee.value.contacts_name,
+        contacts_phone: newConsignee.value.contacts_phone
       })
     })
     
@@ -145,11 +160,13 @@ const saveNewConsignee = async () => {
     
     // 重置表單
     newConsignee.value = {
-      contacts_name: '',
-      contacts_phone: '',
+      name: '',
+      phone: '',
       address: '',
       telephone: '',
-      note: ''
+      note: '',
+      contacts_name: '',
+      contacts_phone: ''
     }
     showAddForm.value = false
     
@@ -164,11 +181,13 @@ const saveNewConsignee = async () => {
 // 取消新增
 const cancelAdd = () => {
   newConsignee.value = {
-    contacts_name: '',
-    contacts_phone: '',
+    name: '',
+    phone: '',
     address: '',
     telephone: '',
-    note: ''
+    note: '',
+    contacts_name: '',
+    contacts_phone: ''
   }
   showAddForm.value = false
 }
@@ -177,8 +196,8 @@ const cancelAdd = () => {
 const confirmSelection = () => {
   if (selectedConsignee.value) {
     emit('select', {
-      name: selectedConsignee.value.C_CONTACTS_NAME,
-      phone: selectedConsignee.value.C_CONTACTS_PHONE,
+      name: selectedConsignee.value.C_NAME,
+      phone: selectedConsignee.value.C_PHONE || selectedConsignee.value.C_TELEPHONE,
       address: selectedConsignee.value.C_ADD
     })
   }
@@ -218,8 +237,8 @@ const closePopup = () => {
                               name="select"
                             >
                             <div class="iteminfo">
-                                <div class="name">{{ consignee.C_CONTACTS_NAME }}</div>
-                                <div class="phone">{{ consignee.C_CONTACTS_PHONE }}</div>
+                                <div class="name">{{ consignee.C_NAME }}</div>
+                                <div class="phone">{{ consignee.C_PHONE || consignee.C_TELEPHONE }}</div>
                                 <div class="addr">{{ consignee.C_ADD }}</div>
                             </div>
                         </label>
@@ -241,23 +260,23 @@ const closePopup = () => {
                 <div v-if="showAddForm" class="addform">
                     <h6>新增常用收貨人</h6>
                     <div class="formgroup">
-                        <label>姓名 *</label>
+                        <label>收貨人姓名 *</label>
                         <input 
                           type="text" 
-                          v-model="newConsignee.contacts_name"
+                          v-model="newConsignee.name"
                           placeholder="請輸入收貨人姓名"
                         >
                     </div>
                     <div class="formgroup">
-                        <label>手機 *</label>
+                        <label>收貨人手機 *</label>
                         <input 
                           type="text" 
-                          v-model="newConsignee.contacts_phone"
+                          v-model="newConsignee.phone"
                           placeholder="請輸入手機號碼"
                         >
                     </div>
                     <div class="formgroup">
-                        <label>地址 *</label>
+                        <label>收貨地址 *</label>
                         <input 
                           type="text" 
                           v-model="newConsignee.address"
@@ -265,11 +284,27 @@ const closePopup = () => {
                         >
                     </div>
                     <div class="formgroup">
-                        <label>市話</label>
+                        <label>收貨人市話</label>
                         <input 
                           type="text" 
                           v-model="newConsignee.telephone"
                           placeholder="請輸入市話(選填)"
+                        >
+                    </div>
+                    <div class="formgroup">
+                        <label>緊急聯絡人姓名 *</label>
+                        <input 
+                          type="text" 
+                          v-model="newConsignee.contacts_name"
+                          placeholder="緊急聯絡人姓名"
+                        >
+                    </div>
+                    <div class="formgroup">
+                        <label>緊急聯絡人電話 *</label>
+                        <input 
+                          type="text" 
+                          v-model="newConsignee.contacts_phone"
+                          placeholder="緊急聯絡人電話"
                         >
                     </div>
                     <div class="formgroup">
@@ -337,7 +372,7 @@ const closePopup = () => {
     margin: auto;
     padding: 24px;
     background-color: $neutral_white;
-    border: 1px solid $neutral_300;
+    border: 1px solid $neutral_700;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
@@ -383,7 +418,6 @@ const closePopup = () => {
 .consigneelist{
     display: flex;
     flex-direction: column;
-    gap: 12px;
 }
 
 .item{
@@ -399,6 +433,7 @@ const closePopup = () => {
     align-items: center;
     cursor: pointer;
     flex: 1;
+    margin-bottom: 12px;
 }
 
 .radio{
@@ -434,13 +469,14 @@ const closePopup = () => {
         color: $neutral_300;
         
         &:hover{
-            color: $point_700;
+            color: $danger_500;
         }
     }
 }
 
 .addinfo{
     padding: 8px 0;
+    display: flex;
     gap: 12px;
     align-items: center;
     background-color: transparent;
@@ -453,7 +489,7 @@ const closePopup = () => {
     }
 
     &:hover{
-        color: $primary_600;
+        color: $primary_400;
     }
 }
 
@@ -463,7 +499,7 @@ const closePopup = () => {
     border-radius: 8px;
     padding: 16px;
     background-color: $neutral_100;
-    width: 100%;
+    width: 95%;
 
     h6{
         font-size: $font_h6;
@@ -483,7 +519,7 @@ const closePopup = () => {
     }
 
     input{
-        width: 100%;
+        width: 95%;
         padding: 8px 12px;
         border: 1px solid $neutral_300;
         border-radius: 4px;
@@ -515,7 +551,9 @@ const closePopup = () => {
         color: $neutral_700;
 
         &:hover{
-            background-color: $neutral_300;
+            background-color: transparent;
+            color: $neutral_black;
+            outline: 1px solid $neutral_700;
         }
     }
 
@@ -524,7 +562,7 @@ const closePopup = () => {
         color: white;
 
         &:hover{
-            background-color: $primary_600;
+            background-color: $primary_400;
         }
     }
 }
@@ -534,42 +572,42 @@ const closePopup = () => {
     text-align: center;
     padding: 60px 20px;
     color: $neutral_700;
-    
+
     .emptyicon{
         margin-bottom: 16px;
         
         i{
-            font-size: 40px;
+            font-size: 48px;
             color: $neutral_300;
         }
     }
 
     p{
         margin-bottom: 8px;
-        font-size: 20px;
-        font-weight: bold;
+        font-size: 16px;
+        font-weight: 500;
     }
     
     .emptytext{
-        font-size: 16px;
-        color: $neutral_300;
+        font-size: 14px;
+        color: $neutral_700;
         margin-bottom: 24px;
-        font-weight: normal;
     }
     
     .addinfo{
-        color: $primary_600;
+        background-color: $primary_600;
+        color: white;
         padding: 12px 24px;
-        border-radius: 24px;
+        border-radius: 8px;
         border: none;
         
         span{
-            font-size: 18px;
             margin-left: 8px;
         }
         
         &:hover{
-            outline: 1px solid $primary_600;
+            background-color: $primary_400;
+            color: white;
         }
     }
 }
@@ -628,6 +666,13 @@ const closePopup = () => {
     
     .btnblock{
         gap: 20px;
+    }
+    .addform{
+      width: 90%;
+    }
+
+    .formgroup input{
+      width: 90%;
     }
 }
 </style>

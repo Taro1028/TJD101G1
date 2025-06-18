@@ -121,7 +121,7 @@ function handleLeaveConfirmed() {
     </div>
 
     <div class="operate">
-      <h3>主菜 4 選 2</h3>
+      <h3>主菜 4 選 2 ({{ localSelectedMeats.length }}/2)</h3>
       <div class="checkboxblock">
         <label v-for="item in meats" :key="item.value"
             :class="{ 'selected-label': isSelected(item.value), 'disabled-label': isDisabled(item.value) }"

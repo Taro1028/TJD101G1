@@ -1,16 +1,26 @@
 <script setup>
-    import { ref, computed, reactive } from 'vue';
+    import { ref, computed, reactive, onMounted} from 'vue';
     import FrontLayout from '../layouts/FrontLayout.vue';
     import Gotop from "../components/Gotop.vue"
     import { useMemberStore } from '@/stores/MemberStore'
     import { useRouter } from 'vue-router'
-
+    import { useRecipientsStore } from '@/stores/RecipientsStore'
+    import RecipientsSuccessPopup from '@/components/Popup_RecipientsSuccess.vue'
+    import { useModalStore } from '@/stores/ModalStore'  
     const showDefaultAvatar = computed(() => !memberStore.hasCustomAvatar);
     const userAvatar = computed(() => memberStore.userAvatar);
     const avatarInput = ref(null);
-    const activeTab = ref('Recipients1');
+    const activeTab = ref('recipient1');  
     const memberStore = useMemberStore()
+    const recipientsStore = useRecipientsStore()  
     const router = useRouter()
+    const modalStore = useModalStore() 
+
+    // 按鈕切換處理函數
+    const switchTab = (tabName) => {
+        activeTab.value = tabName
+        console.log('切換到分頁:', tabName)
+    }
 
     // 電話欄位驗證狀態
 const phoneValidation = reactive({
@@ -51,7 +61,7 @@ const phoneValidation = reactive({
     const handleFileChange = (event) => {
     const file = event.target.files[0];
     
-      console.log('File selected:', file); // 調試用
+      console.log('File selected:', file); 
     
     if (!file) {
         console.log('No file selected');
@@ -111,7 +121,94 @@ const phoneValidation = reactive({
         alert('登出成功！')
     }
     }
-    
+    // 載入狀態和錯誤處理
+    const showLoadingMessage = computed(() => recipientsStore.loading)
+    const showErrorMessage = computed(() => recipientsStore.error)
+
+    // 檢查當前分頁是否有資料
+    const currentRecipientHasData = computed(() => {
+        return recipientsStore.hasRecipientData(activeTab.value)
+    })
+
+    // 當前分頁的收件人資料
+    const currentRecipient = computed(() => {
+        return recipientsStore.getRecipient(activeTab.value)
+    })
+
+    // 載入收件人資料的函數
+    const loadRecipientsData = async () => {
+        try {
+            // 檢查會員是否已登入
+            if (!memberStore.isAuthenticated || !memberStore.memberId) {
+                console.log('使用者未登入，無法載入收件人資料')
+                return
+            }
+
+            // 使用 API 載入收件人資料
+            await recipientsStore.loadRecipientsFromAPI(memberStore.memberId)
+            
+        } catch (error) {
+            console.error('載入收件人資料失敗:', error)
+            // 錯誤處理已在 store 中完成，這裡不需要額外處理
+        }
+    }
+
+    // 頁面載入時執行
+    onMounted(() => {
+        loadRecipientsData()
+    })
+
+    const saveCurrentRecipient = async () => {
+        try {
+            // 檢查會員是否已登入
+            if (!memberStore.isAuthenticated || !memberStore.memberId) {
+                alert('請先登入才能儲存資料')
+                return
+            }
+
+            // 獲取當前分頁的收件人資料
+            const currentRecipientData = recipientsStore.getRecipient(activeTab.value)
+            
+            // 檢查必填欄位
+            if (!currentRecipientData.name || !currentRecipientData.address || !currentRecipientData.phone || 
+                !currentRecipientData.contactsName || !currentRecipientData.contactsPhone) {
+                alert('請填寫完整的收件人資料（收件人姓名、地址、手機、緊急聯絡人姓名、緊急聯絡人電話為必填）')
+                return
+            }
+
+            // 檢查電話格式
+            if (!phoneValidation.recipient_telephone || !phoneValidation.recipient_mobile || !phoneValidation.safety_contact_phone) {
+                alert('請確認電話格式正確')
+                return
+            }
+
+            console.log('準備儲存收件人資料:', activeTab.value, currentRecipientData)
+
+            // 調用 API 儲存資料
+            const result = await recipientsStore.saveRecipientToAPI(
+                memberStore.memberId, 
+                activeTab.value, 
+                currentRecipientData
+            )
+
+            // 顯示成功訊息
+            modalStore.openSuccessPopup('收件人資料儲存成功！')
+            
+            // 重新載入資料以確保同步
+            await loadRecipientsData()
+
+        } catch (error) {
+            console.error('儲存失敗:', error)
+            alert(error.message || '儲存失敗，請重試')
+        }
+    }
+
+// 取消編輯（重新載入資料）
+const cancelEdit = async () => {
+    if (confirm('確定要取消編輯嗎？未儲存的變更將會遺失。')) {
+        await loadRecipientsData()
+    }
+}
 </script>
 
     <template>
@@ -193,25 +290,57 @@ const phoneValidation = reactive({
                             <!-- 切換收件人管理分頁 -->
                             <ul class="recipients-btn-group">
                                 <li class="nav-item">
-                                     <button class="recipients-btn recipients-btn-active" type="button">常用收件人1</button>
+                                    <button 
+                                        class="recipients-btn" 
+                                        :class="{ 'recipients-btn-active': activeTab === 'recipient1' }"
+                                        type="button"
+                                        @click="switchTab('recipient1')"
+                                    >
+                                        常用收件人1
+                                    </button>
                                 </li>
                                 <li class="nav-item">
-                                     <button class="recipients-btn" type="button">常用收件人2</button>
+                                    <button 
+                                        class="recipients-btn" 
+                                        :class="{ 'recipients-btn-active': activeTab === 'recipient2' }"
+                                        type="button"
+                                        @click="switchTab('recipient2')"
+                                    >
+                                        常用收件人2
+                                    </button>
                                 </li>
                                 <li class="nav-item">
-                                     <button class="recipients-btn" type="button">常用收件人3</button>
+                                    <button 
+                                        class="recipients-btn" 
+                                        :class="{ 'recipients-btn-active': activeTab === 'recipient3' }"
+                                        type="button"
+                                        @click="switchTab('recipient3')"
+                                    >
+                                        常用收件人3
+                                    </button>
                                 </li>
                             </ul>
 
                             <div class="tab-content">
-                                <div class="Recipients1-page" id="Recipients1-page">
+                            <!-- 收件人1的表單 -->
+                                <div v-show="activeTab === 'recipient1'" class="recipient-page">
                                     <div class="form-group">
                                         <label class="form-label">收件人姓名</label>
-                                        <input type="text" class="form-input" value="王曉明" />
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            v-model="recipientsStore.recipients.recipient1.name"
+                                            placeholder="請輸入收件人姓名"
+                                        />
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">收件人地址</label>
-                                        <input type="text" class="form-input" value="臺北市中山區南京東路三段" />
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            v-model="recipientsStore.recipients.recipient1.address"
+                                            placeholder="請輸入收件人地址"
+                                        />
                                     </div>
 
                                     <div class="form-group" :class="{ 'phone-error': !phoneValidation.recipient_telephone }">
@@ -221,7 +350,7 @@ const phoneValidation = reactive({
                                                 type="tel" 
                                                 class="form-input" 
                                                 :class="{ 'error': !phoneValidation.recipient_telephone }"
-                                                value="02-2312-3456"
+                                                v-model="recipientsStore.recipients.recipient1.telephone"
                                                 @input="handlePhoneInput($event, 'recipient_telephone')"
                                                 placeholder="請輸入數字"
                                             />
@@ -241,7 +370,7 @@ const phoneValidation = reactive({
                                                 type="tel" 
                                                 class="form-input" 
                                                 :class="{ 'error': !phoneValidation.recipient_mobile }"
-                                                value="0987 078 587"
+                                                v-model="recipientsStore.recipients.recipient1.phone"
                                                 @input="handlePhoneInput($event, 'recipient_mobile')"
                                                 placeholder="請輸入數字"
                                             />
@@ -256,7 +385,12 @@ const phoneValidation = reactive({
 
                                     <div class="form-group">
                                         <label class="form-label">送餐安全聯絡人－姓名</label>
-                                        <input type="text" class="form-input" value="林榮杰" />
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            v-model="recipientsStore.recipients.recipient1.contactsName"
+                                            placeholder="請輸入聯絡人姓名"
+                                        />
                                     </div>
 
                                     <div class="form-group" :class="{ 'phone-error': !phoneValidation.safety_contact_phone }">
@@ -266,7 +400,7 @@ const phoneValidation = reactive({
                                                 type="tel" 
                                                 class="form-input" 
                                                 :class="{ 'error': !phoneValidation.safety_contact_phone }"
-                                                value="0987 078 875"
+                                                v-model="recipientsStore.recipients.recipient1.contactsPhone"
                                                 @input="handlePhoneInput($event, 'safety_contact_phone')"
                                                 placeholder="請輸入數字"
                                             />
@@ -281,14 +415,234 @@ const phoneValidation = reactive({
 
                                     <div class="form-group">
                                         <label class="form-label">備註</label>
-                                        <textarea class="form-textarea">罹有糖尿病、三高、重聽、牙口尚可、茹素、喜清淡</textarea>
+                                        <textarea 
+                                            class="form-textarea"
+                                            v-model="recipientsStore.recipients.recipient1.note"
+                                            placeholder="請輸入備註"
+                                        ></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- 收件人2的表單 -->
+                                <div v-show="activeTab === 'recipient2'" class="recipient-page">
+                                    <div class="form-group">
+                                        <label class="form-label">收件人姓名</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            v-model="recipientsStore.recipients.recipient2.name"
+                                            placeholder="請輸入收件人姓名"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">收件人地址</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            v-model="recipientsStore.recipients.recipient2.address"
+                                            placeholder="請輸入收件人地址"
+                                        />
+                                    </div>
+
+                                    <div class="form-group" :class="{ 'phone-error': !phoneValidation.recipient_telephone }">
+                                        <label class="form-label">收件人市內電話</label>
+                                        <div class="phone-input-container">
+                                            <input 
+                                                type="tel" 
+                                                class="form-input" 
+                                                :class="{ 'error': !phoneValidation.recipient_telephone }"
+                                                v-model="recipientsStore.recipients.recipient2.telephone"
+                                                @input="handlePhoneInput($event, 'recipient_telephone')"
+                                                placeholder="請輸入數字"
+                                            />
+                                            <span class="error-icon" v-show="!phoneValidation.recipient_telephone">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                            </span>
+                                        </div>
+                                        <span class="error-message" v-show="!phoneValidation.recipient_telephone">
+                                            請只輸入數字、空格、短橫線或括號
+                                        </span>
+                                    </div>
+
+                                    <div class="form-group" :class="{ 'phone-error': !phoneValidation.recipient_mobile }">
+                                        <label class="form-label">收件人行動電話</label>
+                                        <div class="phone-input-container">
+                                            <input 
+                                                type="tel" 
+                                                class="form-input" 
+                                                :class="{ 'error': !phoneValidation.recipient_mobile }"
+                                                v-model="recipientsStore.recipients.recipient2.phone"
+                                                @input="handlePhoneInput($event, 'recipient_mobile')"
+                                                placeholder="請輸入數字"
+                                            />
+                                            <span class="error-icon" v-show="!phoneValidation.recipient_mobile">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                            </span>
+                                        </div>
+                                        <span class="error-message" v-show="!phoneValidation.recipient_mobile">
+                                            請只輸入數字、空格、短橫線或括號
+                                        </span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">送餐安全聯絡人－姓名</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            v-model="recipientsStore.recipients.recipient2.contactsName"
+                                            placeholder="請輸入聯絡人姓名"
+                                        />
+                                    </div>
+
+                                    <div class="form-group" :class="{ 'phone-error': !phoneValidation.safety_contact_phone }">
+                                        <label class="form-label">送餐安全聯絡人－電話</label>
+                                        <div class="phone-input-container">
+                                            <input 
+                                                type="tel" 
+                                                class="form-input" 
+                                                :class="{ 'error': !phoneValidation.safety_contact_phone }"
+                                                v-model="recipientsStore.recipients.recipient2.contactsPhone"
+                                                @input="handlePhoneInput($event, 'safety_contact_phone')"
+                                                placeholder="請輸入數字"
+                                            />
+                                            <span class="error-icon" v-show="!phoneValidation.safety_contact_phone">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                            </span>
+                                        </div>
+                                        <span class="error-message" v-show="!phoneValidation.safety_contact_phone">
+                                            請只輸入數字、空格、短橫線或括號
+                                        </span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">備註</label>
+                                        <textarea 
+                                            class="form-textarea"
+                                            v-model="recipientsStore.recipients.recipient2.note"
+                                            placeholder="請輸入備註"
+                                        ></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- 收件人3的表單 -->
+                                <div v-show="activeTab === 'recipient3'" class="recipient-page">
+                                    <div class="form-group">
+                                        <label class="form-label">收件人姓名</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            v-model="recipientsStore.recipients.recipient3.name"
+                                            placeholder="請輸入收件人姓名"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">收件人地址</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            v-model="recipientsStore.recipients.recipient3.address"
+                                            placeholder="請輸入收件人地址"
+                                        />
+                                    </div>
+
+                                    <div class="form-group" :class="{ 'phone-error': !phoneValidation.recipient_telephone }">
+                                        <label class="form-label">收件人市內電話</label>
+                                        <div class="phone-input-container">
+                                            <input 
+                                                type="tel" 
+                                                class="form-input" 
+                                                :class="{ 'error': !phoneValidation.recipient_telephone }"
+                                                v-model="recipientsStore.recipients.recipient3.telephone"
+                                                @input="handlePhoneInput($event, 'recipient_telephone')"
+                                                placeholder="請輸入數字"
+                                            />
+                                            <span class="error-icon" v-show="!phoneValidation.recipient_telephone">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                            </span>
+                                        </div>
+                                        <span class="error-message" v-show="!phoneValidation.recipient_telephone">
+                                            請只輸入數字、空格、短橫線或括號
+                                        </span>
+                                    </div>
+
+                                    <div class="form-group" :class="{ 'phone-error': !phoneValidation.recipient_mobile }">
+                                        <label class="form-label">收件人行動電話</label>
+                                        <div class="phone-input-container">
+                                            <input 
+                                                type="tel" 
+                                                class="form-input" 
+                                                :class="{ 'error': !phoneValidation.recipient_mobile }"
+                                                v-model="recipientsStore.recipients.recipient3.phone"
+                                                @input="handlePhoneInput($event, 'recipient_mobile')"
+                                                placeholder="請輸入數字"
+                                            />
+                                            <span class="error-icon" v-show="!phoneValidation.recipient_mobile">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                            </span>
+                                        </div>
+                                        <span class="error-message" v-show="!phoneValidation.recipient_mobile">
+                                            請只輸入數字、空格、短橫線或括號
+                                        </span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">送餐安全聯絡人－姓名</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            v-model="recipientsStore.recipients.recipient3.contactsName"
+                                            placeholder="請輸入聯絡人姓名"
+                                        />
+                                    </div>
+
+                                    <div class="form-group" :class="{ 'phone-error': !phoneValidation.safety_contact_phone }">
+                                        <label class="form-label">送餐安全聯絡人－電話</label>
+                                        <div class="phone-input-container">
+                                            <input 
+                                                type="tel" 
+                                                class="form-input" 
+                                                :class="{ 'error': !phoneValidation.safety_contact_phone }"
+                                                v-model="recipientsStore.recipients.recipient3.contactsPhone"
+                                                @input="handlePhoneInput($event, 'safety_contact_phone')"
+                                                placeholder="請輸入數字"
+                                            />
+                                            <span class="error-icon" v-show="!phoneValidation.safety_contact_phone">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                            </span>
+                                        </div>
+                                        <span class="error-message" v-show="!phoneValidation.safety_contact_phone">
+                                            請只輸入數字、空格、短橫線或括號
+                                        </span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">備註</label>
+                                        <textarea 
+                                            class="form-textarea"
+                                            v-model="recipientsStore.recipients.recipient3.note"
+                                            placeholder="請輸入備註"
+                                        ></textarea>
                                     </div>
                                 </div>
                             </div>
                             <!-- 儲存/取消按鈕 -->
                             <div class="btn-group">
-                                <button type="button" class="btn2 cancel">取消</button>
-                                <button type="button" class="btn2 save">儲存</button>
+                                <button 
+                                    type="button" 
+                                    class="btn2 cancel"
+                                    @click="cancelEdit"
+                                    :disabled="recipientsStore.loading"
+                                >
+                                    取消
+                                </button>
+                                <button 
+                                    type="button" 
+                                    class="btn2 save"
+                                    @click="saveCurrentRecipient"
+                                    :disabled="recipientsStore.loading"
+                                >
+                                    {{ recipientsStore.loading ? '儲存中...' : '儲存' }}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -296,6 +650,7 @@ const phoneValidation = reactive({
             </div>
         </section>
         <Gotop></Gotop>
+        <RecipientsSuccessPopup />
         </FrontLayout>
     </template>
     <style scoped lang="scss">
