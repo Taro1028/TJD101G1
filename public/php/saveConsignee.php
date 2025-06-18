@@ -1,5 +1,5 @@
 <?php
-// saveConsignee.php - 新增/更新常用收貨人
+// saveConsignee.php
 include_once 'cors_1.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

@@ -1,10 +1,14 @@
 <?php
-// 引入現有的連線檔案和 CORS 設定
-require_once 'connection.php';
-require_once 'cors.php';
+// CORS 設定
+require_once 'cors_1.php';
 
-// 設定回應格式
-header('Content-Type: application/json; charset=utf-8');
+// 處理 OPTIONS 預檢請求
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+// 引入現有的連線檔案
+require_once 'connection.php';
 
 // 只允許 POST 請求
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -33,10 +37,11 @@ try {
     if (!$uploadResult['success']) {
         throw new Exception($uploadResult['error']);
     }
-    
-    // 修正：ORDERS_ID 設為 NULL
-    $sql = "INSERT INTO MESSAGE_CARDS (MESSAGE_TEXT, SELECTED_COLOR, STICKERS_DATA, IMAGE_PATH, ORDERS_ID) 
-            VALUES (:message_text, :selected_color, :stickers_data, :image_path, :orders_id)";
+
+    $sql = "INSERT INTO MESSAGE_CARDS (
+            MESSAGE_TEXT, SELECTED_COLOR, STICKERS_DATA, IMAGE_PATH, CREATED_AT, ORDERS_ID, SHOPPING_CART_ID) 
+            VALUES (
+            :message_text, :selected_color, :stickers_data, :image_path, NOW(), :orders_id, :shopping_cart_id)";
     
     $stmt = $pdo->prepare($sql);
     $result = $stmt->execute([
@@ -44,7 +49,8 @@ try {
         ':selected_color' => $cardData['selectedColor'] ?? '#FFE299',
         ':stickers_data' => json_encode($cardData['stickers'] ?? []),
         ':image_path' => $uploadResult['path'],
-        ':orders_id' => null  // 設為 NULL
+        ':orders_id' => null,  // 設為 NULL
+        ':shopping_cart_id' => null  // 暫時設為 NULL，稍後加入購物車時會更新
     ]);
     
     if (!$result) {
@@ -62,7 +68,7 @@ try {
             'messageText' => $cardData['messageText'] ?? '',
             'selectedColor' => $cardData['selectedColor'] ?? '#FFE299',
             'stickersCount' => count($cardData['stickers'] ?? []),
-            'ordersId' => null
+            'uploadPath' => $uploadResult['fullPath']
         ]
     ]);
     

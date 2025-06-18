@@ -1,5 +1,5 @@
 <?php
-// deleteConsignee.php - 刪除常用收貨人 (修正為 POST 方法)
+// deleteConsignee.php
 include_once 'cors_1.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

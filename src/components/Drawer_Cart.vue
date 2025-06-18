@@ -7,18 +7,25 @@ const router = useRouter()
 const cartStore = useCartStore()
 
 const loading = ref(true)
+const isVisible = ref(false) // 新增：控制動畫顯示
 
 // 關閉視窗 - 當作為路由使用時直接導航
 const emit = defineEmits(['close'])
 
 function closePopup() {
-  // 如果是作為路由組件使用，直接導航回上一頁
-  if (router.currentRoute.value.path === '/Cart') {
-    router.go(-1) // 或者 router.push('/') 導回首頁
-  } else {
-    // 如果是作為彈窗組件使用，發送關閉事件
-    emit('close')
-  }
+  // 先執行滑出動畫
+  isVisible.value = false
+  
+  // 等待動畫完成後再關閉
+  setTimeout(() => {
+    // 如果是作為路由組件使用，直接導航回上一頁
+    if (router.currentRoute.value.path === '/Cart') {
+      router.go(-1) // 或者 router.push('/') 導回首頁
+    } else {
+      // 如果是作為彈窗組件使用，發送關閉事件
+      emit('close')
+    }
+  }, 300) // 等待動畫時間
 }
 
 // 使用 cartStore 的 cartGroups getter，保持一致性
@@ -99,16 +106,22 @@ async function removeCartGroup(cartId, planType) {
 }
 
 function goNext() {
-  // 導向結帳頁面
-  router.push('/Check_OrderInfo')
+  // 先關閉彈窗再導向結帳頁面
+  closePopup()
+  setTimeout(() => {
+    router.push('/Check_OrderInfo')
+  }, 300)
 }
 
 // 載入購物車資料
 onMounted(async () => {
   try {
     loading.value = true
-    // 防止背景滾動
+    
+    // 更好的防止背景滾動方式 - 保留捲軸佔位
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
     document.body.style.overflow = 'hidden'
+    document.body.style.paddingRight = `${scrollBarWidth}px`
     
     // 檢查 cartStore 是否正確載入
     console.log('cartStore:', cartStore)
@@ -131,17 +144,23 @@ onMounted(async () => {
     console.error('載入購物車失敗:', error)
   } finally {
     loading.value = false
+    // 組件載入完成後顯示滑入動畫
+    setTimeout(() => {
+      isVisible.value = true
+    }, 50)
   }
 })
 
 onUnmounted(() => {
+  // 恢復原始狀態
   document.body.style.overflow = ''
+  document.body.style.paddingRight = ''
 })
 </script>
 
 <template>
-<div class="overlay" @click="closePopup">
-    <div class="shopCart" @click.stop>
+<div class="overlay" :class="{ 'overlay-visible': isVisible }" @click="closePopup">
+    <div class="shopCart" :class="{ 'cart-visible': isVisible }" @click.stop>
         <button class="closebtn" @click="closePopup">
           <i class="bi bi-x-circle"></i>
         </button>
@@ -174,7 +193,7 @@ onUnmounted(() => {
                 >
                     <div class="iteminfo">
                         <div class="infotitle">
-                          <h4>{{ group.plan_type }}{{ group.message_card_id ? ' + 小卡' : '' }}</h4>
+                          <h4>{{ group.display_title }}</h4>
                         </div>
                         <div class="period">
                           {{ formatDateRange(group.order_start_date, group.order_end_date, group.total_days) }}
@@ -217,13 +236,20 @@ onUnmounted(() => {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color:rgba(0, 0, 0, 0.4);
-
+    background-color: rgba(0, 0, 0, 0);
+    
     display: flex;
     align-items: center;
     justify-content: center;
-
+    
     z-index: 1000;
+    
+    // 背景淡入動畫
+    transition: background-color 0.3s ease;
+    
+    &.overlay-visible {
+        background-color: rgba(0, 0, 0, 0.4);
+    }
 }
 
 .shopCart{
@@ -238,6 +264,19 @@ onUnmounted(() => {
     position: fixed;
     top: 0;
     right: 0;
+    
+    // 初始狀態：隱藏在右側
+    transform: translateX(100%);
+    opacity: 0;
+    
+    // 滑動動畫
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                opacity 0.3s ease;
+    
+    &.cart-visible {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .closebtn{

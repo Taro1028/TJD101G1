@@ -2,10 +2,13 @@
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useMemberStore } from "@/stores/memberStore"; // 根據你的檔案路徑調整
+import { useCartStore } from "@/stores/cartStore";
+import Drawer_Cart from "@/components/Drawer_Cart.vue";
 
 const router = useRouter();
 const route = useRoute();
 const memberStore = useMemberStore();
+const cartStore = useCartStore();
 
 const showAboutDropdown = ref(false);
 const showMemberDropdown = ref(false);
@@ -14,6 +17,7 @@ const isMounted = ref(false);
 const isMobile = ref(false);
 const aboutDropdownRef = ref(null);
 const memberDropdownRef = ref(null);
+const showCartPopup = ref(false);
 
 // 使用 Pinia store 的資料
 const isLoggedIn = computed(() => !!memberStore.id);
@@ -22,6 +26,20 @@ const isLoggedIn = computed(() => !!memberStore.id);
 const userAvatar = computed(() => memberStore.userAvatar);
 
 const userName = computed(() => memberStore.name || "會員");
+
+// 計算購物車訂單數量
+const cartItemCount = computed(() => {
+  try {
+    if (!cartStore || !cartStore.cartGroups) {
+      return 0;
+    }
+    return cartStore.cartGroups.length;
+  } catch (error) {
+    console.warn('計算購物車件數時發生錯誤:', error);
+    return 0;
+  }
+});
+
 // // 登出功能
 // const logout = () => {
 //   memberStore.clearUser(); // 使用 store 的清除方法
@@ -57,12 +75,39 @@ const toggleMemberDropdown = () => {
   showAboutDropdown.value = false; // 關閉其他下拉選單
 };
 
+// 切換購物車彈窗
+const toggleCartPopup = async () => {
+  if (!isLoggedIn.value) {
+    router.push("/Login");
+    return;
+  }
+  
+  try {
+    // 如果購物車還沒有資料，先載入
+    if (!cartStore.cartGroups || cartStore.cartGroups.length === 0) {
+      await cartStore.fetchCartItemsFromBackend();
+    }
+    showCartPopup.value = !showCartPopup.value;
+    showAboutDropdown.value = false;
+    showMemberDropdown.value = false;
+  } catch (error) {
+    console.error("載入購物車失敗:", error);
+    alert("載入購物車失敗，請稍後再試");
+  }
+};
+
+// 關閉購物車彈窗
+const closeCartPopup = () => {
+  showCartPopup.value = false;
+};
+
 // 切換手機側邊選單
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
   if (!isMobileMenuOpen.value) {
     showAboutDropdown.value = false;
     showMemberDropdown.value = false;
+    showCartPopup.value = false;
   }
 };
 
@@ -70,6 +115,7 @@ const closeMobileMenu = () => {
   isMobileMenuOpen.value = false;
   showAboutDropdown.value = false;
   showMemberDropdown.value = false;
+  showCartPopup.value = false;
 };
 
 const handleClickOutside = (event) => {
@@ -88,6 +134,12 @@ const handleClickOutside = (event) => {
     !event.target.closest(".nav-wrapper") &&
     !event.target.closest(".hamburger");
 
+    // 點擊外部關閉購物車彈窗
+  const clickedOutsideCart =
+    showCartPopup.value &&
+    !event.target.closest(".cart-item") &&
+    !event.target.closest(".shopCart");
+
   if (clickedOutsideAboutDropdown) {
     showAboutDropdown.value = false;
   }
@@ -105,10 +157,20 @@ const checkIsMobile = () => {
   isMobile.value = window.innerWidth <= 820;
 };
 
-onMounted(() => {
+onMounted(async() => {
   isMounted.value = true;
   checkIsMobile();
   memberStore.loadFromsessionStorage();
+  
+  // 如果已登入，載入購物車資料
+  if (memberStore.id) {
+    try {
+      await cartStore.fetchCartItemsFromBackend();
+    } catch (error) {
+      console.warn("初始載入購物車失敗:", error);
+    }
+  }
+
   window.addEventListener("resize", checkIsMobile);
   document.addEventListener("click", handleClickOutside);
 });
@@ -237,13 +299,17 @@ onBeforeUnmount(() => {
             </div>
           </li>
           <li class="nav-item cart-item">
-            <router-link to="/Cart">
+            <a href="javascript:void(0)" @click.stop="toggleCartPopup" class="cart-link">
               <i class="bi bi-cart3"></i>
-            </router-link>
+              <span v-if="cartItemCount > 0" class="cart-badge">
+                {{ cartItemCount > 99 ? '99+' : cartItemCount }}
+              </span>
+            </a>
           </li>
         </template>
       </ul>
     </nav>
+    <Drawer_Cart v-if="showCartPopup" @close="closeCartPopup" />
   </header>
 </template>
 
@@ -329,6 +395,55 @@ header a img {
     &:hover {
       color: $primary_600;
     }
+  }
+}
+
+.cart-item {
+  position: relative; 
+  
+  .cart-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $neutral_black;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 60px;
+    
+    &:hover {
+      color: $primary_600;
+    }
+  }
+  
+  i {
+    margin-right: 20px;
+  }
+}
+
+.cart-badge {
+  position: absolute;
+  top: 9px;
+  right: 12px;
+  background-color: $danger_500;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  // font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  min-width: 20px;
+  z-index: 1;
+  
+  // 當數字超過2位數時調整樣式
+  &:has-text {
+    border-radius: 10px;
+    padding: 0 4px;
+    min-width: 20px;
   }
 }
 
@@ -531,6 +646,16 @@ header a img {
   }
   .cart-item i {
     margin-right: 0px;
+  }
+
+  .cart-item {
+    i {
+      margin-right: 0px;
+    }
+    
+    .cart-badge {
+      right: -8px;
+    }
   }
 }
 </style>

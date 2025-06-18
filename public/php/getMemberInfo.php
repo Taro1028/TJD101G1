@@ -1,5 +1,5 @@
 <?php
-// add_to_cart.php - 支援用戶關聯版本
+// add_to_cart.php
 include_once 'cors_1.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

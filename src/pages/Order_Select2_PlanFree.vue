@@ -125,7 +125,7 @@ function handleLeaveConfirmed() {
             <LeaveDialog v-if="showPopup === 'leave'" @close="closePopup" @confirm-leave="handleLeaveConfirmed" />
         </div>
         <div class="operate">
-            <h3>副菜組合 8 選 5</h3>
+            <h3>副菜組合 8 選 5 ({{ localSelectedSideDishGroups.length }}/5)</h3>
             <div class="select">
                 <div class="selectblock">
                     <button

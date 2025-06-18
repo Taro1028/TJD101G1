@@ -1,4 +1,4 @@
-// stores/cartStore.js - 修正多日計算問題
+// stores/cartStore.js - 簡化版本（只顯示小卡標示）
 import { defineStore } from 'pinia'
 import { useMemberStore } from './MemberStore'
 
@@ -31,20 +31,26 @@ export const useCartStore = defineStore('cart', {
       return state.items.reduce((total, item) => total + (parseFloat(item.dailyTotalAmount) || 0), 0)
     },
 
-    // 獲取購物車群組（按 cart_id 分組）- 修正版本
+    // 獲取購物車群組（按 cart_id 分組）
     cartGroups(state) {
       const groups = {}
       
       state.items.forEach(item => {
         const cartId = item.cart_id
         if (!groups[cartId]) {
+          // 根據是否有留言小卡，調整顯示的標題
+          const displayTitle = item.has_message_card 
+            ? `${item.plan_type} + 小卡`
+            : item.plan_type;
+            
           groups[cartId] = {
             cart_id: cartId,
-            plan_type: item.plan_type,
+            plan_type: item.plan_type, // 原始的方案類型
+            display_title: displayTitle, // 顯示用的標題（包含 + 小卡）
             order_start_date: item.order_start_date,
             order_end_date: item.order_end_date,
             total_days: item.total_days,
-            message_card_id: item.message_card_id || null,
+            has_message_card: item.has_message_card || false,
             total_meal_count: 0,
             total_amount: 0,
             items: []
@@ -67,14 +73,10 @@ export const useCartStore = defineStore('cart', {
           cart_id: group.cart_id,
           plan_type: group.plan_type,
           total_days: group.total_days,
+          has_message_card: group.has_message_card, // 只顯示是否有小卡
           items_count: group.items.length,
           total_meal_count: group.total_meal_count,
-          total_amount: group.total_amount,
-          individual_items: group.items.map(item => ({
-            date: item.date,
-            quantity: item.quantity,
-            dailyTotalAmount: item.dailyTotalAmount
-          }))
+          total_amount: group.total_amount
         })
       })
       console.log('========================')
@@ -108,7 +110,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     /**
-     * 將訂單項目加入購物車
+     * 將訂單項目加入購物車（支援留言小卡）
      * @param {Array} orderItems - 訂單項目陣列
      * @param {Number|null} messageCardId - 留言小卡 ID（可選）
      */
@@ -121,17 +123,18 @@ export const useCartStore = defineStore('cart', {
 
         // 準備傳送的資料
         const orderPayload = {
-          m_id: this.currentMemberId, // 統一使用 m_id 對應資料庫欄位
+          m_id: this.currentMemberId,
           order_items: orderItems
         };
 
-        // 如果有留言小卡 ID，才加入
+        // 如果有留言小卡 ID，加入 payload
         if (messageCardId) {
           orderPayload.message_card_id = messageCardId;
         }
 
         console.log('=== cartStore 準備傳送到後端 ===');
         console.log('會員ID:', this.currentMemberId);
+        console.log('是否包含留言小卡:', messageCardId ? '是' : '否');
         console.log('orderPayload:', JSON.stringify(orderPayload, null, 2));
 
         const response = await fetch(env + '/tjd101/g1/php/add_to_cart.php', {
@@ -148,7 +151,14 @@ export const useCartStore = defineStore('cart', {
           console.log('✅ 訂單添加成功:', result.message);
           // 加入成功後，重新獲取購物車資料
           await this.fetchCartItemsFromBackend();
-          return result;
+          
+          // 統一回傳格式
+          return {
+            success: true,
+            cart_id: result.cart_id,
+            message: result.message,
+            debug_info: result.debug_info
+          };
         } else {
           throw new Error(result.message || 'API 失敗');
         }
@@ -160,7 +170,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     /**
-     * 從後端獲取購物車資料 - 修正版本
+     * 從後端獲取購物車資料（簡化版，只需要知道是否有小卡）
      */
     async fetchCartItemsFromBackend() {
       try {
@@ -200,13 +210,15 @@ export const useCartStore = defineStore('cart', {
                 cart_id: cartGroup.cart_id,
                 plan_type: cartGroup.plan_type,
                 date: item.meal_date,
-                quantity: parseInt(item.count) || 0, // 確保轉換為數字
-                dailyTotalAmount: parseFloat(item.total_amount) || 0, // 確保轉換為數字
+                // 【修正】相容多種欄位名稱
+                quantity: parseInt(item.count || item.daily_count) || 0,
+                dailyTotalAmount: parseFloat(item.total_amount || item.daily_total) || 0,
                 meal_items: item.meal_items,
                 order_start_date: cartGroup.order_start_date,
                 order_end_date: cartGroup.order_end_date,
-                total_days: parseInt(cartGroup.total_days) || 0, // 確保轉換為數字
-                message_card_id: cartGroup.message_card_id
+                total_days: parseInt(cartGroup.total_days) || 0,
+                // 只需要知道是否有留言小卡
+                has_message_card: cartGroup.has_message_card || false
               });
             });
           });
@@ -223,7 +235,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     /**
-     * 將單個商品添加到前端本地購物車 - 修正版本
+     * 將單個商品添加到前端本地購物車
      */
     addItemToLocalCart(item) {
       if (!item || !item.quantity || item.quantity <= 0 || !item.date || !item.dailyTotalAmount) {
@@ -242,7 +254,8 @@ export const useCartStore = defineStore('cart', {
         order_start_date: item.order_start_date,
         order_end_date: item.order_end_date,
         total_days: parseInt(item.total_days) || 0,
-        message_card_id: item.message_card_id || null
+        // 只需要知道是否有留言小卡
+        has_message_card: item.has_message_card || false
       }
       
       console.log('添加到本地購物車:', cartItem)
@@ -258,6 +271,8 @@ export const useCartStore = defineStore('cart', {
           throw new Error('請先登入才能操作購物車')
         }
 
+        console.log('🗑️ 準備刪除購物車項目，cart_id:', cartId)
+
         const response = await fetch(env + '/tjd101/g1/php/remove_cart_item.php', {
           method: 'POST',
           headers: {
@@ -265,13 +280,14 @@ export const useCartStore = defineStore('cart', {
           },
           body: JSON.stringify({ 
             cart_id: cartId,
-            m_id: this.currentMemberId // 統一使用 m_id
+            m_id: this.currentMemberId
           })
         });
 
         const result = await response.json();
 
         if (response.ok && result.success) {
+          console.log('✅ 購物車項目刪除成功:', result.message)
           // 刪除成功後，重新獲取購物車資料
           await this.fetchCartItemsFromBackend();
           return result;
@@ -288,7 +304,18 @@ export const useCartStore = defineStore('cart', {
      * 清空購物車
      */
     clearCart() {
+      console.log('🧹 清空購物車')
       this.items = [];
+    },
+
+    /**
+     * 檢查購物車是否有留言小卡
+     * @param {Number} cartId - 購物車 ID
+     * @returns {Boolean}
+     */
+    hasMessageCard(cartId) {
+      const cartGroup = this.cartGroups.find(group => group.cart_id === cartId);
+      return cartGroup?.has_message_card || false;
     }
   }
 })

@@ -1,5 +1,5 @@
 <?php
-// add_to_cart.php - 支援用戶關聯版本
+// add_to_cart.php
 include_once 'cors_1.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+// 強化錯誤顯示
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
@@ -14,7 +15,12 @@ error_reporting(E_ALL);
 header('Content-Type: application/json; charset=utf-8');
 ob_start();
 
+// 調試：輸出接收到的原始數據
+error_log("=== DEBUG: 開始處理請求 ===");
+error_log("REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
+
 try {
+    // 檢查資料庫連線文件
     if (!file_exists('connection.php')) {
         throw new Exception('資料庫連線文件不存在');
     }
@@ -25,19 +31,24 @@ try {
         throw new Exception('資料庫連線失敗');
     }
 
+    error_log("DEBUG: 資料庫連線成功");
+
+    // 讀取輸入數據
     $rawInput = file_get_contents("php://input");
 
     if (empty($rawInput)) {
         throw new Exception('未收到請求數據');
     }
 
-    error_log("收到的原始數據: " . $rawInput);
+    error_log("DEBUG: 收到的原始數據: " . $rawInput);
 
     $input = json_decode($rawInput, true);
 
     if (json_last_error() !== JSON_ERROR_NONE) {
         throw new Exception('JSON 解析失敗: ' . json_last_error_msg());
     }
+
+    error_log("DEBUG: JSON 解析成功: " . json_encode($input));
 
     // 檢查必要字段
     if (!isset($input['m_id'])) {
@@ -48,11 +59,13 @@ try {
         throw new Exception('缺少 order_items 參數或格式錯誤');
     }
 
-    $m_id = intval($input['m_id']); // 統一使用 m_id
+    $m_id = intval($input['m_id']);
     $orderItems = $input['order_items'];
-    $message_card_id = $input['message_card_id'] ?? null;
+    $message_card_id = isset($input['message_card_id']) ? intval($input['message_card_id']) : null;
 
-    // 驗證會員是否存在（使用正確的表格名稱 MEMBERS）
+    error_log("DEBUG: 解析後的參數 - m_id: {$m_id}, message_card_id: " . ($message_card_id ?? 'NULL'));
+
+    // 驗證會員是否存在
     $memberCheckSql = "SELECT ID FROM `MEMBERS` WHERE ID = :m_id";
     $memberCheckStmt = $pdo->prepare($memberCheckSql);
     $memberCheckStmt->execute([':m_id' => $m_id]);
@@ -61,12 +74,49 @@ try {
         throw new Exception('會員不存在，ID: ' . $m_id);
     }
 
+    error_log("DEBUG: 會員驗證成功");
+
+    // 如果有 message_card_id，驗證留言小卡
+    if ($message_card_id) {
+        error_log("DEBUG: 開始驗證留言小卡 ID: {$message_card_id}");
+        
+        // 檢查 MESSAGE_CARDS 表是否存在且有正確的欄位
+        $tableCheckSql = "SHOW TABLES LIKE 'MESSAGE_CARDS'";
+        $tableCheckStmt = $pdo->query($tableCheckSql);
+        if (!$tableCheckStmt->fetch()) {
+            throw new Exception('MESSAGE_CARDS 表不存在');
+        }
+        
+        // 檢查是否有 SHOPPING_CART_ID 欄位
+        $columnCheckSql = "SHOW COLUMNS FROM MESSAGE_CARDS LIKE 'SHOPPING_CART_ID'";
+        $columnCheckStmt = $pdo->query($columnCheckSql);
+        if (!$columnCheckStmt->fetch()) {
+            throw new Exception('MESSAGE_CARDS 表缺少 SHOPPING_CART_ID 欄位，請先執行資料表更新 SQL');
+        }
+        
+        // 【修正】使用 MYCARDS_ID 作為主鍵
+        $cardCheckSql = "SELECT MYCARDS_ID, SHOPPING_CART_ID, ORDERS_ID FROM MESSAGE_CARDS WHERE MYCARDS_ID = :card_id";
+        $cardCheckStmt = $pdo->prepare($cardCheckSql);
+        $cardCheckStmt->execute([':card_id' => $message_card_id]);
+        $cardInfo = $cardCheckStmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$cardInfo) {
+            throw new Exception('留言小卡不存在，ID: ' . $message_card_id);
+        }
+        
+        if ($cardInfo['SHOPPING_CART_ID'] !== null || $cardInfo['ORDERS_ID'] !== null) {
+            throw new Exception('留言小卡已被使用');
+        }
+        
+        error_log("DEBUG: 留言小卡驗證成功");
+    }
+
     // 驗證 orderItems 不為空
     if (empty($orderItems)) {
         throw new Exception('order_items 不能為空');
     }
 
-    // 從 orderItems 計算摘要資訊
+    // 計算摘要資訊
     $total_meal_count = 0;
     $total_amount = 0;
     $start_date = null;
@@ -79,7 +129,6 @@ try {
 
         if ($plan_type === null && isset($item['plan_type'])) {
             $plan_type = $item['plan_type'];
-            error_log("取得 plan_type: " . $plan_type);
         }
 
         if ($start_date === null || $item['meal_date'] < $start_date) {
@@ -102,45 +151,34 @@ try {
         $total_days = max(1, round(($end_timestamp - $start_timestamp) / (60 * 60 * 24)) + 1);
     }
 
-    $orderSummary = [
-        'm_id' => $m_id, // 對應資料庫的 M_ID 欄位
-        'plan_type' => $plan_type,
-        'order_start_date' => $start_date,
-        'order_end_date' => $end_date,
-        'total_days' => $total_days,
-        'total_meal_count' => $total_meal_count,
-        'total_amount' => $total_amount
-    ];
-
-    error_log("orderSummary: " . json_encode($orderSummary));
-    error_log("message_card_id: " . ($message_card_id ?? 'NULL'));
+    error_log("DEBUG: 計算完成 - total_meal_count: {$total_meal_count}, total_amount: {$total_amount}");
 
     // 開始事務
     $pdo->beginTransaction();
+    error_log("DEBUG: 開始事務");
 
-    // 修改 SQL 語句，使用正確的欄位名稱 M_ID
+    // 插入 SHOPPING_CART
     $sql_cart = "INSERT INTO SHOPPING_CART (
         M_ID, PLAN_TYPE, ORDER_START_DATE, ORDER_END_DATE, TOTAL_DAYS,
-        TOTAL_MEAL_COUNT, TOTAL_AMOUNT, MESSAGE_CARD_ID, ADDCART_CREATE_AT
+        TOTAL_MEAL_COUNT, TOTAL_AMOUNT, ADDCART_CREATE_AT
     ) VALUES (
         :m_id, :plan_type, :order_start_date, :order_end_date, :total_days,
-        :total_meal_count, :total_amount, :message_card_id, NOW()
+        :total_meal_count, :total_amount, NOW()
     )";
 
     $stmt_cart = $pdo->prepare($sql_cart);
 
     $cart_params = [
-        ':m_id' => $m_id, // 使用正確的參數名稱
-        ':plan_type' => $orderSummary['plan_type'],
-        ':order_start_date' => $orderSummary['order_start_date'],
-        ':order_end_date' => $orderSummary['order_end_date'],
-        ':total_days' => $orderSummary['total_days'],
-        ':total_meal_count' => intval($orderSummary['total_meal_count']),
-        ':total_amount' => floatval($orderSummary['total_amount']),
-        ':message_card_id' => $message_card_id
+        ':m_id' => $m_id,
+        ':plan_type' => $plan_type,
+        ':order_start_date' => $start_date,
+        ':order_end_date' => $end_date,
+        ':total_days' => $total_days,
+        ':total_meal_count' => $total_meal_count,
+        ':total_amount' => $total_amount
     ];
 
-    error_log("準備執行 SHOPPING_CART 插入: " . json_encode($cart_params));
+    error_log("DEBUG: 準備插入 SHOPPING_CART: " . json_encode($cart_params));
 
     if (!$stmt_cart->execute($cart_params)) {
         $error_info = $stmt_cart->errorInfo();
@@ -148,7 +186,7 @@ try {
     }
 
     $shopping_cart_id = $pdo->lastInsertId();
-    error_log("SHOPPING_CART 插入成功，ID: " . $shopping_cart_id);
+    error_log("DEBUG: SHOPPING_CART 插入成功，ID: {$shopping_cart_id}");
 
     // 插入 CART_ITEMS
     $sql_items = "INSERT INTO CART_ITEMS (
@@ -160,13 +198,6 @@ try {
     $stmt_items = $pdo->prepare($sql_items);
 
     foreach ($orderItems as $index => $item) {
-        $itemRequiredFields = ['meal_date', 'meal_items', 'count', 'total_amount'];
-        foreach ($itemRequiredFields as $field) {
-            if (!isset($item[$field])) {
-                throw new Exception("orderItems[{$index}] 缺少必要字段: {$field}");
-            }
-        }
-
         $item_params = [
             ':scart_id' => $shopping_cart_id,
             ':meal_date' => $item['meal_date'],
@@ -175,33 +206,50 @@ try {
             ':total_amount' => floatval($item['total_amount'])
         ];
 
-        error_log("準備插入 CART_ITEMS[{$index}]: " . json_encode($item_params));
-
         if (!$stmt_items->execute($item_params)) {
             $error_info = $stmt_items->errorInfo();
             throw new Exception("插入 CART_ITEMS[{$index}] 失敗: " . $error_info[2]);
         }
     }
 
+    error_log("DEBUG: CART_ITEMS 插入完成");
+
+    // 【修正】如果有留言小卡，關聯到購物車（使用 MYCARDS_ID）
+    if ($message_card_id) {
+        $updateCardSql = "UPDATE MESSAGE_CARDS SET SHOPPING_CART_ID = :shopping_cart_id WHERE MYCARDS_ID = :card_id";
+        $updateCardStmt = $pdo->prepare($updateCardSql);
+        
+        if (!$updateCardStmt->execute([
+            ':shopping_cart_id' => $shopping_cart_id,
+            ':card_id' => $message_card_id
+        ])) {
+            throw new Exception('關聯留言小卡失敗');
+        }
+        
+        error_log("DEBUG: 留言小卡關聯成功");
+    }
+
     // 提交事務
     $pdo->commit();
-    error_log("事務提交成功");
+    error_log("DEBUG: 事務提交成功");
 
     ob_clean();
 
     echo json_encode([
         'success' => true,
-        'message' => '餐點成功加入購物車',
-        'shopping_cart_id' => $shopping_cart_id,
+        'message' => '餐點成功加入購物車' . ($message_card_id ? '，留言小卡已關聯' : ''),
+        'cart_id' => $shopping_cart_id,
         'debug_info' => [
-            'm_id' => $m_id, // 對應資料庫欄位名稱
+            'm_id' => $m_id,
             'received_items_count' => count($orderItems),
             'cart_id' => $shopping_cart_id,
-            'plan_type' => $orderSummary['plan_type'],
-            'total_amount' => $orderSummary['total_amount'],
+            'plan_type' => $plan_type,
+            'total_amount' => $total_amount,
+            'message_card_linked' => $message_card_id ? true : false,
             'message_card_id' => $message_card_id
         ]
     ]);
+
 } catch (PDOException $e) {
     if ($pdo && $pdo->inTransaction()) {
         $pdo->rollBack();
@@ -216,7 +264,8 @@ try {
     echo json_encode([
         'success' => false,
         'message' => '資料庫操作失敗: ' . $e->getMessage(),
-        'error_code' => $e->getCode()
+        'error_code' => $e->getCode(),
+        'debug_trace' => $e->getTraceAsString()
     ]);
 } catch (Exception $e) {
     if (isset($pdo) && $pdo && $pdo->inTransaction()) {
@@ -230,7 +279,8 @@ try {
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
+        'debug_trace' => $e->getTraceAsString()
     ]);
 } finally {
     ob_end_flush();
