@@ -1,93 +1,128 @@
 <template>
     <section class="accordion accordion--radio">
-    <div class="tab">
-        <input type="checkbox" name="accordion-2" id="rd1">
-        <label for="rd1" class="tab__label"><i class="bi bi-envelope"> 訂單編號：020</i></label>
-        <div class="tab__content">
-          <p>訂單金額：XXX</p>
-          <p>收件地址：臺北市中山區南京東路三段219號4樓</p>
-          <p>本日餐盒：ＸＸＸＸ餐</p>
-          <p>今日配送進度：已出貨</p>
-          <div class="DeliveryStatusLine-container">
-            <DeliveryStatusLine :status="3" />
-          </div>
-          <p>配送時間：2025/05/04～2025/05/05</p>
-          <div class="OrderDetails-btn">
-            <button class="details-button" @click="openModal">查看訂單明細</button>
-          </div>
+        <!--動態渲染每筆訂單 -->
+        <div 
+            v-for="(order, index) in orders" 
+            :key="order.ID" 
+            class="tab"
+        >
+            <input 
+                type="checkbox" 
+                name="accordion-orders" 
+                :id="`order-${order.ID}`"
+            >
+            <label 
+                :for="`order-${order.ID}`" 
+                class="tab__label"
+            >
+                <i class="bi bi-envelope"> 訂單編號：{{ order.ORDER_NUMBER }}</i>
+            </label>
+            <div class="tab__content">
+                <p>訂單金額：${{ formatAmount(order.TOTAL_AMOUNT) }}</p>
+                <p>收件地址：{{ order.CONSIGNEE_ADDRESS || '地址未設定' }}</p>
+                <p>訂單項目：{{ order.PLAN_TYPE }}</p>
+                <p>訂單狀態：{{ order.STATUS_TEXT }}</p>
+                <div class="DeliveryStatusLine-container">
+                    <DeliveryStatusLine :status="order.STATUS_NUMBER" />
+                </div>
+                <p>配送期間：{{ order.DELIVERY_PERIOD }}</p>
+                <div class="OrderDetails-btn">
+                    <button 
+                        class="details-button" 
+                        @click="openModal(order)"
+                    >
+                        查看訂單明細
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="tab">
-        <input type="checkbox" name="accordion-2" id="rd2">
-        <label for="rd2" class="tab__label"><i class="bi bi-envelope"> 訂單編號：019</i></label>
-        <div class="tab__content">
-          <p>訂單金額：XXX</p>
-          <p>收件地址：臺北市中山區南京東路三段219號4樓</p>
-          <p>本日餐盒：ＸＸＸＸ餐</p>
-          <p>配送進度：已出貨</p>
-          <div class="DeliveryStatusLine-container">
-            <DeliveryStatusLine :status="4" />
-          </div>
-          <p>配送時間：2025/05/04～2025/05/05</p>
-          <div class="OrderDetails-btn">
-            <button class="details-button" @click="openModal">查看訂單明細</button>
-          </div>
+
+        <!--無訂單時的提示 -->
+        <div v-if="!orders || orders.length === 0" class="no-orders">
+            <div class="no-orders-content">
+                <i class="bi bi-inbox"></i>
+                <h3>目前沒有訂單</h3>
+                <p>您還沒有任何訂單記錄</p>
+            </div>
         </div>
-    </div>
     </section>
 
-
-    <!-- 彈出視窗 -->
+    <!--訂單明細彈出視窗 -->
     <div class="modal-overlay" :class="{ active: isModalOpen }" @click="closeModalOnOverlay">
-        <div class="modal-content">
+        <div class="modal-content" v-if="selectedOrder">
             <div class="modal-header">
-                <h2 class="modal-title">訂單明細 - {{ orderData.orderNumber }}</h2>
+                <h2 class="modal-title">訂單明細 - {{ selectedOrder.ORDER_NUMBER }}</h2>
                 <button class="modal-close" @click="closeModal">&times;</button>
             </div>
             
+            <!--  訂單資訊 -->
             <div class="order-info">
                 <h3>訂單資訊</h3>
                 <div class="info-row">
                     <span class="info-label">訂單編號：</span>
-                    <span class="info-value">{{ orderData.orderNumber }}</span>
+                    <span class="info-value">{{ selectedOrder.ORDER_NUMBER }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">訂單金額：</span>
-                    <span class="info-value">${{ orderData.orderAmount }}</span>
+                    <span class="info-value">${{ formatAmount(selectedOrder.TOTAL_AMOUNT) }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">訂單項目：</span>
-                    <span class="info-value">{{ orderData.orderItems }}</span>
+                    <span class="info-value">{{ selectedOrder.PLAN_TYPE }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">配送時間：</span>
-                    <span class="info-value">{{ orderData.deliveryTime }}</span>
+                    <span class="info-label">配送期間：</span>
+                    <span class="info-value">{{ selectedOrder.DELIVERY_PERIOD }}</span>
                 </div>
             </div>
 
+            <!--  收件資訊 -->
             <div class="order-info">
                 <h3>收件資訊</h3>
                 <div class="info-row">
-                    <span class="info-label">收貨人：</span>
-                    <span class="info-value">{{ orderData.recipient }}</span>
+                    <span class="info-label">收件人：</span>
+                    <span class="info-value">{{ selectedOrder.CONSIGNEE_NAME || '未設定' }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">手機：</span>
-                    <span class="info-value">{{ orderData.phone }}</span>
+                    <span class="info-value">{{ selectedOrder.CONSIGNEE_PHONE || '未設定' }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">地址：</span>
-                    <span class="info-value">{{ orderData.address }}</span>
+                    <span class="info-value">{{ selectedOrder.CONSIGNEE_ADDRESS || '未設定' }}</span>
                 </div>
             </div>
 
+            <!--  每日餐盒 -->
             <div class="order-info">
                 <h3>每日餐盒</h3>
-                <div class="daily-meal" v-for="meal in orderData.dailyMeals" :key="meal.date">
-                    <div class="meal-date">{{ meal.date }}</div>
+                <div 
+                    class="daily-meal" 
+                    v-for="item in selectedOrder.ORDER_ITEMS" 
+                    :key="`${selectedOrder.ID}-${item.MEAL_DATE}`"
+                >
+                    <div class="meal-date">{{ formatMealDate(item.MEAL_DATE) }}</div>
                     <div class="meal-content">
-                        <div class="meal-item" v-for="item in meal.items" :key="item">{{ item }}</div>
+                        <div 
+                            class="meal-item" 
+                            v-for="mealItem in item.MEAL_ITEMS_PARSED" 
+                            :key="mealItem.name"
+                        >
+                            主菜：{{ mealItem.name }}
+                        </div>
+                        <!--  如果沒有解析成功的餐點，顯示原始資料 -->
+                        <div 
+                            v-if="!item.MEAL_ITEMS_PARSED || item.MEAL_ITEMS_PARSED.length === 0" 
+                            class="meal-item"
+                        >
+                            {{ item.MEAL_ITEMS || '餐點資訊未設定' }}
+                        </div>
                     </div>
+                </div>
+                
+                <!--  如果沒有餐盒項目 -->
+                <div v-if="!selectedOrder.ORDER_ITEMS || selectedOrder.ORDER_ITEMS.length === 0" class="no-meal-items">
+                    <p>此訂單暫無餐盒明細</p>
                 </div>
             </div>
         </div>
@@ -96,54 +131,66 @@
 
 <script setup>
 import DeliveryStatusLine from '../components/DeliveryStatusLine.vue';
+import { ref, computed } from 'vue'
 
-import { ref, reactive } from 'vue'
-
-// 響應式數據
-const isModalOpen = ref(false)
-
-const orderData = reactive({
-    orderNumber: '020',
-    orderAmount: '1,580',
-    orderItems: '健康餐盒組合',
-    deliveryTime: '2025/05/10~2025/05/12',
-    recipient: '林榮傑',
-    phone: '0912-345-678',
-    address: '臺北市中山區南京東路三段219號4樓',
-    dailyMeals: [
-        {
-            date: '2025/05/10 (週一)',
-            items: [
-                '主餐：XXXX',
-                '配菜：AAAA、BBBB、CCCC',
-            ]
-        },
-        {
-            date: '2025/05/11 (週二)',
-            items: [
-                '主餐：XXXX',
-                '配菜：AAAA、BBBB、CCCC',
-            ]
-        },
-        {
-            date: '2025/05/12 (週三)',
-            items: [
-                '主餐：XXXX',
-                '配菜：AAAA、BBBB、CCCC',
-            ]
-        }
-    ]
+//  接收父元件傳入的訂單資料
+const props = defineProps({
+    orders: {
+        type: Array,
+        default: () => []
+    }
 })
 
-// 方法
-const openModal = () => {
-    isModalOpen.value = true
+//  響應式數據
+const isModalOpen = ref(false)
+const selectedOrder = ref(null)
+
+//  格式化金額 - 使用千分位逗號
+const formatAmount = (amount) => {
+    if (!amount && amount !== 0) return '0'
+    return Number(amount).toLocaleString()
 }
 
+//  格式化餐點日期
+const formatMealDate = (dateString) => {
+    if (!dateString) return '日期未設定'
+    
+    try {
+        const date = new Date(dateString)
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        
+        // 取得星期幾
+        const weekdays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
+        const weekday = weekdays[date.getDay()]
+        
+        return `${year}/${month}/${day} (${weekday})`
+    } catch (error) {
+        console.error('日期格式化錯誤:', error)
+        return dateString
+    }
+}
+
+//  打開訂單明細彈窗
+const openModal = (order) => {
+    selectedOrder.value = order
+    isModalOpen.value = true
+    
+    console.log('🔍 查看訂單明細:', {
+        訂單編號: order.ORDER_NUMBER,
+        訂單項目數: order.ORDER_ITEMS?.length || 0,
+        餐盒明細: order.ORDER_ITEMS
+    })
+}
+
+//  關閉彈窗
 const closeModal = () => {
     isModalOpen.value = false
+    selectedOrder.value = null
 }
 
+//  點擊背景關閉彈窗
 const closeModalOnOverlay = (event) => {
     if (event.target === event.currentTarget) {
         closeModal()
@@ -153,6 +200,35 @@ const closeModalOnOverlay = (event) => {
 </script>
 
 <style scoped>
+
+/*  無訂單狀態樣式 */
+.no-orders {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    text-align: center;
+}
+
+.no-orders-content {
+    color: #666;
+}
+
+.no-orders-content i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #ccc;
+}
+
+.no-orders-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: #999;
+}
+
+.no-orders-content p {
+    margin: 0;
+    color: #bbb;
+}
 
 /* 手風琴摺頁內容 */
 .tab {
@@ -236,7 +312,6 @@ const closeModalOnOverlay = (event) => {
 }
 
 /* 進度條元件容器設定 */
-
 .DeliveryStatusLine-container {
   display: flex;
   justify-content: center;
@@ -389,6 +464,17 @@ const closeModalOnOverlay = (event) => {
       margin-bottom: 0;
   }
 
+  /*  無餐盒項目樣式 */
+  .no-meal-items {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+  }
+
+  .no-meal-items p {
+      margin: 0;
+      font-style: italic;
+  }
 
   @media (max-width: 600px) {
   .tab__label i {

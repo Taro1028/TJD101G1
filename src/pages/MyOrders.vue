@@ -1,70 +1,74 @@
 <script setup>
-    import { ref, computed } from 'vue';
+    import { ref, computed, onMounted } from 'vue';
     import FrontLayout from '../layouts/FrontLayout.vue';
     import DeliveryProgress from '../components/DeliveryProgress.vue';
     import Gotop from "../components/Gotop.vue"
     import { useMemberStore } from '@/stores/MemberStore'
     import { useRouter } from 'vue-router'
+    import { useOrderListStore } from '@/stores/orderListStore'
 
     const showDefaultAvatar = computed(() => !memberStore.hasCustomAvatar);
     const userAvatar = computed(() => memberStore.userAvatar);
     const avatarInput = ref(null);
     const memberStore = useMemberStore()
     const router = useRouter()
+    const orderListStore = useOrderListStore()
+    
+    console.log('orderListStore 建立成功:', orderListStore)
 
     // 點擊大頭照區域觸發檔案選擇
     const handleAvatarClick = () => {
-    console.log('Avatar clicked!');
-    console.log('avatarInput.value:', avatarInput.value);
-    
-    if (avatarInput.value) {
-        console.log('Triggering file input click');
-        avatarInput.value.click();
-    } else {
-        console.error('avatarInput ref is null');
-    }
+        console.log('Avatar clicked!');
+        console.log('avatarInput.value:', avatarInput.value);
+        
+        if (avatarInput.value) {
+            console.log('Triggering file input click');
+            avatarInput.value.click();
+        } else {
+            console.error('avatarInput ref is null');
+        }
     };
 
     // 處理檔案上傳
     const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    
-      console.log('File selected:', file); // 調試用
-    
-    if (!file) {
-        console.log('No file selected');
-        return;
-    }
-    
-    // 檢查檔案類型
-    if (!file.type.startsWith('image/')) {
-        alert('請選擇圖片檔案');
-        console.log('Invalid file type:', file.type);
-        return;
-    }
-    
-    // 檢查檔案大小 (限制 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-        alert('檔案大小不能超過 5MB');
-        console.log('File too large:', file.size);
-        return;
-    }
-    
-    console.log('File validation passed, reading file...');
-    
-    // 使用 FileReader 讀取檔案
-    const reader = new FileReader();
-    
-    reader.onload = (e) => {
-    memberStore.updateAvatar(e.target.result);
-    };
-    
-    reader.onerror = () => {
-        console.error('File read error');
-        alert('檔案讀取失敗，請重新選擇');
-    };
-    
-    reader.readAsDataURL(file);
+        const file = event.target.files[0];
+        
+        console.log('File selected:', file); // 調試用
+        
+        if (!file) {
+            console.log('No file selected');
+            return;
+        }
+        
+        // 檢查檔案類型
+        if (!file.type.startsWith('image/')) {
+            alert('請選擇圖片檔案');
+            console.log('Invalid file type:', file.type);
+            return;
+        }
+        
+        // 檢查檔案大小 (限制 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('檔案大小不能超過 5MB');
+            console.log('File too large:', file.size);
+            return;
+        }
+        
+        console.log('File validation passed, reading file...');
+        
+        // 使用 FileReader 讀取檔案
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+            memberStore.updateAvatar(e.target.result);
+        };
+        
+        reader.onerror = () => {
+            console.error('File read error');
+            alert('檔案讀取失敗，請重新選擇');
+        };
+        
+        reader.readAsDataURL(file);
     };
 
     // 重置大頭照
@@ -74,44 +78,80 @@
             avatarInput.value.value = '';
         }
     };
+
     // 登出處理函數
     const handleLogout = () => {
-    // 確認是否要登出
-    if (confirm('確定要登出嗎？')) {
-        // 清除會員資料
-        memberStore.logout()
-        
-        // 跳轉到首頁
-        router.push('/Home')
-        
-        // 顯示登出成功訊息
-        alert('登出成功！')
+        // 確認是否要登出
+        if (confirm('確定要登出嗎？')) {
+            // 清除會員資料
+            memberStore.logout()
+            
+            // 跳轉到首頁
+            router.push('/Home')
+            
+            // 顯示登出成功訊息
+            alert('登出成功！')
+        }
     }
+
+    //  分頁處理函數
+    const handlePageChange = async (page) => {
+        try {
+            console.log('🔄 切換到頁面:', page)
+            await orderListStore.goToPage(page)
+        } catch (error) {
+            console.error(' 切換頁面失敗:', error)
+        }
     }
+
+    //  上一頁
+    const handlePreviousPage = async () => {
+        if (orderListStore.hasPreviousPage) {
+            await handlePageChange(orderListStore.currentPage - 1)
+        }
+    }
+
+    //  下一頁
+    const handleNextPage = async () => {
+        if (orderListStore.hasNextPage) {
+            await handlePageChange(orderListStore.currentPage + 1)
+        }
+    }
+
+    //  初始化
+    onMounted(async () => {
+        try {
+            console.log('🧪 測試 orderListStore 初始化...')
+            await orderListStore.initialize()
+            console.log('訂單載入成功:', orderListStore.orders.length, '筆')
+            console.log('訂單資料:', orderListStore.orders)
+        } catch (error) {
+            console.error('訂單載入失敗:', error)
+        }
+    })
 </script>
- <template>
-        <FrontLayout>
+
+<template>
+    <FrontLayout>
         <section class="memberCenter">
             <div class="wrapper">
                 <h2>會員中心</h2>
                 <!-- 會員管理區 -->
                 <div class="memberArea">
                     <!-- 左側導覽列 -->
-
                     <div class="user_nav">
                         <div class="head-area">
-                            
-                        <!-- 上傳後的圖片顯示區（初始隱藏） -->
-                        <img id="uploadedAvatar" class="uploaded-avatar" alt="大頭照" style="display: none;" />
-                            
-                        <!-- 上傳按鈕覆蓋層 -->
-                        <div class="upload-overlay" id="uploadOverlay">
-                            <i class="bi bi-camera-fill"></i>
-                            <!-- <span>更換照片</span> -->
-                        </div>
-                            
-                        <!-- 隱藏的檔案輸入 -->
-                        <div class="avatar-container" @click="handleAvatarClick">
+                            <!-- 上傳後的圖片顯示區（初始隱藏） -->
+                            <img id="uploadedAvatar" class="uploaded-avatar" alt="大頭照" style="display: none;" />
+                                
+                            <!-- 上傳按鈕覆蓋層 -->
+                            <div class="upload-overlay" id="uploadOverlay">
+                                <i class="bi bi-camera-fill"></i>
+                                <!-- <span>更換照片</span> -->
+                            </div>
+                                
+                            <!-- 隱藏的檔案輸入 -->
+                            <div class="avatar-container" @click="handleAvatarClick">
                                 <!-- 預設圖標顯示區 -->
                                 <div 
                                     class="default-avatar" 
@@ -165,16 +205,57 @@
                     <div class="user_content">
                         <h3>訂單總覽</h3>
 
-                        <DeliveryProgress />
+                        <!--  載入狀態 -->
+                        <div v-if="orderListStore.loading" class="loading-state">
+                            <p>📦 載入訂單中...</p>
+                        </div>
 
-                        <!-- 換頁按鈕 -->
-                        <ul class="pagination">
-                            <li><button class="prev-btn"><i class="bi bi-arrow-left"></i></button></li>
-                            <li><button class="pages-btn">1</button></li>
-                            <li><button class="pages-btn">2</button></li>
-                            <li><button class="pages-btn">...</button></li>
-                            <li><button class="pages-btn">5</button></li>
-                            <li><button class="next-btn"><i class="bi bi-arrow-right"></i></button></li>
+                        <!--  錯誤狀態 -->
+                        <div v-else-if="orderListStore.error" class="error-state">
+                            <p> {{ orderListStore.error }}</p>
+                            <button @click="orderListStore.refresh()" class="retry-btn">重新載入</button>
+                        </div>
+
+                        <!--  傳遞訂單資料給 DeliveryProgress -->
+                        <DeliveryProgress 
+                            v-else
+                            :orders="orderListStore.orders" 
+                        />
+
+                        <!--  動態分頁按鈕 -->
+                        <ul class="pagination" v-if="orderListStore.totalPages > 1">
+                            <!-- 上一頁按鈕 -->
+                            <li>
+                                <button 
+                                    class="prev-btn" 
+                                    @click="handlePreviousPage"
+                                    :disabled="!orderListStore.hasPreviousPage"
+                                >
+                                    <i class="bi bi-arrow-left"></i>
+                                </button>
+                            </li>
+                            
+                            <!-- 頁碼按鈕 -->
+                            <li v-for="page in orderListStore.pageNumbers" :key="page">
+                                <button 
+                                    class="pages-btn"
+                                    :class="{ active: page === orderListStore.currentPage }"
+                                    @click="handlePageChange(page)"
+                                >
+                                    {{ page }}
+                                </button>
+                            </li>
+                            
+                            <!-- 下一頁按鈕 -->
+                            <li>
+                                <button 
+                                    class="next-btn" 
+                                    @click="handleNextPage"
+                                    :disabled="!orderListStore.hasNextPage"
+                                >
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </li>
                         </ul>
 
                     </div>
@@ -182,8 +263,9 @@
             </div>
         </section>
         <Gotop></Gotop>
-        </FrontLayout>
-    </template>
+    </FrontLayout>
+</template>
+
 <style scoped lang="scss">
 
 img {
@@ -208,6 +290,27 @@ img {
     display: flex;
     gap: 0;
     align-items: stretch;
+}
+
+//  載入和錯誤狀態樣式
+.loading-state, .error-state {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.retry-btn {
+    background-color: $primary_600;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.retry-btn:hover {
+    background-color: $primary_950; //  使用現有變數
 }
 
 // 大頭照區
@@ -342,7 +445,6 @@ img {
 }
 
 // 登出鈕
-
 .logout .btn:hover {
     background-color: $primary_950;
 }
@@ -360,7 +462,6 @@ img {
     background-color: $primary_600;
     color: white;
 }
-
 
 /* 右側內容區域 */
 .user_content {
@@ -385,16 +486,17 @@ img {
     cursor: pointer;
     transition: all 0.3s ease;
 }
-// 換頁按鈕
 
+//  分頁按鈕增強
 .pagination{
     display: flex;
     justify-content: center;
     margin-top: $spacing_10;
+    gap: 5px;
 }
 
 .pagination li{
-    margin: 0 5px;
+    margin: 0;
 }
 
 .pagination button{
@@ -402,13 +504,28 @@ img {
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 5px 10px;
+    padding: 8px 12px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 40px;
 }
 
+.pagination button:hover:not(:disabled) {
+    background-color: $primary_950; //  使用現有變數
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.pagination .pages-btn.active {
+    background-color: $primary_950; //  使用現有變數
+    font-weight: bold;
+}
 
 // 響應式設定
-
 @media (min-width: 800px) {
     .logout.btn {
         display: none;
@@ -471,7 +588,6 @@ img {
     .logout .btn {
         display: none;
     }
-
 }
 
 /* 650px 以下 - 隱藏 view-btn */
@@ -529,7 +645,16 @@ img {
     .form-row{
         padding-left:8px
     }
-
+    
+    .pagination {
+        gap: 2px;
+    }
+    
+    .pagination button {
+        padding: 6px 8px;
+        font-size: 0.9rem;
+        min-width: 32px;
+    }
 }
 
 /* 400px 以下 - 手機螢幕 */
