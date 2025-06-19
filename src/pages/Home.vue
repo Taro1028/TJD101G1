@@ -5,6 +5,7 @@ import FrontLayout from '@/layouts/FrontLayout.vue'
 import Carousel from '../components/Carousel.vue'
 import Marquree from '../components/Marquee.vue'
 import Gotop from "../components/Gotop.vue"
+import NewsBlock from '../components/NewsBlock.vue'
 import { newsApi, newsUtils } from '@/services/newsApi'
 
 const router = useRouter()
@@ -221,21 +222,30 @@ onMounted(() => {
         <h5>News</h5>
       </div>
 
-      <!-- 載入狀態 -->
-      <div v-if="loading" class="news-loading">
+      <!-- 使用 NewsBlock 組件 -->
+      <NewsBlock 
+        mode="home"
+        :news-list="homeNews.list"
+        :cover-news="homeNews.cover"
+        :loading="loading"
+        :error="error"
+        @retry="loadHomeNews"
+      />
+      
+      <!-- <div v-if="loading" class="news-loading">
         <p>載入新聞中...</p>
       </div>
 
-      <!-- 錯誤狀態 -->
+      
       <div v-else-if="error" class="news-error">
         <p>{{ error }}</p>
         <button @click="loadHomeNews()" class="retry-btn">重新載入</button>
       </div>
 
-      <!-- 新聞內容 -->
+      
       <template v-else-if="homeNews.cover || homeNews.list.length > 0">
         <div class="news-container">
-          <!-- 主要新聞（封面） -->
+          
           <div 
             v-if="homeNews.cover" 
             class="main-news" 
@@ -247,7 +257,7 @@ onMounted(() => {
             <h4>{{ homeNews.cover.TITLE }}</h4>
           </div>
 
-          <!-- 新聞列表（3篇） -->
+          
           <div class="news-list">
             <div 
               v-for="news in homeNews.list" 
@@ -265,10 +275,10 @@ onMounted(() => {
         </div>
       </template>
 
-      <!-- 沒有新聞資料 -->
+      
       <div v-else class="no-news">
         <p>目前沒有新聞資料</p>
-      </div>
+      </div> -->
 
       <div class="linkblock">
         <router-link to="/About/News" class="btn">瞭解更多</router-link>

@@ -31,9 +31,7 @@ import color4 from '@/assets/images/MessageCards/color_4.svg'
 import color5 from '@/assets/images/MessageCards/color_5.svg'
 import color6 from '@/assets/images/MessageCards/color_6.svg'
 
-const baseUrl = ref(import.meta.env.BASE_URL);
 
-const env = import.meta.env.VITE_API_URL || 'http://localhost'
 const router = useRouter()
 const orderStore = useOrderStore()
 const planCustomStore = usePlanCustomStore()

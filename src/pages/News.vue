@@ -1,21 +1,17 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import Gotop from "../components/Gotop.vue"
+import NewsBlock from '../components/NewsBlock.vue'
 import { newsApi, newsUtils } from '@/services/newsApi'
-
-const baseUrl = ref(import.meta.env.BASE_URL);
-
-const router = useRouter()
 
 // 響應式資料
 const focusNews = ref([])
 const depthNews = ref([])
 const lunchNews = ref([])
-const mainFocusNews = ref(null)
 const loading = ref(true)
 const error = ref(null)
+const baseUrl = ref(import.meta.env.BASE_URL);
 
 // 載入各類別新聞
 const loadNewsByCategory = async () => {
@@ -30,19 +26,13 @@ const loadNewsByCategory = async () => {
       newsApi.getNewsByTag('誰來午餐', 6)   // 誰來午餐載入6篇
     ])
 
-    // 處理焦點計畫資料
-    const focusData = focusResponse.data
-    if (focusData.length > 0) {
-      mainFocusNews.value = focusData[0] // 第一篇作為主要新聞（封面）
-      focusNews.value = focusData.slice(0, 3) // 前3篇作為列表（包含第一篇）
-    }
-
-    // 處理其他分類資料
+    // 處理各分類資料
+    focusNews.value = focusResponse.data
     depthNews.value = depthResponse.data
     lunchNews.value = lunchResponse.data
 
     console.log('載入成功:', {
-      focus: focusData.length,
+      focus: focusResponse.data.length,
       depth: depthResponse.data.length,
       lunch: lunchResponse.data.length
     })
@@ -54,14 +44,6 @@ const loadNewsByCategory = async () => {
     loading.value = false
   }
 }
-
-// 導航到新聞詳情頁
-const goToNewsDetail = (newsId) => {
-  router.push(`/About/News/Newsitem/${newsId}`)
-}
-
-// 格式化日期
-const formatDate = newsUtils.formatDate
 
 // 組件掛載時載入資料
 onMounted(() => {
@@ -94,33 +76,13 @@ onMounted(() => {
                 <div class="focusplan">
                     <h3>焦點計畫</h3>
                     <section class="sec-1">
-                        <!-- 主要新聞（封面） -->
-                        <div 
-                            class="main-news" 
-                            v-if="mainFocusNews" 
-                            @click="goToNewsDetail(mainFocusNews.ID)"
-                        >
-                            <div class="newstag">焦點</div>
-                            <img :src="baseUrl+mainFocusNews.IMG" :alt="mainFocusNews.TITLE">
-                            <div class="block-overlay"></div>
-                            <h4>{{ mainFocusNews.TITLE }}</h4>
-                        </div>
-
-                        <!-- 焦點計畫列表（包含第一篇） -->
-                        <div class="sec1-list">
-                            <div 
-                                v-for="news in focusNews" 
-                                :key="news.ID"
-                                @click="goToNewsDetail(news.ID)"
-                                style="cursor: pointer;"
-                            >
-                                <div class="planitem">
-                                    <h4>{{ news.TITLE }}</h4>
-                                    <h6>{{ news.SUMMARY }}</h6>
-                                    <p>最後更新 {{ formatDate(news.UPDATED_AT) }}</p>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- 使用 NewsBlock 組件 -->
+                        <NewsBlock 
+                            mode="focus"
+                            :news-list="focusNews"
+                            :loading="false"
+                            :error="null"
+                        />
                     </section>
                     <div class="planlink">
                         <a href="#" @click.prevent>
@@ -136,15 +98,15 @@ onMounted(() => {
                         <div 
                             v-for="news in depthNews" 
                             :key="news.ID"
-                            @click="goToNewsDetail(news.ID)"
+                            @click="$router.push(`/About/News/Newsitem/${news.ID}`)"
                             style="cursor: pointer;"
                         >
                             <div class="projectitem">
-                                <img :src="baseUrl+news.IMG" :alt="news.TITLE">
+                                <img :src="baseUrl + news.IMG" :alt="news.TITLE">
                                 <div class="itemtxt">
                                     <h4>{{ news.TITLE }}</h4>
                                     <h6>{{ news.SUMMARY }}</h6>
-                                    <p>最後更新 {{ formatDate(news.UPDATED_AT) }}</p>
+                                    <p>最後更新 {{ newsUtils.formatDate(news.UPDATED_AT) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -163,15 +125,15 @@ onMounted(() => {
                         <div 
                             v-for="news in lunchNews" 
                             :key="news.ID"
-                            @click="goToNewsDetail(news.ID)"
+                            @click="$router.push(`/About/News/Newsitem/${news.ID}`)"
                             style="cursor: pointer;"
                         >
                             <div class="newscard">
-                                <img :src="baseUrl+news.IMG" :alt="news.TITLE">
+                                <img :src="baseUrl + news.IMG" :alt="news.TITLE">
                                 <div class="newsinfo">
                                     <h4>{{ news.TITLE }}</h4>
                                     <h6>{{ news.SUMMARY }}</h6>
-                                    <p>最後更新 {{ formatDate(news.UPDATED_AT) }}</p>
+                                    <p>最後更新 {{ newsUtils.formatDate(news.UPDATED_AT) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -215,7 +177,6 @@ onMounted(() => {
     }
 }
 
-// 原有樣式保持不變...
 .wrapper {
     margin: 40px auto 64px;
     width: 1000px;
@@ -243,7 +204,7 @@ onMounted(() => {
     padding-top: 16px;
 }
 
-// 焦點計畫
+// 各區塊
 .focusplan,
 .project {
     display: flex;
@@ -263,120 +224,6 @@ onMounted(() => {
     display: flex;
     gap: 24px;
     align-items: center;
-}
-
-// 主要(封面)新聞
-.main-news {
-    position: relative;
-    cursor: pointer;
-}
-
-.main-news img {
-    display: block;
-    border-radius: 8px;
-    margin: auto;
-}
-
-.block-overlay {
-    border-radius: 8px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.6));
-    transition: opacity 0.3s ease;
-    z-index: 1;
-
-    &:hover {
-        opacity: 0;
-    }
-}
-
-.newstag {
-    padding: 4px 8px;
-    background-color: $primary_100;
-    color: $primary_950;
-    border-radius: 4px;
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    z-index: 2;
-    font-size: $font_h6;
-}
-
-.main-news h4 {
-    font-size: $font_h4;
-    font-weight: normal;
-    color: $neutral_white;
-    position: absolute;
-    bottom: 24px;
-    left: 18px;
-    z-index: 1;
-}
-
-// 焦點計畫列表
-.sec1-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.sec1-list > div {
-    text-decoration: none;
-}
-
-.planitem {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    padding-left: 28px;
-    gap: 16px;
-
-    &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 8px;
-        height: 64px;
-        background-color: $primary_600;
-        transition: 0.3s ease;
-    }
-}
-
-.sec1-list > div:hover .planitem::before {
-    background-color: $primary_400;
-    transition: 0.3s ease;
-}
-
-.planitem h4,
-.itemtxt h4 {
-    font-size: $font_h4;
-    color: $neutral_black;
-    transition: 0.3s ease;
-}
-
-.sec1-list > div:hover .planitem h4 {
-    color: $primary_600;
-    transition: 0.3s ease;
-}
-
-.planitem h6,
-.itemtxt h6 {
-    font-weight: normal;
-    font-size: $font_h6;
-    color: $neutral_700;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.planitem p,
-.itemtxt p {
-    color: $neutral_300;
 }
 
 .planlink a {
@@ -444,6 +291,27 @@ onMounted(() => {
     flex-direction: column;
     justify-content: space-between;
     padding: 8px 0;
+}
+
+.itemtxt h4 {
+    font-size: $font_h4;
+    color: $neutral_black;
+    transition: 0.3s ease;
+}
+
+.itemtxt h6 {
+    font-weight: normal;
+    font-size: $font_h6;
+    color: $neutral_700;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.itemtxt p {
+    color: $neutral_300;
 }
 
 // 誰來午餐
@@ -539,10 +407,6 @@ onMounted(() => {
         width: 700px;
     }
 
-    .main-news{
-        width: 480px;
-    }
-
     .itemtxt{
         padding: 0;
     }
@@ -561,19 +425,6 @@ onMounted(() => {
         width: 460px;
     }
 
-    .main-news,
-    .main-news img{
-        width: 320px;
-        height: auto;
-    }
-
-    .newstag,
-    .block-overlay,
-    .main-news h4{
-        display: none;
-    }
-
-    .planitem h4,
     .itemtxt h4,
     .newsinfo h4{
         font-size: $font_h5;

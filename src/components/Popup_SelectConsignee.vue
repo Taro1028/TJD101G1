@@ -595,19 +595,18 @@ const closePopup = () => {
     }
     
     .addinfo{
-        background-color: $primary_600;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        border: none;
+        color: $primary_600;
+        padding: 12px 20px;
+        border-radius: 24px;
+        border: 1px solid $primary_600;
         
         span{
             margin-left: 8px;
         }
         
         &:hover{
-            background-color: $primary_400;
-            color: white;
+            border: 1px solid $primary_400;
+            color: $primary_400;
         }
     }
 }
