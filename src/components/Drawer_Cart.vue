@@ -242,7 +242,7 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     
-    z-index: 1000;
+    z-index: 1001;
     
     // 背景淡入動畫
     transition: background-color 0.3s ease;

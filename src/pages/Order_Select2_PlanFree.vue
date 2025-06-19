@@ -298,7 +298,7 @@ h3 {
     border: 1px solid $neutral_black;
     cursor: pointer;
     transition: all 0.3s ease;
-    opacity: .5;
+    opacity: .4;
 }
 
 .dish-button.selected {
@@ -307,7 +307,7 @@ h3 {
 
 .dish-button.disabled {
 background-color: $neutral_100;
-  opacity: 0.3;
+  opacity: 0.2;
   pointer-events: none;
 }
 

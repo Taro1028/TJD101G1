@@ -61,13 +61,22 @@ const debugOrderData = () => {
     console.log('data.order_time:', result.data.order_time) // 🔥 新增
     console.log('data.orders:', result.data.orders) // 🔥 新增
     
-    // 🔥 檢查配送時間資料
+    // 🔥 檢查購物車和訂單資料
+    console.log('🛒 checkoutStore.selectedCartItems:', checkoutStore.selectedCartItems)
+    
+    // 🔥 檢查配送時間資料和訂單詳情
     if (result.data.orders && result.data.orders.length > 0) {
-      const firstOrder = result.data.orders[0]
-      console.log('📦 配送時間資料:')
-      console.log('  start_date:', firstOrder.start_date)
-      console.log('  end_date:', firstOrder.end_date)
-      console.log('  total_days:', firstOrder.total_days)
+      console.log('📦 訂單詳情:')
+      result.data.orders.forEach((order, index) => {
+        console.log(`  訂單 ${index + 1}:`)
+        console.log('    start_date:', order.start_date)
+        console.log('    end_date:', order.end_date)
+        console.log('    total_days:', order.total_days)
+        console.log('    🔥 plan_type:', order.plan_type) // 🔥 保留這個，可能有值
+        console.log('    total_amount:', order.total_amount)
+        // 🔥 移除這些 undefined 欄位的輸出：
+        // plan_name, meal_plan_name, combo_name, name, meal_count
+      })
     }
     
     if (Array.isArray(result.data.order_numbers)) {
@@ -165,16 +174,56 @@ const formatPrice = (price) => {
   return isNaN(num) ? '0' : num.toLocaleString()
 }
 
-// 🔥 修正：格式化訂單項目摘要
+// 🔥 修正：格式化訂單項目摘要 - 參考付款頁面邏輯
 const orderSummary = computed(() => {
-  const orderCount = orderResult.value?.data?.total_orders || 0
-  if (orderCount === 0) return '無項目'
+  console.log('🔍 計算訂單項目摘要...')
   
-  if (orderCount === 1) {
-    return '餐盒訂單'
+  // 🔥 方法1：優先使用 checkoutStore 中保留的購物車資料
+  const selectedCartItems = checkoutStore.selectedCartItems
+  if (selectedCartItems && selectedCartItems.length > 0) {
+    console.log('✅ 使用購物車資料 (selectedCartItems):', selectedCartItems)
+    
+    if (selectedCartItems.length === 1) {
+      const item = selectedCartItems[0]
+      const displayTitle = item.display_title || item.title || '餐盒訂單'
+      console.log('✅ 單項購物車項目:', displayTitle)
+      return displayTitle
+    }
+    
+    const firstItem = selectedCartItems[0]
+    const firstTitle = firstItem.display_title || firstItem.title || '餐盒訂單'
+    const result = `${firstTitle} 等${selectedCartItems.length}項`
+    console.log('✅ 多項購物車摘要:', result)
+    return result
   }
   
-  return `${orderCount} 項訂單`
+  // 🔥 方法2：備用 - 使用訂單資料中的 plan_type
+  const orders = orderResult.value?.data?.orders
+  const orderCount = orderResult.value?.data?.total_orders || 0
+  
+  if (orderCount === 0) return '無項目'
+  
+  if (!orders || !Array.isArray(orders) || orders.length === 0) {
+    console.log('⚠️ 無 orders 資料，使用預設格式')
+    return orderCount === 1 ? '餐盒訂單' : `餐盒訂單 等${orderCount}筆`
+  }
+  
+  console.log('📦 使用訂單資料 (備用):', orders)
+  
+  // 單筆訂單：使用 plan_type
+  if (orderCount === 1) {
+    const firstOrder = orders[0]
+    const planName = firstOrder.plan_type || '餐盒訂單'
+    console.log('✅ 單筆訂單方案名稱:', planName)
+    return planName
+  }
+  
+  // 多筆訂單：顯示第一個方案名稱 + 等N筆
+  const firstOrder = orders[0]
+  const firstPlanName = firstOrder.plan_type || '餐盒訂單'
+  const result = `${firstPlanName} 等${orderCount}筆`
+  console.log('✅ 多筆訂單摘要:', result)
+  return result
 })
 
 // 🔥 修正：格式化配送時間 - 從實際訂單資料取得並加上天數
@@ -285,6 +334,29 @@ const totalMealCount = computed(() => {
 const finalTotalAmount = computed(() => {
   return orderResult.value?.data?.final_total || 0
 })
+
+// 🔥 修正：根據索引取得訂單方案名稱 - 參考購物車資料
+const getOrderPlanName = (index) => {
+  // 🔥 方法1：優先使用 checkoutStore 中保留的購物車資料
+  const selectedCartItems = checkoutStore.selectedCartItems
+  if (selectedCartItems && selectedCartItems.length > index) {
+    const item = selectedCartItems[index]
+    const displayTitle = item.display_title || item.title || '餐盒訂單'
+    console.log(`✅ 購物車項目 ${index + 1} 名稱:`, displayTitle)
+    return displayTitle
+  }
+  
+  // 🔥 方法2：備用 - 使用訂單資料
+  const orders = orderResult.value?.data?.orders
+  if (!orders || !Array.isArray(orders) || index >= orders.length) {
+    return '餐盒訂單'
+  }
+  
+  const order = orders[index]
+  const planName = order.plan_type || '餐盒訂單'
+  console.log(`✅ 訂單 ${index + 1} 方案名稱:`, planName)
+  return planName
+}
 
 // 🔥 修正：從 API 回傳時間解析完整時間（包含時分秒）
 const orderCreatedTime = computed(() => {
@@ -437,30 +509,30 @@ const continueOrdering = () => {
                     <h5>地址： {{ consigneeInfo.address }}</h5>
                 </div>
                 
-                <!-- 🔥 多筆 EAT 格式訂單詳情 - 保持原有邏輯 -->
+                <!-- 🔥 多筆 EAT 格式訂單詳情 - 使用 plan_type -->
                 <div v-if="orderResult?.data?.order_numbers && orderResult.data.order_numbers.length > 1" class="order-details">
                     <h6>訂單明細：</h6>
-                    <div v-for="orderNumber in orderResult.data.order_numbers" :key="orderNumber" class="order-item">
+                    <div v-for="(orderNumber, index) in orderResult.data.order_numbers" :key="orderNumber" class="order-item">
                         <span class="order-info">
-                            訂單 {{ orderNumber }} - 餐盒訂單
+                            訂單 {{ orderNumber }} - {{ getOrderPlanName(index) }}
                         </span>
                     </div>
                 </div>
                 <!-- 🔥 備用：如果沒有 data.order_numbers，檢查頂層 -->
                 <div v-else-if="orderResult?.order_numbers && orderResult.order_numbers.length > 1" class="order-details">
                     <h6>訂單明細：</h6>
-                    <div v-for="orderNumber in orderResult.order_numbers" :key="orderNumber" class="order-item">
+                    <div v-for="(orderNumber, index) in orderResult.order_numbers" :key="orderNumber" class="order-item">
                         <span class="order-info">
-                            訂單 {{ orderNumber }} - 餐盒訂單
+                            訂單 {{ orderNumber }} - {{ getOrderPlanName(index) }}
                         </span>
                     </div>
                 </div>
                 <!-- 🔥 最後備用：使用 order_ids -->
                 <div v-else-if="orderResult?.data?.order_ids && orderResult.data.order_ids.length > 1" class="order-details">
                     <h6>訂單明細：</h6>
-                    <div v-for="orderId in orderResult.data.order_ids" :key="orderId" class="order-item">
+                    <div v-for="(orderId, index) in orderResult.data.order_ids" :key="orderId" class="order-item">
                         <span class="order-info">
-                            訂單 #{{ orderId }} - 餐盒訂單
+                            訂單 #{{ orderId }} - {{ getOrderPlanName(index) }}
                         </span>
                     </div>
                 </div>
@@ -499,7 +571,6 @@ const continueOrdering = () => {
     </div>
 </FrontLayout>
 </template>
-
 <style>
 .custom-bg{
 background-image: url(../assets/images/Order/background.svg);

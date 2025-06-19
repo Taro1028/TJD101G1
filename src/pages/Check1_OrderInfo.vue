@@ -31,8 +31,8 @@ onMounted(async () => {
     // 載入購物車資料
     await cartStore.fetchCartItemsFromBackend()
     
-    console.log('✅ 購物車資料載入完成')
-    console.log('購物車群組數量:', cartGroups.value.length)
+    // console.log('✅ 購物車資料載入完成')
+    // console.log('購物車群組數量:', cartGroups.value.length)
     
     // 初始化 checkoutStore - 預設全選
     if (cartGroups.value.length > 0) {
@@ -40,7 +40,7 @@ onMounted(async () => {
       checkoutStore.setSelectedCartIds(allCartIds)
     }
   } catch (error) {
-    console.error('載入購物車資料失敗:', error)
+    // console.error('載入購物車資料失敗:', error)
     alert('載入購物車資料失敗，請重試')
   } finally {
     loading.value = false
@@ -573,6 +573,16 @@ button{
     font-size: $font_h5;
 }
 
+.titleItem h5:nth-child(3){
+  width: 55px;
+  text-align: right;
+}
+
+.price{
+  width: 55px;
+  text-align: right;
+}
+
 .maintitle,
 .day_box{
   width: 480px;
@@ -801,6 +811,16 @@ button{
   flex-direction: column;
   align-items: start;
   gap: 4px;
+}
+
+.titleItem h5:nth-child(3){
+  width: fit-content;
+  text-align: left;
+}
+
+.price{
+  width: fit-content;
+  text-align: left;
 }
 
 }

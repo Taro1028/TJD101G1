@@ -219,14 +219,15 @@ watch(() => route.params.id, (newId) => {
         padding: 12px 24px;
         background-color: $primary_600;
         color: white;
-        border: none;
+        border: 2px solid $primary_600;
         border-radius: 6px;
         font-size: $font_h5;
         cursor: pointer;
         transition: 0.3s ease;
         
         &:hover {
-            background-color: $primary_600;
+            color: $primary_600;
+            background-color: transparent;
             transform: translateY(-1px);
         }
     }

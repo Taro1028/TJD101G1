@@ -214,6 +214,14 @@ function closePopup() {
 .foodtitle {
     display: flex;
     justify-content: space-between;
+
+    &:hover{
+        cursor: pointer;
+    }
+
+    &:hover h5{
+    opacity: .6;
+    }
 }
 
 .foodtitle i {
@@ -222,6 +230,7 @@ function closePopup() {
 
 .foodtitle h5 {
     font-size: $font_h5;
+    transition: 0.3s ease;
 }
 
 .foodtxt h6 {

@@ -5,9 +5,9 @@ import { useCartStore } from './cartStore'
 import { useMemberStore } from './MemberStore'
 
 export const useCheckoutStore = defineStore('checkout', () => {
-  // ================================
-  // 狀態定義
-  // ================================
+  
+  // 狀態定義 ================================
+
 
   // 結帳步驟
   const currentStep = ref(1) // 1: 訂單資料, 2: 付款資料, 3: 完成結帳
@@ -52,9 +52,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
   // 載入狀態
   const isSubmitting = ref(false)
 
-  // ================================
-  // 計算屬性
-  // ================================
+
+  // 計算屬性 ================================
 
   // 取得被選中的購物車項目
   const selectedCartItems = computed(() => {
@@ -110,12 +109,16 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const canProceedToNextStep = computed(() => {
     switch (currentStep.value) {
       case 1:
+        console.log('a');
         return selectedCartIds.value.length > 0
       case 2:
+        console.log('b')
         return isStep2Valid.value
       case 3:
+        console.log('c')
         return false
       default:
+        console.log('d')
         return false
     }
   })
@@ -141,9 +144,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
     return ordererValid && consigneeValid && invoiceValid
   })
 
-  // ================================
-  // 方法
-  // ================================
+
+  // 方法 ================================
 
   // 添加調試方法 - 用於檢查數據結構
   const debugCartData = () => {
@@ -176,7 +178,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     console.log('==================')
   }
 
-  // 🔥 新增：會員資料調試方法
+  // 會員資料調試方法
   const debugMemberData = () => {
     const memberStore = useMemberStore()
     console.log('=== 會員資料調試資訊 ===')
@@ -313,7 +315,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     try {
       const memberStore = useMemberStore()
 
-      // 🔥 修正：多重方式取得會員ID
+      // 多重方式取得會員ID
       let memberId = null
       if (memberStore.memberId) {
         memberId = memberStore.memberId
@@ -323,7 +325,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         throw new Error('無會員ID')
       }
 
-      const env = import.meta.env.VITE_API_URL || 'http://localhost'
+      const env = import.meta.env.VITE_API_URL
       const baseUrl = env.endsWith('/') ? env : env + '/'
       const apiUrl = `${baseUrl}tjd101/g1/php/getConsignees.php?member_id=${memberId}`
 
@@ -349,10 +351,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
         address: item.C_ADD
       }))
 
-      console.log('✅ 常用收貨人列表載入完成:', savedConsignees.value)
+      // console.log('✅ 常用收貨人列表載入完成:', savedConsignees.value)
 
     } catch (error) {
-      console.error('❌ 載入常用收貨人失敗:', error)
+      // console.error('❌ 載入常用收貨人失敗:', error)
       // 載入失敗時使用空陣列
       savedConsignees.value = []
     }
@@ -366,13 +368,13 @@ export const useCheckoutStore = defineStore('checkout', () => {
       phone: consignee.phone,
       address: consignee.address
     }
-    console.log('✅ 已選擇常用收貨人:', consignee)
+    // console.log('✅ 已選擇常用收貨人:', consignee)
   }
 
-  // 🔥 核心修改：提交訂單並處理購物車刪除
+  // 提交訂單並處理購物車刪除
   const submitOrder = async () => {
     if (isSubmitting.value) {
-      console.log('⚠️ 正在提交中，請勿重複操作')
+      // console.log('⚠️ 正在提交中，請勿重複操作')
       return
     }
 
@@ -381,7 +383,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       const memberStore = useMemberStore()
       const cartStore = useCartStore()
 
-      // 🔥 新增：調試會員資料
+      // 調試會員資料
       debugMemberData()
 
       if (!memberStore.isAuthenticated) {
@@ -398,31 +400,31 @@ export const useCheckoutStore = defineStore('checkout', () => {
       // 方法1: 從 memberStore.memberId (getter)
       if (memberStore.memberId) {
         memberId = memberStore.memberId
-        console.log('✅ 使用 memberStore.memberId:', memberId)
+        // console.log('✅ 使用 memberStore.memberId:', memberId)
       }
       // 方法2: 從 memberStore.id (state)
       else if (memberStore.id) {
         memberId = memberStore.id
-        console.log('✅ 使用 memberStore.id:', memberId)
+        // console.log('✅ 使用 memberStore.id:', memberId)
       }
       // 方法3: 如果有 member 物件，從中取得
       else if (memberStore.member && memberStore.member.M_ID) {
         memberId = memberStore.member.M_ID
-        console.log('✅ 使用 memberStore.member.M_ID:', memberId)
+        // console.log('✅ 使用 memberStore.member.M_ID:', memberId)
       }
       else if (memberStore.member && memberStore.member.ID) {
         memberId = memberStore.member.ID
-        console.log('✅ 使用 memberStore.member.ID:', memberId)
+        // console.log('✅ 使用 memberStore.member.ID:', memberId)
       }
       // 方法4: 如果上述都失敗，嘗試重新載入會員資料
       else {
-        console.log('⚠️ 無法取得會員ID，嘗試重新載入會員資料...')
+        // console.log('⚠️ 無法取得會員ID，嘗試重新載入會員資料...')
 
         // 嘗試從 sessionStorage 載入
         const loaded = memberStore.loadFromsessionStorage()
         if (loaded && memberStore.id) {
           memberId = memberStore.id
-          console.log('✅ 從 sessionStorage 重新載入會員ID:', memberId)
+          // console.log('✅ 從 sessionStorage 重新載入會員ID:', memberId)
         } else {
           throw new Error('無法取得會員ID，請重新登入')
         }
@@ -433,7 +435,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         throw new Error('會員ID無效，請重新登入')
       }
 
-      console.log('🔍 最終使用的會員ID:', memberId)
+      // console.log('🔍 最終使用的會員ID:', memberId)
 
       // 準備訂單資料
       const orderData = {
@@ -448,10 +450,10 @@ export const useCheckoutStore = defineStore('checkout', () => {
         total_amount: finalTotalAmount.value
       }
 
-      console.log('🚀 準備提交訂單:', orderData)
+      // console.log('準備提交訂單:', orderData)
 
       // 調用結帳 API
-      const env = import.meta.env.VITE_API_URL || 'http://localhost'
+      const env = import.meta.env.VITE_API_URL
       const baseUrl = env.endsWith('/') ? env : env + '/'
       const apiUrl = `${baseUrl}tjd101/g1/php/checkout.php`
 
@@ -463,28 +465,20 @@ export const useCheckoutStore = defineStore('checkout', () => {
         body: JSON.stringify(orderData)
       })
 
-      // 🔥 先檢查回應的原始內容
+      // 先檢查回應的原始內容
       const responseText = await response.text()
-      console.log('🔍 API 原始回應:', responseText)
-      console.log('🔍 回應狀態:', response.status, response.statusText)
-      console.log('🔍 回應標頭:', Object.fromEntries(response.headers.entries()))
 
       if (!response.ok) {
-        console.error('❌ HTTP 狀態錯誤:', response.status, response.statusText)
-        console.error('❌ 回應內容:', responseText)
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 
-      // 🔥 檢查回應是否為有效 JSON
+      // 檢查回應是否為有效 JSON
       let result
       try {
         result = JSON.parse(responseText)
-        console.log('✅ JSON 解析成功:', result)
+        
       } catch (jsonError) {
-        console.error('❌ JSON 解析失敗:', jsonError)
-        console.error('❌ 回應前100字元:', responseText.substring(0, 100))
-        console.error('❌ 回應後100字元:', responseText.substring(responseText.length - 100))
-
+        
         // 檢查是否包含 PHP 錯誤或額外輸出
         if (responseText.includes('=== 緊湊型時間戳')) {
           throw new Error('PHP 檔案包含測試程式碼，請移除所有 echo 和測試輸出')
@@ -501,18 +495,16 @@ export const useCheckoutStore = defineStore('checkout', () => {
         throw new Error(result.message || '結帳失敗')
       }
 
-      console.log('✅ 結帳成功:', result)
-
-      // 🔥 結帳成功後的處理
+      // 結帳成功後的處理
       orderResult.value = {
         success: true,
         message: result.message,
         created_at: new Date().toISOString(),
 
-        // 🔥 重要：保持 API 回傳的完整 data 結構
+        // 重要：保持 API 回傳的完整 data 結構
         data: {
           order_ids: result.data.order_ids,
-          order_numbers: result.data.order_numbers, // 🔥 時間+ID格式陣列 (如: ["250618152315"])
+          order_numbers: result.data.order_numbers, 
           orders: result.data.orders,
           total_orders: result.data.total_orders,
           total_amount: result.data.total_amount,
@@ -527,7 +519,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
           cart_to_order_mapping: result.data.cart_to_order_mapping
         },
 
-        // 🔥 為了相容性，也在頂層放一份（但主要使用 data 內的）
+        // 為了相容性，也在頂層放一份（但主要使用 data 內的）
         order_ids: result.data.order_ids,
         order_numbers: result.data.order_numbers,
         total_orders: result.data.total_orders,
@@ -536,7 +528,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         final_total: result.data.final_total
       }
 
-      // 🔥 除錯輸出（確認資料結構）
+      // 除錯輸出（確認資料結構）
       console.log('✅ 結帳成功，orderResult 結構:', {
         success: orderResult.value.success,
         hasData: !!orderResult.value.data,
@@ -550,7 +542,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         finalTotal: orderResult.value.data?.final_total
       })
 
-      // 🔥 特別檢查訂單編號格式
+      // 特別檢查訂單編號格式
       if (orderResult.value.data?.order_numbers && Array.isArray(orderResult.value.data.order_numbers)) {
         orderResult.value.data.order_numbers.forEach((num, index) => {
           const numStr = String(num)
@@ -565,12 +557,11 @@ export const useCheckoutStore = defineStore('checkout', () => {
             const minute = parseInt(numStr.substring(8, 10))
             const id = parseInt(numStr.substring(10, 12))
 
-            console.log(`  解析: ${year}-${month}-${day} ${hour}:${minute} (ID: ${id})`)
           }
         })
       }
 
-      // 🔥 重要：重新載入購物車資料
+      // 重要：重新載入購物車資料
       await cartStore.fetchCartItemsFromBackend()
 
       // 清空已選擇的項目
@@ -579,14 +570,12 @@ export const useCheckoutStore = defineStore('checkout', () => {
       // 進入完成步驟
       currentStep.value = 3
 
-      console.log('✅ 結帳流程完成，購物車已更新')
-
       return orderResult.value
 
     } catch (error) {
-      console.error('❌ 提交訂單失敗:', error)
+      console.error('提交訂單失敗:', error)
 
-      // 🔥 詳細錯誤資訊
+      // 詳細錯誤資訊
       if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
         console.error('💡 這是 JSON 解析錯誤，通常是因為:')
         console.error('   1. PHP 檔案包含額外的輸出（echo, var_dump, 測試程式碼）')
@@ -608,7 +597,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }
   }
 
-  // 🔥 新增：重新載入購物車數據（結帳後使用）
+  // 重新載入購物車數據（結帳後使用）
   const refreshCartAfterCheckout = async () => {
     try {
       const cartStore = useCartStore()
@@ -620,7 +609,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }
   }
 
-  // 🔥 新增：檢查所選項目是否還有效（防止併發問題）
+  // 新增：檢查所選項目是否還有效（防止併發問題）
   const validateSelectedItems = () => {
     const cartStore = useCartStore()
     const validCartIds = cartStore.cartGroups.map(group => group.cart_id)
@@ -666,7 +655,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     console.log('🔄 結帳流程已重置')
   }
 
-  // 🔥 新增：處理結帳成功後的跳轉
+  // 處理結帳成功後的跳轉
   const handleCheckoutComplete = async (redirectToOrders = true) => {
     try {
       // 可以在這裡加入額外的後處理邏輯
@@ -723,9 +712,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     submitOrder,
     resetCheckout,
     debugCartData,
-    debugMemberData, // 🔥 新增
-
-    // 🔥 新增的方法
+    debugMemberData,
     refreshCartAfterCheckout,
     validateSelectedItems,
     handleCheckoutComplete

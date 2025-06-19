@@ -4,6 +4,9 @@ import path from "path"; // 載入 path
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    target: 'esnext',   //專案似乎顯式地設定了太舊的瀏覽器(ChatGPT建議加這段)
+  },
   base: "/tjd101/g1/", // 設定相對路徑
   plugins: [vue()],
   css: {

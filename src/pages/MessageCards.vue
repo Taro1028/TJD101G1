@@ -279,7 +279,8 @@ async function saveCardState() {
 
     // 發送到後端 API
     console.log('發送請求到 PHP...')
-    const response = await fetch('http://localhost/tjd101/g1/php/save-message-card.php', {
+    const env = import.meta.env.VITE_API_URL || 'http://localhost'
+    const response = await fetch(env+'/tjd101/g1/php/save-message-card.php', {
       method: 'POST',
       body: formData
     })

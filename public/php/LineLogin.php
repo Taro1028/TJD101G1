@@ -9,9 +9,9 @@ include_once 'cors.php';
 // LINE 開發者資訊
 $line_client_id = '2007574091';
 $line_client_secret = '573592083730417e5bd749b98ca6a8e2';
-$line_redirect_uri = 'http://localhost:5173/tjd101/g1/LineCallback';
+// $line_redirect_uri = 'http://localhost:5173/tjd101/g1/LineCallback';
 // 若部署正式站請改用以下
-// $line_redirect_uri = 'https://tibamef2e.com/tjd101/g1/LineCallback'; 
+$line_redirect_uri = 'https://tibamef2e.com/tjd101/g1/LineCallback'; 
 
 // 取得前端傳來的 code 與 redirect_uri
 $input = file_get_contents('php://input');
