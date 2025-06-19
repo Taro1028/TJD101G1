@@ -176,6 +176,14 @@ const routes = [
     },
   },
   {
+    path: "/LineCallBack",
+    component: () => import("@/components/LineCallBack.vue"),
+    meta: {
+      title: "會員登入 - TibaEAT 提膳",
+      requiredLogin: false,
+    },
+  },
+  {
     path: "/Login",
     name: "Login",
     beforeEnter: (to, from, next) => {

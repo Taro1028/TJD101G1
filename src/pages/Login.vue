@@ -55,11 +55,16 @@
                   src="../assets/images/Member/Google_color.svg"
                   alt="google-signup"
               /></a>
-              <a href="#"
+              <button @click="handleLineLogin" class="line-button" aria-label="使用 Line 登入">
+                <img src="../assets/images/Member/Line_color.svg" alt="line-signup" />
+              </button>
+              <!-- <a href="#"
                 ><img
                   src="../assets/images/Member/Line_color.svg"
                   alt="line-signup"
-              /></a>
+                  aria-label="使用 Line 登入" 
+                  @click="handleLineLogin"
+              /></a> -->
             </div>
           </div>
 
@@ -151,6 +156,24 @@ const handleLogin = async () => {
     alert("網路連線錯誤，請稍後再試");
   }
 };
+
+function handleLineLogin() {
+  const lineClientId = import.meta.env.VITE_LINE_CLIENT_ID; // 您的 LINE Channel ID
+  const lineRedirectUri = import.meta.env.VITE_LINE_REDIRECT_URI; // 您的回調 URL
+  const lineAuthState = 'your_random_state_string'; // 為了安全，請生成一個隨機的 state 字串
+  // const lineScope = 'profile openid email'; // 請求的權限，例如 profile, openid, email
+  const lineScope = 'profile openid'; // 請求的權限，例如 profile, openid
+
+
+  // 將 state 存儲起來，以便回調時驗證
+  localStorage.setItem('line_auth_state', lineAuthState);
+
+  const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${lineClientId}&redirect_uri=${encodeURIComponent(lineRedirectUri)}&state=${lineAuthState}&scope=${lineScope}`;
+  
+  console.log('Line Auth URL:', lineAuthUrl); // 為了除錯，您可以打印出這個 URL 看看是否正確
+
+  window.location.href = lineAuthUrl;
+}
 </script>
 
 <style scoped lang="scss">
@@ -311,6 +334,13 @@ a.signup_link {
     object-fit: cover;
     object-position: center;
   }
+}
+
+.line-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 // 響應式設計
 @media (max-width: 768px) {

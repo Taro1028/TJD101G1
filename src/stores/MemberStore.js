@@ -5,6 +5,7 @@ export const useMemberStore = defineStore("member", {
   state: () => ({
     // 原有的會員資料
     id: null,
+    lineid: "",   // LINE
     name: "",
     nickname: "",
     sex: "",
@@ -83,6 +84,7 @@ export const useMemberStore = defineStore("member", {
       if (member.success) {
         // 設定會員資料
         this.id = member.ID ?? null;
+        this.lineid = member.LINE_ID ?? "";
         this.name = member.M_NAME ?? "";
         this.nickname = member.NICKNAME ?? "";
         this.sex = member.GENDER ?? "";
@@ -261,6 +263,7 @@ export const useMemberStore = defineStore("member", {
       try {
         const memberData = {
           id: this.id,
+          lineid: this.lineid,
           name: this.name,
           nickname: this.nickname,
           note: this.note,
@@ -294,6 +297,7 @@ export const useMemberStore = defineStore("member", {
           // 只有在有登入狀態時才載入資料
           if (memberData.isLoggedIn) {
             this.id = memberData.id;
+            this.lineid = memberData.lineid;
             this.name = memberData.name;
             this.nickname = memberData.nickname ?? "";
             this.note = memberData.note ?? "";
