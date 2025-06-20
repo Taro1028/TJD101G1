@@ -774,7 +774,6 @@ img {
   padding: 30px 30px 12px 30px;
   margin-left: 1rem;
   border-radius: 8px;
-
   background-color: $primary_100;
 }
 
