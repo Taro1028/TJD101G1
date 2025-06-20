@@ -382,6 +382,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       isSubmitting.value = true
       const memberStore = useMemberStore()
       const cartStore = useCartStore()
+      
 
       // 調試會員資料
       debugMemberData()
@@ -561,6 +562,17 @@ export const useCheckoutStore = defineStore('checkout', () => {
         })
       }
 
+      // 🔥 新增：保存購物車資訊到訂單結果中（用於完成頁面顯示）
+      orderResult.value.selectedCartItems = selectedCartItems.value.map(item => ({
+        cart_id: item.cart_id,
+        plan_type: item.plan_type,
+        display_title: item.plan_type,
+        title: item.plan_type,
+        total_amount: item.total_amount,
+        total_meal_count: item.total_meal_count,
+        items: item.items || []
+      }))
+
       // 重要：重新載入購物車資料
       await cartStore.fetchCartItemsFromBackend()
 
@@ -569,6 +581,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
       // 進入完成步驟
       currentStep.value = 3
+
+      // 🔥 新增：儲存訂單資料到 sessionStorage
+      saveOrderToSession(orderResult.value)
 
       return orderResult.value
 
@@ -673,6 +688,41 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }
   }
 
+  // 🔥 新增：儲存訂單到 sessionStorage
+  const saveOrderToSession = (orderResult) => {
+    try {
+      sessionStorage.setItem('orderResult', JSON.stringify(orderResult))
+      console.log('✅ 訂單資料已儲存到 sessionStorage')
+    } catch (error) {
+      console.error('儲存訂單資料失敗:', error)
+    }
+  }
+
+  // 🔥 新增：從 sessionStorage 載入訂單
+  const loadOrderFromSession = () => {
+    try {
+      const saved = sessionStorage.getItem('orderResult')
+      if (saved) {
+        orderResult.value = JSON.parse(saved)
+        console.log('✅ 從 sessionStorage 恢復訂單資料')
+        return true
+      }
+    } catch (error) {
+      console.error('載入訂單資料失敗:', error)
+    }
+    return false
+  }
+
+  // 🔥 新增：清除 sessionStorage 訂單資料
+  const clearOrderFromSession = () => {
+    try {
+      sessionStorage.removeItem('orderResult')
+      console.log('✅ 已清除 sessionStorage 訂單資料')
+    } catch (error) {
+      console.error('清除訂單資料失敗:', error)
+    }
+  }
+
   // 返回所有狀態和方法
   return {
     // 狀態
@@ -715,6 +765,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
     debugMemberData,
     refreshCartAfterCheckout,
     validateSelectedItems,
-    handleCheckoutComplete
+    handleCheckoutComplete,
+    saveOrderToSession,
+    loadOrderFromSession,
+    clearOrderFromSession
   }
 })

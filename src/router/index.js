@@ -307,36 +307,72 @@ router.beforeEach(async (to, from, next) => {
   const memberStore = useMemberStore();
   const modalStore = useModalStore();
 
-  // ✨ 確保會員資料已載入（防止重新整理時狀態丟失）
-  if (!memberStore.isLoggedIn && !memberStore.checkAuthStatus()) {
-    // 如果沒有登入狀態且無法從 sessionStorage 恢復，確保狀態是清空的
-    memberStore.logout();
+  // 🔥 新增：檢查完整 URL 和參數
+  console.log('🔍 完整除錯資訊:');
+  console.log('  window.location.href:', window.location.href);
+  console.log('  window.location.hash:', window.location.hash);
+  console.log('  document.referrer:', document.referrer);
+  console.log('  to.fullPath:', to.fullPath);
+  console.log('  to.path:', to.path);
+  console.log('  to.name:', to.name);
+
+  // 🔥 修正：檢查實際的路由路徑
+  let actualPath = to.path;
+  
+  // 如果 to.path 是 '/' 但 hash 包含其他路徑，從 hash 中提取
+  if (to.path === '/' && window.location.hash) {
+    const hashPath = window.location.hash.replace('#', '').split('?')[0];
+    if (hashPath && hashPath !== '/') {
+      actualPath = hashPath;
+      console.log('🔧 從 hash 中修正路徑:', actualPath);
+    }
   }
 
-  // 檢查是否需要登入
-  const requiresAuth = to.meta.requiredLogin;
-  console.log('路由守衛檢查 - 目標頁面:', to.path);
+  console.log('🔍 實際路徑:', actualPath);
+
+  // 🔥 檢查是否來自綠界且要去完成頁面
+  if (document.referrer.includes('ecpay.com.tw') && actualPath === '/Check_Complete') {
+    console.log('🎯 檢測到來自綠界的跳轉到完成頁面！');
+    
+    // 強制導航到完成頁面
+    if (to.path !== '/Check_Complete') {
+      console.log('🔧 強制導航到完成頁面');
+      next('/Check_Complete');
+      return;
+    }
+  }
+  
+  // ✨ 確保會員資料已載入
+  if (!memberStore.isLoggedIn && !memberStore.checkAuthStatus()) {
+    console.log('  載入 sessionStorage 結果: 失敗');
+    memberStore.logout();
+  } else {
+    console.log('  載入 sessionStorage 結果: 成功');
+  }
+
+  // 🔥 修正：使用 actualPath 來檢查路由權限
+  const targetRoute = routes.find(route => route.path === actualPath);
+  const requiresAuth = targetRoute?.meta?.requiredLogin || to.meta.requiredLogin;
+  
+  console.log('路由守衛檢查 - 實際目標頁面:', actualPath);
   console.log('需要登入:', requiresAuth);
   console.log('是否已認證:', memberStore.isAuthenticated);
   
   // 如果需要登入但使用者未登入
   if (requiresAuth && !memberStore.isAuthenticated) {
-    console.log("需要登入才能進入此頁面:", to.path);
+    console.log("需要登入才能進入此頁面:", actualPath);
 
-    // 🔔 顯示登入彈窗，並記住要重定向的路徑
     modalStore.openLoginPopup(
       to.fullPath,
-      `請先登入才能進入「${to.meta.title || "此頁面"}」`
+      `請先登入才能進入「${targetRoute?.meta?.title || "此頁面"}」`
     );
 
-    // 阻止導航，停留在當前頁面
     next(false);
   } else if (to.path === "/Login" && memberStore.isAuthenticated) {
-    // 如果已經登入但試圖進入登入頁面，跳轉到首頁
     console.log("已登入，跳轉到會員中心");
     next("/MemberCenter");
   } else {
-    // 正常進入頁面
+    console.log("✅ 正常進入頁面:", actualPath);
     next();
   }
 });

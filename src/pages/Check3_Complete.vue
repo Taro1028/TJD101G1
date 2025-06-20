@@ -2,20 +2,85 @@
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import { onMounted, onUnmounted, computed } from 'vue'
 import { useCheckoutStore } from '@/stores/checkoutStore'
+import { useMemberStore } from '@/stores/MemberStore'
 import { useRouter } from 'vue-router'
 
+// 🔥 加入這行 - 在任何邏輯執行前就記錄
+console.log('🚀 Check3_Complete.vue 組件被載入！')
+
 const checkoutStore = useCheckoutStore()
+const memberStore = useMemberStore()
 const router = useRouter()
 
 onMounted(() => {
+  console.log('🚀 Check3_Complete.vue onMounted 執行開始')
+
+  // 🔥 新增：檢查 sessionStorage 內容
+  console.log('🔍 檢查 sessionStorage 內容:')
+  console.log('  orderResult:', sessionStorage.getItem('orderResult'))
+  console.log('  memberData:', sessionStorage.getItem('memberData'))
+
   document.body.classList.add('custom-bg')
+
+  // 🔥 修改：先嘗試從 sessionStorage 恢復訂單資料
+  if (!checkoutStore.orderResult) {
+    console.log('⚠️ 無訂單資料，嘗試從 sessionStorage 恢復...')
+    const restored = checkoutStore.loadOrderFromSession()
+    
+    if (!restored) {
+      console.log('❌ 無法恢復訂單資料')
+      
+      // 🔥 檢查是否來自綠界
+      if (document.referrer.includes('ecpay.com.tw')) {
+        console.log('🎯 來自綠界但無訂單資料，顯示基本付款成功訊息')
+        // 🔥 設定基本的成功資料
+        checkoutStore.orderResult = {
+          success: true,
+          message: '付款成功',
+          data: {
+            order_numbers: ['付款已完成'],
+            final_total: 0,
+            total_meal_count: 0,
+            consignee_info: {
+              name: memberStore.name || '收貨人',
+              phone: memberStore.phone || '',
+              address: memberStore.address || ''
+            },
+            order_time: new Date().toISOString()
+          }
+        }
+        console.log('🔥 設定基本付款成功資料')
+        return
+      }
+      
+      // 如果不是來自綠界，導向訂單頁面
+      console.log('↩️ 非綠界跳轉且無訂單資料，導向訂單頁面')
+      router.push('/Check_OrderInfo')
+      return
+    }else{console.log('✅ 成功恢復訂單資料')}
+  }else{
+      console.log('✅ checkoutStore 中已有訂單資料')
+    }
+  
+  // 🔥 嘗試從 sessionStorage 恢復登入狀態
+  if (!memberStore.isAuthenticated) {
+    console.log('⚠️ 未登入，嘗試從 sessionStorage 恢復...')
+    const loaded = memberStore.loadFromsessionStorage()
+    console.log('恢復結果:', loaded)
+    
+    if (!loaded || !memberStore.isAuthenticated) {
+      alert('登入狀態已失效，請重新登入')
+      router.push('/login')
+      return
+    }
+  }
   
   // 檢查是否有訂單結果，如果沒有則導回訂單頁面
-  if (!checkoutStore.orderResult) {
-    console.log('⚠️ 無訂單資料，導向訂單頁面')
-    router.push('/Check_OrderInfo')
-    return
-  }
+  // if (!checkoutStore.orderResult) {
+  //   console.log('⚠️ 無訂單資料，導向訂單頁面')
+  //   router.push('/Check_OrderInfo')
+  //   return
+  // }
   
   console.log('✅ 訂單完成頁面載入 (EAT格式支援)', checkoutStore.orderResult)
   

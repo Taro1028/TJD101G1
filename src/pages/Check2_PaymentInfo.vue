@@ -39,7 +39,7 @@ onMounted(async () => {
     // 載入常用收貨人列表
     await checkoutStore.loadSavedConsignees()
     
-    console.log('✅ 付款頁面資料載入完成')
+    // console.log('✅ 付款頁面資料載入完成')
   } catch (error) {
     console.error('載入付款頁面資料失敗:', error)
     alert('載入資料失敗，請重試')
@@ -70,29 +70,29 @@ const fetchMemberDataFromAPI = async () => {
       throw new Error('無會員ID，請重新登入')
     }
     
-    console.log('🔍 使用會員ID:', memberId)
+    // console.log('🔍 使用會員ID:', memberId)
     
     // 修改 API 路徑，使用完整路徑
     const env = import.meta.env.VITE_API_URL || 'http://localhost'
     const apiUrl = env + `/tjd101/g1/php/getMemberInfo.php?member_id=${memberId}`
-    console.log('📡 API URL:', apiUrl)
+    // console.log('📡 API URL:', apiUrl)
     
     const response = await fetch(apiUrl)
     
-    console.log('📊 API Response Status:', response.status, response.statusText)
+    // console.log('📊 API Response Status:', response.status, response.statusText)
     
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
     
     const result = await response.json()
-    console.log('📋 API Response Data:', result)
+    // console.log('📋 API Response Data:', result)
     
     if (!result.success) {
       throw new Error(result.message || '獲取會員資料失敗')
     }
     
-    console.log('✅ PHP API 會員資料:', result.data)
+    // console.log('✅ PHP API 會員資料:', result.data)
     
     // 🔥 重要：同步更新 memberStore 的會員資料
     memberStore.updateMember({
@@ -108,7 +108,7 @@ const fetchMemberDataFromAPI = async () => {
     checkoutStore.ordererInfo.phone = result.data.PHONE || ''
     checkoutStore.ordererInfo.address = result.data.ADDRESS || ''
     
-    console.log('✅ 訂購人資料設定完成:', checkoutStore.ordererInfo)
+    // console.log('✅ 訂購人資料設定完成:', checkoutStore.ordererInfo)
     
   } catch (error) {
     console.error('❌ 獲取會員資料失敗:', error)
@@ -188,29 +188,207 @@ function goNext() {
         return
     }
     
-    // 提交訂單
+    // 🔥 修改：分兩步驟處理
     submitOrder()
 }
 
-// 提交訂單
+// 🔥 修改：分兩步驟提交訂單
 const submitOrder = async () => {
   try {
     loading.value = true
     
-    const result = await checkoutStore.submitOrder()
+    // console.log('🚀 步驟1：開始創建訂單...')
     
-    if (result.success) {
-      // 成功後導向完成頁面
-      router.push('/Check_Complete')
+    // === 步驟1：調用 checkout.php 創建訂單 ===
+    // 🔥 修正：獲取會員ID的方式
+    let memberId = null
+    
+    if (memberStore.memberId) {
+      memberId = memberStore.memberId
+    } else if (memberStore.id) {
+      memberId = memberStore.id
     } else {
-      alert('訂單提交失敗：' + result.message)
+      // 嘗試重新從 sessionStorage 載入
+      const loaded = memberStore.loadFromsessionStorage()
+      if (loaded && memberStore.id) {
+        memberId = memberStore.id
+      }
     }
+    
+    if (!memberId) {
+      throw new Error('無會員ID，請重新登入')
+    }
+    
+    // console.log('🔍 使用會員ID:', memberId)
+    
+    const orderData = {
+      m_id: memberId,
+      cart_ids: checkoutStore.selectedCartIds,
+      consignee_info: checkoutStore.consigneeInfo.isSameAsOrderer 
+        ? checkoutStore.ordererInfo 
+        : checkoutStore.consigneeInfo,
+      // shipping_fee: checkoutStore.shippingFee
+    }
+
+    // console.log('📦 訂單資料:', orderData)
+
+    const env = import.meta.env.VITE_API_URL || 'http://localhost'
+    const checkoutResponse = await fetch(`${env}/tjd101/g1/php/checkout.php`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData)
+    })
+
+    if (!checkoutResponse.ok) {
+      throw new Error(`訂單創建失敗: HTTP ${checkoutResponse.status}`)
+    }
+
+    const checkoutResult = await checkoutResponse.json()
+    // console.log('✅ 訂單創建結果:', checkoutResult)
+
+    if (!checkoutResult.success) {
+      throw new Error(checkoutResult.message || '訂單創建失敗')
+    }
+
+    // 🔥 新增：保存完整訂單資料到 checkoutStore
+    checkoutStore.orderResult = {
+      success: true,
+      message: checkoutResult.message,
+      data: {
+        order_ids: checkoutResult.data.order_ids,
+        order_numbers: checkoutResult.data.order_numbers,
+        orders: checkoutResult.data.orders,
+        total_orders: checkoutResult.data.total_orders,
+        total_amount: checkoutResult.data.total_amount,
+        total_meal_count: checkoutResult.data.total_meal_count,
+        final_total: checkoutResult.data.final_total,
+        // shipping_fee: checkoutResult.data.shipping_fee,
+        consignee_info: checkoutResult.data.consignee_info,
+        order_time: checkoutResult.data.order_time
+      },
+      // 🔥 重要：保存購物車資訊
+      selectedCartItems: checkoutStore.selectedCartItems.map(item => ({
+        cart_id: item.cart_id,
+        plan_type: item.plan_type,
+        display_title: item.plan_type,
+        title: item.plan_type,
+        total_amount: item.total_amount,
+        total_meal_count: item.total_meal_count,
+        items: item.items || []
+      }))
+    }
+
+    // 🔥 新增：保存到 sessionStorage
+    checkoutStore.saveOrderToSession(checkoutStore.orderResult)
+    // console.log('✅ 訂單資料已保存到 sessionStorage')
+
+    // console.log('🚀 步驟2：準備綠界付款...')
+
+    // === 步驟2：調用 ecpay_payment.php 準備綠界付款 ===
+    const paymentData = {
+      order_numbers: checkoutResult.data.order_numbers,
+      total_amount: checkoutResult.data.final_total,
+      item_name: generateItemName(checkoutResult.data),
+      consignee_info: checkoutResult.data.consignee_info
+    }
+
+    // console.log('💳 付款資料:', paymentData)
+
+    const paymentResponse = await fetch(`${env}/tjd101/g1/php/ecpay_payment.php`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(paymentData)
+    })
+
+    if (!paymentResponse.ok) {
+      throw new Error(`付款準備失敗: HTTP ${paymentResponse.status}`)
+    }
+
+    const paymentResult = await paymentResponse.json()
+    // console.log('💳 綠界付款準備結果:', paymentResult)
+    
+    // 🔥 新增：詳細檢查回傳資料結構
+    // console.log('🔍 檢查 paymentResult 結構:')
+    // console.log('  - success:', paymentResult.success)
+    // console.log('  - message:', paymentResult.message)
+    // console.log('  - data:', paymentResult.data)
+    if (paymentResult.data) {
+      // console.log('  - data.action_url:', paymentResult.data.action_url)
+      // console.log('  - data.form_data:', paymentResult.data.form_data)
+    }
+
+    if (paymentResult.success && paymentResult.data && paymentResult.data.action_url) {
+      console.log('🚀 跳轉到綠界付款頁面...')
+      
+      // === 步驟3：創建表單並跳轉到綠界 ===
+      submitECPayForm(paymentResult.data)
+      
+    } else {
+      console.error('❌ 付款資料不完整:', paymentResult)
+      throw new Error(paymentResult.message || '付款準備失敗：缺少必要資料')
+    }
+
   } catch (error) {
-    console.error('提交訂單失敗:', error)
-    alert('提交訂單失敗：' + error.message)
-  } finally {
+    console.error('❌ 結帳失敗:', error)
+    alert('結帳失敗：' + error.message)
     loading.value = false
   }
+}
+
+// 🔥 新增：生成商品名稱
+const generateItemName = (orderData) => {
+  const orders = orderData.orders || []
+  
+  if (orders.length === 0) {
+    return '餐盒訂購'
+  }
+  
+  if (orders.length === 1) {
+    return orders[0].plan_type || '餐盒訂購'
+  }
+  
+  // 多筆訂單：使用第一個 + 等N筆
+  const firstName = orders[0].plan_type || '餐盒訂購'
+  return `${firstName}等${orders.length}筆`
+}
+
+// 🔥 新增：提交綠界表單
+const submitECPayForm = (paymentData) => {
+  // console.log('📋 創建綠界付款表單...', paymentData)
+  
+  // 創建隱藏表單
+  const form = document.createElement('form')
+  form.method = 'POST'
+  form.action = paymentData.action_url
+  form.style.display = 'none'
+
+  // 添加表單欄位
+  Object.keys(paymentData.form_data).forEach(key => {
+    const input = document.createElement('input')
+    input.type = 'hidden'
+    input.name = key
+    input.value = paymentData.form_data[key]
+    form.appendChild(input)
+    
+    // console.log(`表單欄位 ${key}: ${paymentData.form_data[key]}`)
+  })
+
+  // 添加到頁面並提交
+  document.body.appendChild(form)
+  
+  // console.log('🚀 跳轉到綠界付款頁面:', paymentData.action_url)
+  form.submit()
+
+  // 清理表單
+  setTimeout(() => {
+    if (document.body.contains(form)) {
+      document.body.removeChild(form)
+    }
+  }, 1000)
 }
 
 // 從彈窗選擇收貨人
