@@ -86,55 +86,72 @@ export const newsApi = {
   getNewsByTag: async (tag, limit = 10) => {
     console.log('📰 載入分類新聞:', { tag, limit })
     const queryString = buildQueryString({ tag, limit })
-    return apiRequest(`/news_by_tag.php?${queryString}`)
-  },
+    const response = await apiRequest(`/news_by_tag.php?${queryString}`)
 
-  // 獲取單篇新聞詳情 (Newsitem.vue 需要)
-  getNewsDetail: async (id) => {
-    console.log('📄 載入新聞詳情:', { id })
-    const queryString = buildQueryString({ id })
-    return apiRequest(`/news_detail.php?${queryString}`)
-  }
-}
+    // 按照 IS_FEATURED 排序邏輯
+    if (response.data && Array.isArray(response.data)) {
+      response.data.sort((a, b) => {
+        // IS_FEATURED = 1 的排在前面
+        const aFeatured = (a.IS_FEATURED === 1 || a.IS_FEATURED === '1') ? 1 : 0
+        const bFeatured = (b.IS_FEATURED === 1 || b.IS_FEATURED === '1') ? 1 : 0
 
-// 工具函數
-export const newsUtils = {
-  // 格式化日期
-  formatDate: (dateString) => {
-    if (!dateString) return ''
-
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return dateString
-
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}.${month}.${day}`
-  },
-
-  // 獲取標籤顯示名稱
-  getTagDisplayName: (tag) => {
-    const tagMap = {
-      'focus': '焦點計畫',
-      'depth': '深度專題',
-      'lunch': '誰來午餐',
-      '焦點計畫': '焦點計畫',
-      '深度專題': '深度專題',
-      '誰來午餐': '誰來午餐'
+        if (aFeatured !== bFeatured) {
+          return bFeatured - aFeatured // 精選新聞排前面
+        }
+        // 如果都是精選或都不是精選，按照更新時間排序
+        return new Date(b.UPDATED_AT) - new Date(a.UPDATED_AT)
+      })
     }
-    return tagMap[tag] || tag
-  },
 
-  // 處理 API 錯誤的顯示訊息
-  getErrorMessage: (error) => {
-    if (error.message.includes('Failed to fetch')) {
-      return '網路連線問題，請檢查網路狀態'
-    } else if (error.message.includes('404')) {
-      return '找不到資源'
-    } else if (error.message.includes('500')) {
-      return '伺服器錯誤，請稍後再試'
-    } else {
-      return error.message || '發生未知錯誤'
+    return response
+    },
+
+    // 獲取單篇新聞詳情 (Newsitem.vue 需要)
+    getNewsDetail: async (id) => {
+      console.log('📄 載入新聞詳情:', { id })
+      const queryString = buildQueryString({ id })
+      return apiRequest(`/news_detail.php?${queryString}`)
     }
   }
-}
+
+    // 工具函數
+    export const newsUtils = {
+    // 格式化日期
+    formatDate: (dateString) => {
+      if (!dateString) return ''
+
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return dateString
+
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}.${month}.${day}`
+    },
+
+    // 獲取標籤顯示名稱
+    getTagDisplayName: (tag) => {
+      const tagMap = {
+        'focus': '焦點計畫',
+        'depth': '深度專題',
+        'lunch': '誰來午餐',
+        '焦點計畫': '焦點計畫',
+        '深度專題': '深度專題',
+        '誰來午餐': '誰來午餐'
+      }
+      return tagMap[tag] || tag
+    },
+
+    // 處理 API 錯誤的顯示訊息
+    getErrorMessage: (error) => {
+      if (error.message.includes('Failed to fetch')) {
+        return '網路連線問題，請檢查網路狀態'
+      } else if (error.message.includes('404')) {
+        return '找不到資源'
+      } else if (error.message.includes('500')) {
+        return '伺服器錯誤，請稍後再試'
+      } else {
+        return error.message || '發生未知錯誤'
+      }
+    }
+  }
