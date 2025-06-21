@@ -289,6 +289,8 @@ const handleRetry = () => {
 .news-block--focus {
   .main-news {
     img {
+      width: 480px;
+      height: 390px;
       margin: auto;
     }
   }
