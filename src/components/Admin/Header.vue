@@ -22,6 +22,7 @@ const Adminmember = useAdminMemberStore();
 
 function logoutadmember() {
   Adminmember.logout();
+  Adminmember.clearsessionStorage();
   // router.push("/adminLogin");
   window.location.href = "/tjd101/g1/adminLogin"; //修復字體重新載入
 }

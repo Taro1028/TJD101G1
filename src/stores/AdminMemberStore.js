@@ -8,7 +8,9 @@ export const useAdminMemberStore = defineStore("adminMember", {
     username: "",
     password: "",
   }),
-
+ getters: {
+    isAuthenticated: (state) => !!state.id,
+  },
   actions: {
     // 設定會員資料（登入時呼叫）
     setAdminMember(member) {
@@ -37,7 +39,7 @@ export const useAdminMemberStore = defineStore("adminMember", {
       try {
         const savedData = sessionStorage.getItem("adminMemberData");
         if (savedData) {
-          const memberData = JSON.parse(savedData);
+          const memberData = JSON.parse(atob(savedData));
 
           // 只有在有登入狀態時才載入資料
           if (memberData) {
@@ -69,7 +71,7 @@ export const useAdminMemberStore = defineStore("adminMember", {
     //清除 sessionStorage
     clearsessionStorage() {
       try {
-        sessionStorage.removeItem("member");
+        sessionStorage.removeItem("adminMemberData");
       } catch (error) {
         console.error("清除 sessionStorage 失敗:", error);
       }
@@ -87,7 +89,7 @@ export const useAdminMemberStore = defineStore("adminMember", {
         };
         sessionStorage.setItem(
           "adminMemberData",
-          JSON.stringify(adminMemberData)
+          btoa(JSON.stringify(adminMemberData))
         );
       } catch (error) {
         console.error("儲存後台會員資料到 sessionStorage 失敗:", error);

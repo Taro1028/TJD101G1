@@ -5,7 +5,7 @@ export const useMemberStore = defineStore("member", {
   state: () => ({
     // 原有的會員資料
     id: null,
-    lineid: "",   // LINE
+    lineid: "", // LINE
     name: "",
     nickname: "",
     sex: "",
@@ -77,8 +77,6 @@ export const useMemberStore = defineStore("member", {
     // 設定會員資料（登入時呼叫）
     setMember(member) {
       console.log("member", member);
-
-      
 
       // 檢查登入是否成功
       if (member.success) {
@@ -281,7 +279,7 @@ export const useMemberStore = defineStore("member", {
           success: this.success,
           // ✨ 注意：不儲存 memberAvatars，因為它有專門的儲存方法
         };
-        sessionStorage.setItem("memberData", JSON.stringify(memberData));
+        sessionStorage.setItem("memberData", btoa(JSON.stringify(memberData)));
       } catch (error) {
         console.error("儲存會員資料到 sessionStorage 失敗:", error);
       }
@@ -292,7 +290,7 @@ export const useMemberStore = defineStore("member", {
       try {
         const savedData = sessionStorage.getItem("memberData");
         if (savedData) {
-          const memberData = JSON.parse(savedData);
+          const memberData = JSON.parse(atob(savedData));
 
           // 只有在有登入狀態時才載入資料
           if (memberData.isLoggedIn) {

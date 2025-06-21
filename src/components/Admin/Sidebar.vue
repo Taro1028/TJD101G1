@@ -7,7 +7,7 @@
       <RouterLink to="/admin/consignees" class="adimnbtn">
         收貨人資料
       </RouterLink>
-      <RouterLink to="/admin/web" class="adimnbtn"> 網站資料 </RouterLink>
+      <RouterLink to="/admin/web" class="adimnbtn"> 最新消息資料 </RouterLink>
     </div>
 
     <RouterView v-slot="{ Component }">
@@ -30,7 +30,7 @@ const userData = ref("");
 const formTitle = ref("");
 const tableHeaders = ref([]); //下面watch
 const memberHeaders = [
-  { key: "ID", label: "會員編號" },
+  { key: "ID", label: "會員ID" },
   { key: "M_NAME", label: "會員名稱" },
   { key: "NICKNAME", label: "暱稱" },
   { key: "GENDER", label: "會員性別" },
@@ -55,20 +55,31 @@ const productHeaders = [
   //   { key: "actions", label: "操作" },
 ];
 const orderHeaders = [
-  { key: "ID", label: "訂單編號" },
-  { key: "M_ID", label: "會員編號" },
-  { key: "P_ID", label: "商品編號" },
-  { key: "ORDER_DATE", label: "訂購日期" },
-  { key: "DETAILS", label: "餐點明細" },
-  { key: "COUNT", label: "餐點數量" },
-  { key: "TOTAL", label: "訂單金額" },
-  { key: "ORDER_STATE", label: "商品上下架狀態" },
-  { key: "ORDERS_STATE", label: "訂單狀態" },
+  { key: "order_id", label: "訂單編號" },
+  { key: "ORDER_NUMBER", label: "訂單代碼" },
+  { key: "M_ID", label: "會員ID" },
+  { key: "PLAN_TYPE", label: "方案型態" },
+  { key: "ORDER_START_DATE", label: "訂購日期" },
+  { key: "ORDER_END_DATE", label: "結束日期" },
+  { key: "TOTAL_DAYS", label: "總訂購天數" },
+  { key: "TOTAL_MEAL_COUNT", label: "餐點數量" },
+  { key: "TOTAL_AMOUNT", label: "訂單金額" },
+  { key: "MEAL_ITEMS", label: "餐點明細" },
+  { key: "ORDERS_CREATE_AT", label: "成立訂單時間" },
+  { key: "ORDERS_UPDATE_AT", label: "訂單更新時間" },
+  { key: "ORDERS_STATUS", label: "訂單狀態" },
+  { key: "CONSIGNEE_NAME", label: "收貨人姓名" },
+  { key: "CONSIGNEE_PHONE", label: "收貨人電話" },
+  { key: "CONSIGNEE_ADDRESS", label: "收貨人地址" },
+  { key: "TRANSACTION_ID", label: "第三方金流付款編號" },
+  { key: "PAYMENT_STATUS", label: "付款狀態" },
+  { key: "PAID_AT", label: "實際付款時間" },
+
   //   { key: "actions", label: "操作" },
 ];
 const consigneesHeaders = [
   { key: "ID", label: "收貨人編號" },
-  { key: "M_ID", label: "會員編號" },
+  { key: "M_ID", label: "會員ID" },
   { key: "C_NAME", label: "收貨人姓名" },
   { key: "C_ADD", label: "收貨人地址" },
   { key: "C_CONTACTS_PHONE", label: "收貨人市內電話" },
@@ -79,14 +90,20 @@ const consigneesHeaders = [
   //   { key: "actions", label: "操作" },
 ];
 const webHeaders = [
-  { key: "ID", label: "網站資料編號" },
+  { key: "ID", label: "編號" },
+  // { key: "NEWS_ITEMS_ID", label: "串接新聞項目編號" },
+  // { key: "CONTENTS", label: "段落內容" },
+  // { key: "SUBTITLE", label: "副標題" },
   { key: "TITLE", label: "標題" },
-  { key: "CONTENT", label: "內文" },
+  // { key: "SUMMARY", label: "摘要" },
+  { key: "TAG", label: "分類標籤" },
   { key: "IMG", label: "圖片" },
-  { key: "PAGE", label: "網站頁面" },
-  //  { key: "city", label: "城市" },
-  { key: "STATE", label: "消息上下架狀態" },
-  { key: "actionsweb", label: "操作" },
+  { key: "UPDATED_AT", label: "更新時間" },
+  { key: "STATUS", label: "新聞上下架狀態" },
+  { key: "IS_FEATURED", label: "是否精選" },
+
+  { key: "actionsweb", label: "操作" }
+ 
 ];
 const tableBodys = ref([]);
 const member = [
@@ -178,7 +195,7 @@ watch(
         tableBodys.value = consignees;
         break;
       case "/admin/web":
-        formTitle.value = "網站資料";
+        formTitle.value = "最新消息資料";
         tableHeaders.value = webHeaders;
         tableBodys.value = web;
         break;

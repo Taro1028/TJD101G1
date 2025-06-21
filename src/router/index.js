@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useMemberStore } from "@/stores/MemberStore";
 import { useModalStore } from "@/stores/ModalStore";
+import { useAdminMemberStore } from "@/stores/AdminMemberStore";
 
 // path → component
 const routes = [
@@ -152,7 +153,7 @@ const routes = [
   },
   {
     path: "/About/News/Newsitem/:id",
-    name: 'NewsDetail',
+    name: "NewsDetail",
     component: () => import("@/pages/Newsitem.vue"),
     props: true,
     meta: {
@@ -306,58 +307,80 @@ export default router;
 router.beforeEach(async (to, from, next) => {
   const memberStore = useMemberStore();
   const modalStore = useModalStore();
+  const adminMemberStore = useAdminMemberStore();
 
   // 🔥 新增：檢查完整 URL 和參數
-  console.log('🔍 完整除錯資訊:');
-  console.log('  window.location.href:', window.location.href);
-  console.log('  window.location.hash:', window.location.hash);
-  console.log('  document.referrer:', document.referrer);
-  console.log('  to.fullPath:', to.fullPath);
-  console.log('  to.path:', to.path);
-  console.log('  to.name:', to.name);
+  console.log("🔍 完整除錯資訊:");
+  console.log("  window.location.href:", window.location.href);
+  console.log("  window.location.hash:", window.location.hash);
+  console.log("  document.referrer:", document.referrer);
+  console.log("  to.fullPath:", to.fullPath);
+  console.log("  to.path:", to.path);
+  console.log("  to.name:", to.name);
 
   // 🔥 修正：檢查實際的路由路徑
   let actualPath = to.path;
-  
-  // 如果 to.path 是 '/' 但 hash 包含其他路徑，從 hash 中提取
-  if (to.path === '/' && window.location.hash) {
-    const hashPath = window.location.hash.replace('#', '').split('?')[0];
-    if (hashPath && hashPath !== '/') {
-      actualPath = hashPath;
-      console.log('🔧 從 hash 中修正路徑:', actualPath);
-    }
-  }
 
-  console.log('🔍 實際路徑:', actualPath);
+  if (to.path.startsWith("/admin/")) {
+    console.log("進入 admin 區域:", to.path);
+    adminMemberStore.loadFromsessionStorage();
+    console.log(
+      "測試 adminMemberStore 登入狀態:",
+      adminMemberStore.isAuthenticated
+    );
 
-  // 🔥 檢查是否來自綠界且要去完成頁面
-  if (document.referrer.includes('ecpay.com.tw') && actualPath === '/Check_Complete') {
-    console.log('🎯 檢測到來自綠界的跳轉到完成頁面！');
-    
-    // 強制導航到完成頁面
-    if (to.path !== '/Check_Complete') {
-      console.log('🔧 強制導航到完成頁面');
-      next('/Check_Complete');
+    if (!adminMemberStore.isAuthenticated) {
+      next("/adminLogin");
+      return;
+    } else {
+      next();
       return;
     }
   }
-  
+
+  // 如果 to.path 是 '/' 但 hash 包含其他路徑，從 hash 中提取
+  if (to.path === "/" && window.location.hash) {
+    const hashPath = window.location.hash.replace("#", "").split("?")[0];
+    if (hashPath && hashPath !== "/") {
+      actualPath = hashPath;
+      console.log("🔧 從 hash 中修正路徑:", actualPath);
+    }
+  }
+
+  console.log("🔍 實際路徑:", actualPath);
+
+  // 🔥 檢查是否來自綠界且要去完成頁面
+  if (
+    document.referrer.includes("ecpay.com.tw") &&
+    actualPath === "/Check_Complete"
+  ) {
+    console.log("🎯 檢測到來自綠界的跳轉到完成頁面！");
+
+    // 強制導航到完成頁面
+    if (to.path !== "/Check_Complete") {
+      console.log("🔧 強制導航到完成頁面");
+      next("/Check_Complete");
+      return;
+    }
+  }
+
   // ✨ 確保會員資料已載入
   if (!memberStore.isLoggedIn && !memberStore.checkAuthStatus()) {
-    console.log('  載入 sessionStorage 結果: 失敗');
+    console.log("  載入 sessionStorage 結果: 失敗");
     memberStore.logout();
   } else {
-    console.log('  載入 sessionStorage 結果: 成功');
+    console.log("  載入 sessionStorage 結果: 成功");
   }
 
   // 🔥 修正：使用 actualPath 來檢查路由權限
-  const targetRoute = routes.find(route => route.path === actualPath);
-  const requiresAuth = targetRoute?.meta?.requiredLogin || to.meta.requiredLogin;
-  
-  console.log('路由守衛檢查 - 實際目標頁面:', actualPath);
-  console.log('需要登入:', requiresAuth);
-  console.log('是否已認證:', memberStore.isAuthenticated);
-  
+  const targetRoute = routes.find((route) => route.path === actualPath);
+  const requiresAuth =
+    targetRoute?.meta?.requiredLogin || to.meta.requiredLogin;
+
+  console.log("路由守衛檢查 - 實際目標頁面:", actualPath);
+  console.log("需要登入:", requiresAuth);
+  console.log("是否已認證:", memberStore.isAuthenticated);
+
   // 如果需要登入但使用者未登入
   if (requiresAuth && !memberStore.isAuthenticated) {
     console.log("需要登入才能進入此頁面:", actualPath);
@@ -368,11 +391,14 @@ router.beforeEach(async (to, from, next) => {
     );
 
     next(false);
+    return;
   } else if (to.path === "/Login" && memberStore.isAuthenticated) {
     console.log("已登入，跳轉到會員中心");
     next("/MemberCenter");
+    return;
   } else {
     console.log("✅ 正常進入頁面:", actualPath);
     next();
+    return;
   }
 });
