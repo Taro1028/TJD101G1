@@ -8,13 +8,18 @@
         <img :src="content.picture" alt="" />
         <div class="b">
           <p class="inf">{{ content.description }}</p>
-          <button>{{ text }}</button>
+          <button @click="goToOrder">{{ text }}</button>
         </div>
       </article>
     </section>
 
     <section class="box-wrap">
-      <article v-for="(item, index) in content.item" :key="index" class="box">
+      <article
+        v-for="(item, index) in content.item"
+        :key="index"
+        class="box"
+        @click="showLightbox(index)"
+      >
         <img :src="item.picture" alt="" />
         <section class="test">
           <article>
@@ -38,7 +43,13 @@
           </article>
         </section>
       </article>
-
+      <!-- vue-easy-lightbox 元件 -->
+      <VueEasyLightbox
+        :visible="visible"
+        :imgs="imageList"
+        :index="previewIndex"
+        @hide="visible = false"
+      />
       <!-- <article class="box">
             <img src="../assets/images/LunchBox/title1item2.png" alt="">
             <article>
@@ -82,14 +93,24 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-defineProps(["content", "text"]);
+import { ref, onMounted } from "vue";
+import VueEasyLightbox from "vue-easy-lightbox";
+import { useRouter } from "vue-router";
+const router = useRouter();
+const { content, text } = defineProps(["content", "text"]);
 
 const openIndex = ref(null);
 function toggleAccordion(index) {
   openIndex.value = openIndex.value === index ? null : index;
 }
 
+const visible = ref(false); // 控制是否顯示 lightbox
+const previewIndex = ref(0); // 點到哪張
+const imageList = ref([]); // 所有圖片的 URL
+
+function goToOrder() {
+  router.push("/Order/Select");
+}
 // const product=ref({
 //     title: '樂活元氣餐',
 //     picture:new URL('../assets/images/LunchBox/boxitemtitle1.png', import.meta.url).href,
@@ -119,6 +140,19 @@ function toggleAccordion(index) {
 //     }
 // ]
 // })
+
+// 點圖片開啟 lightbox
+const showLightbox = (index) => {
+  previewIndex.value = index;
+  visible.value = true;
+};
+
+// 頁面載入時整理圖片清單
+onMounted(() => {
+  if (content?.item?.length) {
+    imageList.value = content.item.map((item) => item.picture);
+  }
+});
 </script>
 
 <style scoped lang="scss">
@@ -152,9 +186,10 @@ function toggleAccordion(index) {
   justify-content: space-between;
   margin: 40px 0px;
 }
-.box {//[data-v-5aae0fb5]
-  width: 45%; 
-  margin-bottom: 30px; 
+.box {
+  //[data-v-5aae0fb5]
+  width: 45%;
+  margin-bottom: 30px;
 }
 
 .ss1 {
@@ -205,8 +240,8 @@ function toggleAccordion(index) {
   margin-right: 20px;
 }
 
-.b button:hover{
-  background-color:$primary_400;
+.b button:hover {
+  background-color: $primary_400;
 }
 
 //
@@ -218,7 +253,7 @@ function toggleAccordion(index) {
 }
 
 .ingredients.open {
-  max-height: 100px; 
+  max-height: 100px;
   opacity: 1;
 }
 
@@ -235,6 +270,14 @@ function toggleAccordion(index) {
   font-size: $font_h5;
   margin: 20px 0px 20px 0px;
   text-align: center;
+}
+.box > a > img {
+  width: 200px;
+  height: auto;
+  margin-right: 50px;
+  object-fit: contain;
+  border-radius: 8px;
+  cursor: pointer;
 }
 .box > img {
   width: 200px;
@@ -291,7 +334,8 @@ function toggleAccordion(index) {
     padding: 0px 30px;
   }
 
-  .box {//[data-v-5aae0fb5][data-v-5aae0fb5]
+  .box {
+    //[data-v-5aae0fb5][data-v-5aae0fb5]
     display: flex;
     width: 42%;
     margin-bottom: 30px;
@@ -326,15 +370,13 @@ function toggleAccordion(index) {
   }
 }
 
-
-
 // @media (max-width: 933px) {
 //   .box-wrap {
 //     // flex-direction: column;
 //     align-items: center;
 //   }
 
-//   .box{//[data-v-5aae0fb5][data-v-5aae0fb5] 
+//   .box{//[data-v-5aae0fb5][data-v-5aae0fb5]
 //     width: 43%;
 //     margin-bottom: 30px;
 //   }
@@ -343,7 +385,7 @@ function toggleAccordion(index) {
 //     margin-right: 20px;
 //   }
 
-//   .box h5{//[data-v-5aae0fb5] 
+//   .box h5{//[data-v-5aae0fb5]
 //     font-size: 1.25rem;
 //     margin: 10px 0px 20px 0px;
 //     text-align: center;
@@ -351,7 +393,8 @@ function toggleAccordion(index) {
 // }
 
 @media (max-width: 860px) {
-  .box { //[data-v-5aae0fb5][data-v-5aae0fb5]
+  .box {
+    //[data-v-5aae0fb5][data-v-5aae0fb5]
     width: 42%;
     margin-bottom: 30px;
   }
@@ -367,8 +410,8 @@ function toggleAccordion(index) {
   }
 }
 @media (max-width: 857px) {
-  .box >img{
-    width:40%;
+  .box > img {
+    width: 40%;
   }
 }
 @media (max-width: 810px) {

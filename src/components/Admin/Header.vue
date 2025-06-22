@@ -35,7 +35,8 @@ onMounted(() => {
 <style lang="scss" scoped>
 section {
   display: flex;
-
+  position: fixed;
+  width: 100%;
   background-color: $primary_100;
   padding: 4px 10px 4px 30px;
 }
@@ -56,7 +57,7 @@ section img:nth-of-type(2) {
 }
 .s2 {
   // border: 1px solid red;
-  width: 70%;
+  width: 80%;
   display: flex;
   margin-left: 260px;
   justify-content: end;

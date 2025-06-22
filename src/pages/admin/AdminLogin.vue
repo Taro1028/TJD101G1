@@ -84,7 +84,7 @@ const handleLogin = async () => {
   box-sizing: border-box;
 }
 .wrapper {
-  max-width: 1440px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;

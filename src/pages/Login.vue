@@ -50,13 +50,20 @@
           <div class="fast_signup">
             <p>快速登入</p>
             <div class="social_links">
-              <a href="#"
+              <a href="#" @click.prevent="loginWithGoogle"
                 ><img
                   src="../assets/images/Member/Google_color.svg"
                   alt="google-signup"
               /></a>
-              <button @click="handleLineLogin" class="line-button" aria-label="使用 Line 登入">
-                <img src="../assets/images/Member/Line_color.svg" alt="line-signup" />
+              <button
+                @click="handleLineLogin"
+                class="line-button"
+                aria-label="使用 Line 登入"
+              >
+                <img
+                  src="../assets/images/Member/Line_color.svg"
+                  alt="line-signup"
+                />
               </button>
               <!-- <a href="#"
                 ><img
@@ -162,19 +169,75 @@ const handleLogin = async () => {
 function handleLineLogin() {
   const lineClientId = import.meta.env.VITE_LINE_CLIENT_ID; // 您的 LINE Channel ID
   const lineRedirectUri = import.meta.env.VITE_LINE_REDIRECT_URI; // 您的回調 URL
-  const lineAuthState = 'your_random_state_string'; // 為了安全，請生成一個隨機的 state 字串
+  const lineAuthState = "your_random_state_string"; // 為了安全，請生成一個隨機的 state 字串
   // const lineScope = 'profile openid email'; // 請求的權限，例如 profile, openid, email
-  const lineScope = 'profile openid'; // 請求的權限，例如 profile, openid
-
+  const lineScope = "profile openid"; // 請求的權限，例如 profile, openid
 
   // 將 state 存儲起來，以便回調時驗證
-  localStorage.setItem('line_auth_state', lineAuthState);
+  localStorage.setItem("line_auth_state", lineAuthState);
 
-  const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${lineClientId}&redirect_uri=${encodeURIComponent(lineRedirectUri)}&state=${lineAuthState}&scope=${lineScope}`;
-  
-  console.log('Line Auth URL:', lineAuthUrl); // 為了除錯，您可以打印出這個 URL 看看是否正確
+  const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${lineClientId}&redirect_uri=${encodeURIComponent(
+    lineRedirectUri
+  )}&state=${lineAuthState}&scope=${lineScope}`;
+
+  console.log("Line Auth URL:", lineAuthUrl); // 為了除錯，您可以打印出這個 URL 看看是否正確
 
   window.location.href = lineAuthUrl;
+}
+
+function loginWithGoogle() {
+  google.accounts.id.initialize({
+    client_id:
+      "1010508992557-rlnbp3o2h7327jmco3726c6qei92s0et.apps.googleusercontent.com", // 🔸請換成你自己的
+    callback: handleCredentialResponse,
+  });
+
+  google.accounts.id.prompt(); // 顯示 Google 登入彈窗
+}
+
+function handleCredentialResponse(response) {
+  console.log("收到 Google ID Token:", response.credential);
+
+  fetch(env + "/tjd101/g1/php/Login.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken: response.credential }),
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.success) {
+        // alert(`登入成功，歡迎 ${result.M_NAME}`);
+        console.log(result);
+        if (result.blacklisted) {
+          alert("會員已停權");
+        } else {
+          // 設定會員資料到 store
+          member.setMember(result);
+          console.log("會員 ID:", member.id);
+
+          // 🔔 優先檢查 ModalStore 的重定向路徑
+          let redirectPath = "/Home";
+
+          if (modalStore.hasRedirectPath) {
+            // 如果有彈窗設定的重定向路徑，使用它
+            redirectPath = modalStore.redirectPath;
+            modalStore.clearRedirectPath(); // 清除重定向路徑
+          } else {
+            // 否則檢查 URL query 參數
+            redirectPath = router.currentRoute.value.query.redirect || "/Home";
+          }
+
+          // 關閉登入彈窗（如果有開啟的話）
+          modalStore.closeLoginPopup();
+
+          // 跳轉到指定頁面
+          router.push(redirectPath);
+        }
+        // 你可以接著把登入資料儲存到 Pinia、sessionStorage 等
+      } else {
+        alert("登入失敗：" + result.message);
+      }
+    });
 }
 </script>
 

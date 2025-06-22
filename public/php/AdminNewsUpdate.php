@@ -21,7 +21,8 @@ try {
     $sortOrders = $_POST['sortOrder'] ?? [];
 
     // 圖片（允許「修改時不換圖」）
-    $uploadDir = '/Users/kevin/TJD101G1/public/images/News/';
+    $uploadDir = __DIR__ . '/../images/News/';
+    // $uploadDir = '/Users/kevin/TJD101G1/public/images/News/';
     $relativePath = null;
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {

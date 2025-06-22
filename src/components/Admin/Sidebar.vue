@@ -30,7 +30,7 @@ const userData = ref("");
 const formTitle = ref("");
 const tableHeaders = ref([]); //下面watch
 const memberHeaders = [
-  { key: "ID", label: "會員ID" },
+  { key: "ID", label: "ID編號" },
   { key: "M_NAME", label: "會員名稱" },
   { key: "NICKNAME", label: "暱稱" },
   { key: "GENDER", label: "會員性別" },
@@ -102,8 +102,7 @@ const webHeaders = [
   { key: "STATUS", label: "新聞上下架狀態" },
   { key: "IS_FEATURED", label: "是否精選" },
 
-  { key: "actionsweb", label: "操作" }
- 
+  { key: "actionsweb", label: "操作" },
 ];
 const tableBodys = ref([]);
 const member = [
@@ -212,7 +211,7 @@ section {
   display: flex;
   width: 100%;
   height: 100vh;
-
+  padding-top: 55px;
   overflow: hidden;
 }
 div {

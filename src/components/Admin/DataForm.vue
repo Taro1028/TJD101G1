@@ -35,7 +35,10 @@
             </thead>
 
             <tbody>
-              <tr v-for="(tableBody, index) in localBodys" :key="tableBody.id">
+              <tr
+                v-for="(tableBody, index) in paginatedData"
+                :key="tableBody.id"
+              >
                 <td v-for="(header, hIndex) in tableHeaders" :key="hIndex">
                   <!-- 特殊欄位處理 -->
                   <template v-if="header.key === 'AVATAR'">
@@ -128,13 +131,23 @@
 
       <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-end me-4">
-          <li class="page-item previous">
-            <a class="page-link" href="#">Previous</a>
+          <li
+            class="page-item previous"
+            :class="{ disabled: currentPage === 1 }"
+          >
+            <button class="page-link" @click="currentPage--">上一頁</button>
           </li>
-          <li class="page-item num"><a class="page-link" href="#">1</a></li>
-          <li class="page-item num"><a class="page-link" href="#">2</a></li>
-          <li class="page-item num"><a class="page-link" href="#">3</a></li>
-          <li class="page-item next"><a class="page-link" href="#">Next</a></li>
+          <li class="page-item disabled">
+            <span class="page-link page-info"
+              >{{ currentPage }} / {{ totalPages }}</span
+            >
+          </li>
+          <li
+            class="page-item"
+            :class="{ disabled: currentPage === totalPages }"
+          >
+            <button class="page-link" @click="currentPage++">下一頁</button>
+          </li>
         </ul>
       </nav>
     </section>
@@ -142,11 +155,14 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch } from "vue";
+import { onMounted, reactive, ref, watch, computed } from "vue";
 import Dailog from "./Dailog.vue";
 import { useRoute } from "vue-router";
 
 const env = import.meta.env.VITE_API_URL;
+
+const perPage = 10; // 每頁幾筆
+const currentPage = ref(1); // 當前頁碼
 
 const item = reactive({});
 const searchId = ref("");
@@ -336,7 +352,7 @@ async function websitedata() {
     console.error("錯誤發生:", error);
   }
 }
- //order訂單狀態的API
+//order訂單狀態的API
 async function handleStatusChange(orderId, newStatus) {
   console.log(`訂單 ${orderId} 狀態變更為 ${newStatus}`);
   try {
@@ -350,12 +366,11 @@ async function handleStatusChange(orderId, newStatus) {
         status: newStatus,
       }),
     });
-console.log(response)
-    if (response.ok) {//.ok回傳200
+    console.log(response);
+    if (response.ok) {
+      //.ok回傳200
       const result = await response.json();
       console.log("訂單資料載入成功:", result);
-
-      
     } else {
       console.error("載入訂單狀態資料失敗");
     }
@@ -366,6 +381,7 @@ console.log(response)
 
 //搜尋bar=========================================================================
 async function filterById() {
+  currentPage.value = 1;
   const keyword = searchId.value.trim();
   localBodys.value = []; // 先清空畫面
 
@@ -391,7 +407,7 @@ async function filterById() {
       body: JSON.stringify({ searchId: keyword }),
     });
 
-    const result = await response.json(); 
+    const result = await response.json();
 
     if (result.success) {
       localBodys.value = result.members;
@@ -439,6 +455,15 @@ async function toggleBlacklist(member) {
     alert("無法切換黑名單狀態，請稍後再試");
   }
 }
+//分頁
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * perPage;
+  return localBodys.value.slice(start, start + perPage);
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(localBodys.value.length / perPage);
+});
 
 onMounted(() => {
   const newPath = route.fullPath;
@@ -595,5 +620,29 @@ onMounted(() => {
 
 .form-select {
   width: 150px;
+}
+
+.pagination .page-link {
+  /* 讓元素本身變成 flex 容器 */
+  display: flex;
+  align-items: center;   // 垂直置中
+  justify-content: center; // 水平置中
+
+  /* 建議順手把高度定死，或讓 line-height 一致，避免不同瀏覽器差異 */
+  height: 30px;   // 與 .out button 相同高度
+  padding: 0 12px; // 保留左右內距
+}
+
+/* 保留你原本針對上一頁 / 下一頁的配色設定 */
+.page-item.previous .page-link {
+  background-color: $primary_600;
+  color: #fff;
+}
+.page-item.next .page-link {
+  background-color: $primary_600;
+  color: #fff;
+}
+page-item disabled{
+  
 }
 </style>

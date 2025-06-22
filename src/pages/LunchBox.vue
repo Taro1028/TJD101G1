@@ -7,18 +7,20 @@
         v-for="(item, index) in buttonContent"
         :key="index"
         class="fbutton"
+        @click="scrollToSection(index)"
       >
         {{ item }}
       </button>
     </div>
     <div class="outwrap">
-      <LunchBoxItem
-        v-for="(item, index) in totalProduct"
-        :key="index"
-        :content="item"
-        :text="btext"
-      >
-      </LunchBoxItem>
+      <section
+  v-for="(item, index) in totalProduct"
+  :key="index"
+  :ref="el => sectionRefs[index] = el"
+  class="meal-section"
+>
+  <LunchBoxItem :content="item" :text="btext" />
+</section>
     </div>
     <Gotop></Gotop>
   </FrontLayout>
@@ -37,7 +39,7 @@ const buttonContent = ref([
   "蔬食養生餐",
 ]);
 const btext = ref("前往訂餐");
-
+const sectionRefs = ref([]);
 const totalProduct = ref([
   {
     title: "樂活元氣餐",
@@ -263,6 +265,16 @@ const totalProduct = ref([
     ],
   },
 ]);
+
+
+
+/** 點按按鈕時平滑捲動到對應區塊 */
+function scrollToSection(idx) {
+  const el = sectionRefs.value[idx]
+  el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+
 </script>
 
 <style scoped lang="scss">
@@ -276,20 +288,19 @@ img {
 
 .allbutton {
   // border: 1px solid red;
-   max-width: 1200px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   padding: 20px;
   background-color: $primary_50;
-  position: sticky;       
-  top: 0px;              
-  z-index: 10; 
+  position: sticky;
+  top: 0px;
+  z-index: 10;
 }
 
 .fbutton {
-   display: block;
-
+  display: block;
 
   padding: 8px 12px;
   font-size: 14px;
@@ -306,16 +317,19 @@ img {
   // margin: 5px;
 }
 .fbutton:hover {
-  background-color:$primary_400;
+  background-color: $primary_400;
 }
+
+.meal-section {
+  scroll-margin-top: 100px;
+}
+
 // ===================RWD=====================
 @media (max-width: 650px) {
   .allbutton {
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
-    
-   
   }
 
   .fbutton {

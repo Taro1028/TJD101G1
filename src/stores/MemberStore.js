@@ -279,7 +279,10 @@ export const useMemberStore = defineStore("member", {
           success: this.success,
           // ✨ 注意：不儲存 memberAvatars，因為它有專門的儲存方法
         };
-        sessionStorage.setItem("memberData", btoa(JSON.stringify(memberData)));
+        sessionStorage.setItem(
+          "memberData",
+          btoa(unescape(encodeURIComponent(JSON.stringify(memberData))))
+        );
       } catch (error) {
         console.error("儲存會員資料到 sessionStorage 失敗:", error);
       }
@@ -290,7 +293,9 @@ export const useMemberStore = defineStore("member", {
       try {
         const savedData = sessionStorage.getItem("memberData");
         if (savedData) {
-          const memberData = JSON.parse(atob(savedData));
+          const memberData = JSON.parse(
+            decodeURIComponent(escape(atob(savedData)))
+          );
 
           // 只有在有登入狀態時才載入資料
           if (memberData.isLoggedIn) {

@@ -33,29 +33,29 @@ const ifo = reactive({
 
 // 電話數字驗證
 const phoneValidation = reactive({
-  telephone: true,        
-  phone: true,           
-  emergency_contacts_phone: true  
+  telephone: true,
+  phone: true,
+  emergency_contacts_phone: true,
 });
 
 // 密碼相關的響應式變數
 const passwordFields = reactive({
-  newPassword: '',       
-  confirmPassword: ''    
+  newPassword: "",
+  confirmPassword: "",
 });
 
 // 密碼可視性控制
 const passwordVisibility = reactive({
-  current: false,    
-  new: false,       
-  confirm: false    
+  current: false,
+  new: false,
+  confirm: false,
 });
 
 // 密碼驗證狀態
 const passwordValidation = reactive({
-  newPasswordValid: true,        
-  confirmPasswordValid: true,    
-  newPasswordFormat: true       
+  newPasswordValid: true,
+  confirmPasswordValid: true,
+  newPasswordFormat: true,
 });
 
 // 數字驗證函數
@@ -85,14 +85,17 @@ const validateNewPassword = () => {
     passwordValidation.newPasswordFormat = true;
     return;
   }
-  
+
   // 檢查新密碼是否與舊密碼不同
-  passwordValidation.newPasswordValid = passwordFields.newPassword !== ifo.password;
-  
+  passwordValidation.newPasswordValid =
+    passwordFields.newPassword !== ifo.password;
+
   // 檢查新密碼格式（8-16位英數字）
   const passwordRegex = /^[a-zA-Z0-9]{8,16}$/;
-  passwordValidation.newPasswordFormat = passwordRegex.test(passwordFields.newPassword);
-  
+  passwordValidation.newPasswordFormat = passwordRegex.test(
+    passwordFields.newPassword
+  );
+
   // 如果新密碼改變，重新驗證確認密碼
   if (passwordFields.confirmPassword) {
     validateConfirmPassword();
@@ -105,8 +108,9 @@ const validateConfirmPassword = () => {
     passwordValidation.confirmPasswordValid = true;
     return;
   }
-  
-  passwordValidation.confirmPasswordValid = passwordFields.confirmPassword === passwordFields.newPassword;
+
+  passwordValidation.confirmPasswordValid =
+    passwordFields.confirmPassword === passwordFields.newPassword;
 };
 
 // 點擊大頭照區域觸發檔案選擇
@@ -195,18 +199,24 @@ async function update() {
   if (passwordFields.newPassword) {
     validateNewPassword();
     validateConfirmPassword();
-    
-    if (!passwordValidation.newPasswordValid || 
-        !passwordValidation.newPasswordFormat || 
-        !passwordValidation.confirmPasswordValid) {
-      alert('請檢查密碼輸入');
+
+    if (
+      !passwordValidation.newPasswordValid ||
+      !passwordValidation.newPasswordFormat ||
+      !passwordValidation.confirmPasswordValid
+    ) {
+      alert("請檢查密碼輸入");
       return;
     }
   }
 
   // 電話驗證
-  if (!phoneValidation.telephone || !phoneValidation.phone || !phoneValidation.emergency_contacts_phone) {
-    alert('請檢查電話號碼格式');
+  if (
+    !phoneValidation.telephone ||
+    !phoneValidation.phone ||
+    !phoneValidation.emergency_contacts_phone
+  ) {
+    alert("請檢查電話號碼格式");
     return;
   }
 
@@ -220,7 +230,7 @@ async function update() {
         id: ifo.id,
         gender: ifo.gender,
         nickname: ifo.nickname,
-        password: passwordFields.newPassword || ifo.password, 
+        password: passwordFields.newPassword || ifo.password,
         address: ifo.address,
         email: ifo.email,
         phone: ifo.phone,
@@ -233,38 +243,37 @@ async function update() {
     });
 
     console.log("response", response);
-    
+
     if (response.ok) {
       const result = await response.json();
       console.log("更新成功:", result);
-      
+
       // 檢查後端回傳是否真的成功
-      if (result.success === true || result.status === 'success') {
+      if (result.success === true || result.status === "success") {
         // 更新 memberStore
         memberStore.setMember(result.member);
-        
+
         // 如果有新密碼，清空密碼欄位
         if (passwordFields.newPassword) {
-          passwordFields.newPassword = '';
-          passwordFields.confirmPassword = '';
+          passwordFields.newPassword = "";
+          passwordFields.confirmPassword = "";
           // 更新本地的密碼資料
           ifo.password = passwordFields.newPassword || ifo.password;
         }
-        
+
         // 顯示成功彈窗
-        modalStore.openSuccessPopup('修改成功！');
-        
+        modalStore.openSuccessPopup("修改成功！");
       } else {
         // 後端回傳失敗
-        alert('修改失敗：' + (result.message || '未知錯誤'));
+        alert("修改失敗：" + (result.message || "未知錯誤"));
       }
     } else {
       // HTTP 狀態碼不是 200
-      alert('修改失敗，請稍後再試');
+      alert("修改失敗，請稍後再試");
     }
   } catch (error) {
     console.error("修改時發生錯誤:", error);
-    alert('網路錯誤，請稍後再試');
+    alert("網路錯誤，請稍後再試");
   }
 }
 
@@ -421,57 +430,121 @@ onMounted(() => {
                     placeholder="請輸入密碼"
                     v-model="ifo.password"
                   />
-                  <span class="password-toggle" @click="togglePasswordVisibility('current')">
-                    <i :class="passwordVisibility.current ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'"></i>
+                  <span
+                    class="password-toggle"
+                    @click="togglePasswordVisibility('current')"
+                  >
+                    <i
+                      :class="
+                        passwordVisibility.current
+                          ? 'bi bi-eye-fill'
+                          : 'bi bi-eye-slash-fill'
+                      "
+                    ></i>
                   </span>
                 </div>
               </div>
 
-              <div class="form-group" :class="{ 'password-error': !passwordValidation.newPasswordValid || !passwordValidation.newPasswordFormat }">
+              <div
+                class="form-group"
+                :class="{
+                  'password-error':
+                    !passwordValidation.newPasswordValid ||
+                    !passwordValidation.newPasswordFormat,
+                }"
+              >
                 <label class="form-label">新密碼</label>
                 <div class="password-input-container">
                   <input
                     :type="passwordVisibility.new ? 'text' : 'password'"
                     class="form-input"
-                    :class="{ 'error': !passwordValidation.newPasswordValid || !passwordValidation.newPasswordFormat }"
+                    :class="{
+                      error:
+                        !passwordValidation.newPasswordValid ||
+                        !passwordValidation.newPasswordFormat,
+                    }"
                     placeholder="至少8-16個英數組成"
                     v-model="passwordFields.newPassword"
                     @input="validateNewPassword"
                   />
-                  <span class="error-icon" v-show="!passwordValidation.newPasswordValid || !passwordValidation.newPasswordFormat">
+                  <span
+                    class="error-icon"
+                    v-show="
+                      !passwordValidation.newPasswordValid ||
+                      !passwordValidation.newPasswordFormat
+                    "
+                  >
                     <i class="bi bi-exclamation-triangle-fill"></i>
                   </span>
-                  <span class="password-toggle" @click="togglePasswordVisibility('new')">
-                    <i :class="passwordVisibility.new ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'"></i>
+                  <span
+                    class="password-toggle"
+                    @click="togglePasswordVisibility('new')"
+                  >
+                    <i
+                      :class="
+                        passwordVisibility.new
+                          ? 'bi bi-eye-fill'
+                          : 'bi bi-eye-slash-fill'
+                      "
+                    ></i>
                   </span>
                 </div>
-                <span class="error-message" v-show="!passwordValidation.newPasswordValid">
+                <span
+                  class="error-message"
+                  v-show="!passwordValidation.newPasswordValid"
+                >
                   新密碼不能與舊密碼相同
                 </span>
-                <span class="error-message" v-show="!passwordValidation.newPasswordFormat && passwordValidation.newPasswordValid">
+                <span
+                  class="error-message"
+                  v-show="
+                    !passwordValidation.newPasswordFormat &&
+                    passwordValidation.newPasswordValid
+                  "
+                >
                   密碼必須為8-16位英數字組成
                 </span>
               </div>
 
-              <div class="form-group" :class="{ 'password-error': !passwordValidation.confirmPasswordValid }">
+              <div
+                class="form-group"
+                :class="{
+                  'password-error': !passwordValidation.confirmPasswordValid,
+                }"
+              >
                 <label class="form-label">確認新密碼</label>
                 <div class="password-input-container">
                   <input
                     :type="passwordVisibility.confirm ? 'text' : 'password'"
                     class="form-input"
-                    :class="{ 'error': !passwordValidation.confirmPasswordValid }"
+                    :class="{ error: !passwordValidation.confirmPasswordValid }"
                     placeholder="至少8-16個英數組成"
                     v-model="passwordFields.confirmPassword"
                     @input="validateConfirmPassword"
                   />
-                  <span class="error-icon" v-show="!passwordValidation.confirmPasswordValid">
+                  <span
+                    class="error-icon"
+                    v-show="!passwordValidation.confirmPasswordValid"
+                  >
                     <i class="bi bi-exclamation-triangle-fill"></i>
                   </span>
-                  <span class="password-toggle" @click="togglePasswordVisibility('confirm')">
-                    <i :class="passwordVisibility.confirm ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill'"></i>
+                  <span
+                    class="password-toggle"
+                    @click="togglePasswordVisibility('confirm')"
+                  >
+                    <i
+                      :class="
+                        passwordVisibility.confirm
+                          ? 'bi bi-eye-fill'
+                          : 'bi bi-eye-slash-fill'
+                      "
+                    ></i>
                   </span>
                 </div>
-                <span class="error-message" v-show="!passwordValidation.confirmPasswordValid">
+                <span
+                  class="error-message"
+                  v-show="!passwordValidation.confirmPasswordValid"
+                >
                   確認密碼與新密碼不相符
                 </span>
               </div>
@@ -496,13 +569,16 @@ onMounted(() => {
                 />
               </div>
 
-              <div class="form-group" :class="{ 'phone-error': !phoneValidation.telephone }">
+              <div
+                class="form-group"
+                :class="{ 'phone-error': !phoneValidation.telephone }"
+              >
                 <label class="form-label">市內電話</label>
                 <div class="phone-input-container">
                   <input
                     type="tel"
                     class="form-input"
-                    :class="{ 'error': !phoneValidation.telephone }"
+                    :class="{ error: !phoneValidation.telephone }"
                     value=""
                     v-model="ifo.telephone"
                     @input="handlePhoneInput($event, 'telephone')"
@@ -517,26 +593,29 @@ onMounted(() => {
                 </span>
               </div>
 
-              <div class="form-group" :class="{ 'phone-error': !phoneValidation.phone }">
-              <label class="form-label">行動電話</label>
-              <div class="phone-input-container">
-                <input
-                  type="tel"
-                  class="form-input"
-                  :class="{ 'error': !phoneValidation.phone }"
-                  value=""
-                  v-model="ifo.phone"
-                  @input="handlePhoneInput($event, 'phone')"
-                  placeholder="請輸入數字"
-                />
-                <span class="error-icon" v-show="!phoneValidation.phone">
-                  <i class="bi bi-exclamation-triangle-fill"></i>
+              <div
+                class="form-group"
+                :class="{ 'phone-error': !phoneValidation.phone }"
+              >
+                <label class="form-label">行動電話</label>
+                <div class="phone-input-container">
+                  <input
+                    type="tel"
+                    class="form-input"
+                    :class="{ error: !phoneValidation.phone }"
+                    value=""
+                    v-model="ifo.phone"
+                    @input="handlePhoneInput($event, 'phone')"
+                    placeholder="請輸入數字"
+                  />
+                  <span class="error-icon" v-show="!phoneValidation.phone">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </span>
+                </div>
+                <span class="error-message" v-show="!phoneValidation.phone">
+                  請只輸入數字、空格、短橫線或括號
                 </span>
               </div>
-              <span class="error-message" v-show="!phoneValidation.phone">
-                請只輸入數字、空格、短橫線或括號
-              </span>
-            </div>
 
               <div class="form-group">
                 <label class="form-label">備用聯絡人-姓名</label>
@@ -548,23 +627,38 @@ onMounted(() => {
                 />
               </div>
 
-              <div class="form-group" :class="{ 'phone-error': !phoneValidation.emergency_contacts_phone }">
+              <div
+                class="form-group"
+                :class="{
+                  'phone-error': !phoneValidation.emergency_contacts_phone,
+                }"
+              >
                 <label class="form-label">備用聯絡人-電話</label>
                 <div class="phone-input-container">
                   <input
                     type="tel"
                     class="form-input"
-                    :class="{ 'error': !phoneValidation.emergency_contacts_phone }"
+                    :class="{
+                      error: !phoneValidation.emergency_contacts_phone,
+                    }"
                     value=""
                     v-model="ifo.emergency_contacts_phone"
-                    @input="handlePhoneInput($event, 'emergency_contacts_phone')"
+                    @input="
+                      handlePhoneInput($event, 'emergency_contacts_phone')
+                    "
                     placeholder="請輸入數字"
                   />
-                  <span class="error-icon" v-show="!phoneValidation.emergency_contacts_phone">
+                  <span
+                    class="error-icon"
+                    v-show="!phoneValidation.emergency_contacts_phone"
+                  >
                     <i class="bi bi-exclamation-triangle-fill"></i>
                   </span>
                 </div>
-                <span class="error-message" v-show="!phoneValidation.emergency_contacts_phone">
+                <span
+                  class="error-message"
+                  v-show="!phoneValidation.emergency_contacts_phone"
+                >
                   請只輸入數字、空格、短橫線或括號
                 </span>
               </div>
@@ -838,7 +932,7 @@ img {
 .form-input.error {
   border: 2px solid #dc3545;
   background-color: #ffeaa7;
-  
+
   &:focus {
     outline: none;
     border: 2px solid #dc3545;
