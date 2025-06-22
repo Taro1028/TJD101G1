@@ -13,66 +13,69 @@ $member = json_decode(file_get_contents("php://input"), true);
 
 try {
         // ✅ Google 登入：如果有 idToken
-        // if (isset($member['idToken'])) {
-        //         $client = new Google_Client(['client_id' => '1010508992557-rlnbp3o2h7327jmco3726c6qei92s0et.apps.googleusercontent.com']); // 替換成你自己的
-        //         $payload = $client->verifyIdToken($member['idToken']);
+        if (isset($member['idToken'])) {
+                $idToken = $member['idToken'];
+                // $client = new Google_Client(['client_id' => '1010508992557-rlnbp3o2h7327jmco3726c6qei92s0et.apps.googleusercontent.com']); // 替換成你自己的
+                // $payload = $client->verifyIdToken($member['idToken']);
+                // $response = file_get_contents("https://oauth2.googleapis.com/tokeninfo?id_token=$idToken");
+                $payload = verifyGoogleIdToken($idToken);
 
-        //         if ($payload) {
-        //                 $googleId = $payload['sub'];
-        //                 $email = $payload['email'];
-        //                 $name = $payload['name'];
-        //                 $avatar = $payload['picture'];
+                if ($payload) {
+                        $googleId = $payload['sub'];
+                        $email = $payload['email'];
+                        $name = $payload['name'];
+                        $avatar = $payload['picture'];
 
-        //                 // 檢查是否已註冊
-        //                 $stmt = $pdo->prepare("SELECT * FROM MEMBERS WHERE GOOGLE_ID = :gid");
-        //                 $stmt->execute([':gid' => $googleId]);
-        //                 $result = $stmt->fetch();
+                        // 檢查是否已註冊
+                        $stmt = $pdo->prepare("SELECT * FROM MEMBERS WHERE GOOGLE_ID = :gid");
+                        $stmt->execute([':gid' => $googleId]);
+                        $result = $stmt->fetch();
 
-        //                 // 沒有就自動註冊
-        //                 if (!$result) {
-        //                         $stmt = $pdo->prepare("INSERT INTO MEMBERS (GOOGLE_ID, EMAIL, M_NAME, AVATAR) VALUES (?, ?, ?, ?)");
-        //                         $stmt->execute([$googleId, $email, $name, $avatar]);
+                        // 沒有就自動註冊
+                        if (!$result) {
+                                $stmt = $pdo->prepare("INSERT INTO MEMBERS (GOOGLE_ID, EMAIL, M_NAME, AVATAR) VALUES (?, ?, ?, ?)");
+                                $stmt->execute([$googleId, $email, $name, $avatar]);
 
-        //                         $stmt = $pdo->prepare("SELECT * FROM MEMBERS WHERE GOOGLE_ID = :gid");
-        //                         $stmt->execute([':gid' => $googleId]);
-        //                         $result = $stmt->fetch();
-        //                 }
+                                $stmt = $pdo->prepare("SELECT * FROM MEMBERS WHERE GOOGLE_ID = :gid");
+                                $stmt->execute([':gid' => $googleId]);
+                                $result = $stmt->fetch();
+                        }
 
-        //                 // 檢查是否停權
-        //                 if ((int)($result['BLACKLISTED'] ?? 0) === 1) {
-        //                         echo json_encode([
-        //                                 'success' => false,
-        //                                 'blacklisted' => true,
-        //                                 'message' => '此帳號已被停權',
-        //                         ]);
-        //                         exit;
-        //                 }
+                        // 檢查是否停權
+                        if ((int)($result['BLACKLISTED'] ?? 0) === 1) {
+                                echo json_encode([
+                                        'success' => false,
+                                        'blacklisted' => true,
+                                        'message' => '此帳號已被停權',
+                                ]);
+                                exit;
+                        }
 
-        //                 // 登入成功
-        //                 echo json_encode([
-        //                         'success' => true,
-        //                         'blacklisted' => false,
-        //                         'ID' => $result['ID'],
-        //                         'EMAIL' => $result['EMAIL'],
-        //                         'M_NAME' => $result['M_NAME'],
-        //                         'NICKNAME' => $result['NICKNAME'],
-        //                         'GENDER' => $result['GENDER'],
-        //                         'ADDRESS' => $result['ADDRESS'],
-        //                         'TELEPHONE' => $result['TELEPHONE'],
-        //                         'PHONE' => $result['PHONE'],
-        //                         'EMERGENCY_CONTACTS_NAME' => $result['EMERGENCY_CONTACTS_NAME'],
-        //                         'EMERGENCY_CONTACTS_PHONE' => $result['EMERGENCY_CONTACTS_PHONE'],
-        //                         'BIRTHDAY' => $result['BIRTHDAY'],
-        //                         'NOTE' => $result['NOTE'],
-        //                         'AVATAR' => $result['AVATAR'],
-        //                         'PASSWORD' => $result['PASSWORD']                           
-        //                 ]);
-        //                 exit;
-        //         } else {
-        //                 echo json_encode(['success' => false, 'message' => '無效的 Google token']);
-        //                 exit;
-        //         }
-        // }
+                        // 登入成功
+                        echo json_encode([
+                                'success' => true,
+                                'blacklisted' => false,
+                                'ID' => $result['ID'],
+                                'EMAIL' => $result['EMAIL'],
+                                'M_NAME' => $result['M_NAME'],
+                                'NICKNAME' => $result['NICKNAME'],
+                                'GENDER' => $result['GENDER'],
+                                'ADDRESS' => $result['ADDRESS'],
+                                'TELEPHONE' => $result['TELEPHONE'],
+                                'PHONE' => $result['PHONE'],
+                                'EMERGENCY_CONTACTS_NAME' => $result['EMERGENCY_CONTACTS_NAME'],
+                                'EMERGENCY_CONTACTS_PHONE' => $result['EMERGENCY_CONTACTS_PHONE'],
+                                'BIRTHDAY' => $result['BIRTHDAY'],
+                                'NOTE' => $result['NOTE'],
+                                'AVATAR' => $result['AVATAR'],
+                                'PASSWORD' => $result['PASSWORD']
+                        ]);
+                        exit;
+                } else {
+                        echo json_encode(['success' => false, 'message' => '無效的 Google token']);
+                        exit;
+                }
+        }
 
         $sql = "SELECT * FROM MEMBERS WHERE EMAIL = :usr AND PASSWORD = :pwd";
         $stmt = $pdo->prepare($sql);
@@ -123,4 +126,24 @@ try {
                 'success' => false,
                 'message' => '伺服器錯誤：' . $e->getMessage()
         ]);
+}
+
+
+function verifyGoogleIdToken($idToken)
+{
+        $url = "https://oauth2.googleapis.com/tokeninfo?id_token=" . urlencode($idToken);
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true); // 強烈建議開啟 SSL 驗證
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+                curl_close($ch);
+                return null;
+        }
+
+        curl_close($ch);
+        return json_decode($response, true);
 }

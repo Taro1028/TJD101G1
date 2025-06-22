@@ -196,8 +196,6 @@ function loginWithGoogle() {
 }
 
 function handleCredentialResponse(response) {
-  console.log("收到 Google ID Token:", response.credential);
-
   fetch(env + "/tjd101/g1/php/Login.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
