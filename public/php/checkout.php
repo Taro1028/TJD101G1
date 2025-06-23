@@ -59,7 +59,19 @@ try {
     $memberId = (int)$input['m_id'];
     $cartIds = $input['cart_ids'];
     $consigneeInfo = $input['consignee_info'] ?? [];
-    $shippingFee = $input['shipping_fee'] ?? 0;
+    
+    // 🔥 新增：接收金額資料
+    $mealAmount = floatval($input['meal_amount'] ?? 0);        // 便當金額
+    $shippingFee = floatval($input['shipping_fee'] ?? 0);      // 運費
+    $totalAmount = floatval($input['total_amount'] ?? 0);      // 總金額(含運費)
+    
+    // 🔥 新增：驗證金額計算正確性
+    $calculatedTotal = $mealAmount + $shippingFee;
+    if (abs($calculatedTotal - $totalAmount) > 0.01) {
+        throw new Exception("金額計算錯誤：便當($mealAmount) + 運費($shippingFee) ≠ 總額($totalAmount)");
+    }
+    
+    error_log("💰 金額驗證通過 - 便當:$mealAmount, 運費:$shippingFee, 總額:$totalAmount");
     
     // 驗證會員ID
     if ($memberId <= 0) {
@@ -112,8 +124,8 @@ try {
     
     // 組織資料
     $cartItemsByCartId = [];
-    $totalMealCount = 0;
-    $totalAmount = 0;
+    $verifyMealCount = 0;
+    $verifyMealAmount = 0;
     
     foreach ($cartItems as $item) {
         $cartId = $item['SCART_ID'];
@@ -121,21 +133,44 @@ try {
             $cartItemsByCartId[$cartId] = [];
         }
         $cartItemsByCartId[$cartId][] = $item;
-        $totalMealCount += (int)$item['COUNT'];
-        $totalAmount += (float)$item['TOTAL_AMOUNT'];
+        $verifyMealCount += (int)$item['COUNT'];
+        $verifyMealAmount += (float)$item['TOTAL_AMOUNT'];
+    }
+    
+    // 🔥 新增：驗證便當金額是否一致
+    if (abs($verifyMealAmount - $mealAmount) > 0.01) {
+        error_log("⚠️ 便當金額不一致 - 購物車:$verifyMealAmount, 前端傳送:$mealAmount");
+        // 使用購物車的實際金額
+        $mealAmount = $verifyMealAmount;
+        $totalAmount = $mealAmount + $shippingFee;
+        error_log("✅ 已修正為購物車實際金額 - 新總額:$totalAmount");
     }
     
     $createdOrders = [];
     $totalOrderCount = 0;
     $cartToOrderMapping = []; // 記錄購物車ID到訂單ID的映射
     
+    // 🔥 計算運費分配（如果有多筆訂單，需要分配運費）
+    $totalDaysAllCarts = array_sum(array_column($carts, 'TOTAL_DAYS'));
+    
     // 為每個購物車項目創建訂單
     foreach ($carts as $cart) {
         $totalDays = (int)$cart['TOTAL_DAYS'];
         $groupMealCount = (int)$cart['TOTAL_MEAL_COUNT'];
-        $groupTotalAmount = (float)$cart['TOTAL_AMOUNT'];
+        $groupMealAmount = (float)$cart['TOTAL_AMOUNT']; // 這是便當金額，不含運費
         
-        // 🔥 插入 ORDERS 表（包含收貨人資訊）
+        // 🔥 計算這個訂單應分配的運費（按天數比例分配）
+        $groupShippingFee = 0;
+        if ($totalDaysAllCarts > 0) {
+            $groupShippingFee = ($totalDays / $totalDaysAllCarts) * $shippingFee;
+        }
+        
+        // 🔥 重要：訂單總金額 = 便當金額 + 分配的運費
+        $orderTotalAmount = $groupMealAmount + $groupShippingFee;
+        
+        error_log("🧮 訂單 {$cart['PLAN_TYPE']} 金額計算 - 便當:$groupMealAmount, 運費:$groupShippingFee, 總額:$orderTotalAmount");
+        
+        // 🔥 插入 ORDERS 表（TOTAL_AMOUNT 包含運費）
         $orderSql = "INSERT INTO ORDERS (
             M_ID, PLAN_TYPE, ORDER_START_DATE, ORDER_END_DATE, 
             TOTAL_DAYS, TOTAL_MEAL_COUNT, TOTAL_AMOUNT, 
@@ -151,7 +186,7 @@ try {
             $cart['END_DATE'],
             $totalDays,
             $groupMealCount,
-            $groupTotalAmount,
+            $orderTotalAmount,  // 🔥 使用包含運費的金額
             $consigneeInfo['name'] ?? '',
             $consigneeInfo['phone'] ?? '',
             $consigneeInfo['address'] ?? ''
@@ -164,7 +199,7 @@ try {
         $orderNumber = generateOrderNumber($orderId);
         
         // 🔥 記錄生成的訂單編號（除錯用）
-        error_log("生成訂單編號: $orderNumber (訂單ID: $orderId)");
+        error_log("生成訂單編號: $orderNumber (訂單ID: $orderId, 含運費總額: $orderTotalAmount)");
         
         // 🔥 更新訂單編號到資料庫
         $updateOrderNumberSql = "UPDATE ORDERS SET ORDER_NUMBER = ? WHERE ID = ?";
@@ -174,7 +209,7 @@ try {
         // 🔥 記錄購物車ID到訂單ID的映射
         $cartToOrderMapping[$cart['ID']] = $orderId;
         
-        // 插入 ORDERS_ITEMS
+        // 插入 ORDERS_ITEMS （這裡存放的是每日便當的金額，不含運費）
         if (isset($cartItemsByCartId[$cart['ID']])) {
             foreach ($cartItemsByCartId[$cart['ID']] as $item) {
                 $orderItemSql = "INSERT INTO ORDERS_ITEMS (
@@ -187,7 +222,7 @@ try {
                     $item['MEAL_DATE'],
                     $item['MEAL_ITEMS'],
                     $item['COUNT'],
-                    $item['TOTAL_AMOUNT']
+                    $item['TOTAL_AMOUNT']  // 這是每日便當金額，不含運費
                 ]);
             }
         }
@@ -201,7 +236,9 @@ try {
             'end_date' => $cart['END_DATE'],
             'total_days' => $totalDays,
             'total_meal_count' => $groupMealCount,
-            'total_amount' => $groupTotalAmount,
+            'meal_amount' => $groupMealAmount,        // 🔥 新增：便當金額
+            'shipping_fee' => $groupShippingFee,      // 🔥 新增：運費
+            'total_amount' => $orderTotalAmount,      // 🔥 總金額(含運費)
             'items_count' => isset($cartItemsByCartId[$cart['ID']]) ? count($cartItemsByCartId[$cart['ID']]) : 0
         ];
         
@@ -249,10 +286,11 @@ try {
             'order_numbers' => array_column($createdOrders, 'order_number'), // 🔥 新格式陣列：["EAT2506180001"]
             'orders' => $createdOrders,
             'total_orders' => $totalOrderCount,
-            'total_amount' => $totalAmount,
-            'total_meal_count' => $totalMealCount,
-            'shipping_fee' => $shippingFee,
-            'final_total' => $totalAmount + $shippingFee,
+            'meal_amount' => $mealAmount,            // 🔥 便當總金額
+            'shipping_fee' => $shippingFee,          // 🔥 總運費
+            'total_amount' => $totalAmount,          // 🔥 總金額(含運費)
+            'total_meal_count' => $verifyMealCount,  // 🔥 使用驗證後的餐盒數量
+            'final_total' => $totalAmount,           // 🔥 最終總金額
             'deleted_cart_count' => $deletedCartCount,
             'deleted_items_count' => $deletedItemsCount,
             'migrated_cards_count' => $migratedCardsCount,
@@ -265,6 +303,7 @@ try {
 } catch (PDOException $e) {
     $pdo->rollBack();
     ob_clean(); // 🔥 清理輸出緩衝區
+    error_log("💥 PDO 錯誤: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
@@ -273,6 +312,7 @@ try {
 } catch (Exception $e) {
     $pdo->rollBack();
     ob_clean(); // 🔥 清理輸出緩衝區
+    error_log("💥 一般錯誤: " . $e->getMessage());
     http_response_code(400);
     echo json_encode([
         'success' => false,
