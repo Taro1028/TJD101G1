@@ -642,6 +642,10 @@ h1 {
     background-color: $primary_100;
     border: 1px solid $primary_100;
     border-radius: 24px;
+    
+    &:hover{
+        cursor: pointer;
+    }
 }
 
 .finish{
@@ -656,10 +660,16 @@ h1 {
     background-color: $primary_400;
     border: 1px solid $primary_400;
     border-radius: 24px;
+    cursor: pointer;
 }
 
 .disabled {
     opacity: .5;
+}
+
+.prevbtn:disabled,
+.nextbtn:disabled {
+    cursor: not-allowed;
 }
 
 // --- RWD ---

@@ -140,6 +140,12 @@ const selectedTotalAmount = computed(() => checkoutStore.selectedTotalAmount)
 const selectedTotalMeals = computed(() => checkoutStore.selectedTotalMeals)
 const shippingFee = computed(() => checkoutStore.shippingFee)
 const finalTotalAmount = computed(() => checkoutStore.finalTotalAmount)
+// 計算總配送天數用於顯示
+const totalDeliveryDays = computed(() => {
+  return selectedCartItems.value.reduce((sum, group) => {
+    return sum + (parseInt(group.total_days) || 0)
+  }, 0)
+})
 
 // 格式化價格
 const formatPrice = (price) => {
@@ -231,8 +237,6 @@ const submitOrder = async () => {
     }
 
     // console.log('📦 訂單資料:', orderData)
-
-    const env = import.meta.env.VITE_API_URL || 'http://localhost'
     const checkoutResponse = await fetch(`${env}/tjd101/g1/php/checkout.php`, {
       method: 'POST',
       headers: {
@@ -572,11 +576,11 @@ const handleConsigneeSelected = (consignee) => {
                             <h6>{{ selectedTotalMeals }} 份餐盒</h6>
                         </div>
                         <div class="payItem">
-                            <h6>金額合計</h6>
+                            <h6>餐盒金額合計</h6>
                             <h6>${{ formatPrice(selectedTotalAmount) }}</h6>
                         </div>
                         <div class="payItem">
-                            <h6>運費</h6>
+                            <h6>運費 ({{ totalDeliveryDays }}天 × $100)</h6>
                             <h6>${{ formatPrice(shippingFee) }}</h6>
                         </div>
                         <div class="payItem">

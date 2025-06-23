@@ -8,7 +8,6 @@ export const useCheckoutStore = defineStore('checkout', () => {
   
   // 狀態定義 ================================
 
-
   // 結帳步驟
   const currentStep = ref(1) // 1: 訂單資料, 2: 付款資料, 3: 完成結帳
 
@@ -52,7 +51,6 @@ export const useCheckoutStore = defineStore('checkout', () => {
   // 載入狀態
   const isSubmitting = ref(false)
 
-
   // 計算屬性 ================================
 
   // 取得被選中的購物車項目
@@ -95,12 +93,29 @@ export const useCheckoutStore = defineStore('checkout', () => {
     }, 0)
   })
 
-  // 計算運費 (先寫死，之後可以改成動態計算)
+  // 🔥 修正：計算運費 - 簡化版：天數 × 100
   const shippingFee = computed(() => {
-    return selectedCartItems.value.length > 0 ? 800 : 0
+    if (selectedCartItems.value.length === 0) {
+      return 0
+    }
+
+    // 計算總配送天數
+    const totalDeliveryDays = selectedCartItems.value.reduce((sum, group) => {
+      return sum + (parseInt(group.total_days) || 0)
+    }, 0)
+
+    // 簡單計算：天數 × 100元
+    return totalDeliveryDays * 100
   })
 
-  // 計算最終總金額 (餐費 + 運費)
+  // 🔥 新增：計算總配送天數（用於顯示）
+  const totalDeliveryDays = computed(() => {
+    return selectedCartItems.value.reduce((sum, group) => {
+      return sum + (parseInt(group.total_days) || 0)
+    }, 0)
+  })
+
+  // 🔥 修正：計算最終總金額 (便當 + 運費) - 這會傳給後端
   const finalTotalAmount = computed(() => {
     return selectedTotalAmount.value + shippingFee.value
   })
@@ -109,16 +124,12 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const canProceedToNextStep = computed(() => {
     switch (currentStep.value) {
       case 1:
-        console.log('a');
         return selectedCartIds.value.length > 0
       case 2:
-        console.log('b')
         return isStep2Valid.value
       case 3:
-        console.log('c')
         return false
       default:
-        console.log('d')
         return false
     }
   })
@@ -141,9 +152,20 @@ export const useCheckoutStore = defineStore('checkout', () => {
     // 發票資訊只需要選擇類型即可，不需要額外驗證
     const invoiceValid = invoiceInfo.value.type !== ''
 
-    return ordererValid && consigneeValid && invoiceValid
+    const result = ordererValid && consigneeValid && invoiceValid
+    
+    // 🔥 新增：調試輸出
+    console.log('Step2 驗證結果:', {
+      ordererValid,
+      consigneeValid, 
+      invoiceValid,
+      result,
+      ordererInfo: ordererInfo.value,
+      consigneeInfo: consigneeInfo.value
+    })
+    
+    return result
   })
-
 
   // 方法 ================================
 
@@ -156,6 +178,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
     console.log('selectedCartItems:', selectedCartItems.value)
     console.log('selectedTotalMeals:', selectedTotalMeals.value)
     console.log('selectedTotalAmount:', selectedTotalAmount.value)
+    console.log('shippingFee:', shippingFee.value)
+    console.log('finalTotalAmount:', finalTotalAmount.value)
 
     // 詳細檢查每個選中的項目
     selectedCartItems.value.forEach((group, index) => {
@@ -163,7 +187,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
         cart_id: group.cart_id,
         items: group.items,
         total_amount: group.total_amount,
-        total_meal_count: group.total_meal_count
+        total_meal_count: group.total_meal_count,
+        total_days: group.total_days
       })
 
       if (group.items) {
@@ -351,10 +376,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         address: item.C_ADD
       }))
 
-      // console.log('✅ 常用收貨人列表載入完成:', savedConsignees.value)
-
     } catch (error) {
-      // console.error('❌ 載入常用收貨人失敗:', error)
       // 載入失敗時使用空陣列
       savedConsignees.value = []
     }
@@ -368,13 +390,11 @@ export const useCheckoutStore = defineStore('checkout', () => {
       phone: consignee.phone,
       address: consignee.address
     }
-    // console.log('✅ 已選擇常用收貨人:', consignee)
   }
 
   // 提交訂單並處理購物車刪除
   const submitOrder = async () => {
     if (isSubmitting.value) {
-      // console.log('⚠️ 正在提交中，請勿重複操作')
       return
     }
 
@@ -382,7 +402,6 @@ export const useCheckoutStore = defineStore('checkout', () => {
       isSubmitting.value = true
       const memberStore = useMemberStore()
       const cartStore = useCartStore()
-      
 
       // 調試會員資料
       debugMemberData()
@@ -401,31 +420,24 @@ export const useCheckoutStore = defineStore('checkout', () => {
       // 方法1: 從 memberStore.memberId (getter)
       if (memberStore.memberId) {
         memberId = memberStore.memberId
-        // console.log('✅ 使用 memberStore.memberId:', memberId)
       }
       // 方法2: 從 memberStore.id (state)
       else if (memberStore.id) {
         memberId = memberStore.id
-        // console.log('✅ 使用 memberStore.id:', memberId)
       }
       // 方法3: 如果有 member 物件，從中取得
       else if (memberStore.member && memberStore.member.M_ID) {
         memberId = memberStore.member.M_ID
-        // console.log('✅ 使用 memberStore.member.M_ID:', memberId)
       }
       else if (memberStore.member && memberStore.member.ID) {
         memberId = memberStore.member.ID
-        // console.log('✅ 使用 memberStore.member.ID:', memberId)
       }
       // 方法4: 如果上述都失敗，嘗試重新載入會員資料
       else {
-        // console.log('⚠️ 無法取得會員ID，嘗試重新載入會員資料...')
-
         // 嘗試從 sessionStorage 載入
         const loaded = memberStore.loadFromsessionStorage()
         if (loaded && memberStore.id) {
           memberId = memberStore.id
-          // console.log('✅ 從 sessionStorage 重新載入會員ID:', memberId)
         } else {
           throw new Error('無法取得會員ID，請重新登入')
         }
@@ -436,9 +448,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         throw new Error('會員ID無效，請重新登入')
       }
 
-      // console.log('🔍 最終使用的會員ID:', memberId)
-
-      // 準備訂單資料
+      // 🔥 準備訂單資料 - 確保傳送正確的金額資料到後端
       const orderData = {
         m_id: parseInt(memberId), // 確保是整數
         cart_ids: selectedCartIds.value,
@@ -446,12 +456,19 @@ export const useCheckoutStore = defineStore('checkout', () => {
         consignee_info: consigneeInfo.value.isSameAsOrderer ? ordererInfo.value : consigneeInfo.value,
         invoice_info: invoiceInfo.value,
         payment_method: paymentInfo.value.method,
-        meal_amount: selectedTotalAmount.value,
-        shipping_fee: shippingFee.value,
-        total_amount: finalTotalAmount.value
+        
+        // 🔥 重要：分別傳送便當金額和運費
+        meal_amount: selectedTotalAmount.value,    // 只有便當的金額
+        shipping_fee: shippingFee.value,           // 運費
+        total_amount: finalTotalAmount.value       // 便當 + 運費 = 最終總額
       }
 
-      // console.log('準備提交訂單:', orderData)
+      console.log('💰 金額資料檢查:', {
+        便當金額: orderData.meal_amount,
+        運費: orderData.shipping_fee,
+        總金額: orderData.total_amount,
+        計算確認: orderData.meal_amount + orderData.shipping_fee === orderData.total_amount
+      })
 
       // 調用結帳 API
       const env = import.meta.env.VITE_API_URL
@@ -477,9 +494,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       let result
       try {
         result = JSON.parse(responseText)
-        
       } catch (jsonError) {
-        
         // 檢查是否包含 PHP 錯誤或額外輸出
         if (responseText.includes('=== 緊湊型時間戳')) {
           throw new Error('PHP 檔案包含測試程式碼，請移除所有 echo 和測試輸出')
@@ -505,13 +520,14 @@ export const useCheckoutStore = defineStore('checkout', () => {
         // 重要：保持 API 回傳的完整 data 結構
         data: {
           order_ids: result.data.order_ids,
-          order_numbers: result.data.order_numbers, 
+          order_numbers: result.data.order_numbers,
           orders: result.data.orders,
           total_orders: result.data.total_orders,
-          total_amount: result.data.total_amount,
+          meal_amount: result.data.meal_amount,        // 🔥 新增：便當金額
+          shipping_fee: result.data.shipping_fee,      // 🔥 運費
+          total_amount: result.data.total_amount,      // 🔥 總金額(含運費)
           total_meal_count: result.data.total_meal_count,
           final_total: result.data.final_total,
-          shipping_fee: result.data.shipping_fee,
           consignee_info: result.data.consignee_info,
           order_time: result.data.order_time,
           deleted_cart_count: result.data.deleted_cart_count,
@@ -529,6 +545,18 @@ export const useCheckoutStore = defineStore('checkout', () => {
         final_total: result.data.final_total
       }
 
+      // 🔥 新增：保存購物車資訊到訂單結果中（用於完成頁面顯示）
+      orderResult.value.selectedCartItems = selectedCartItems.value.map(item => ({
+        cart_id: item.cart_id,
+        plan_type: item.plan_type,
+        display_title: item.display_title || item.plan_type, // 🔥 保留 display_title
+        title: item.plan_type,
+        total_amount: item.total_amount,
+        total_meal_count: item.total_meal_count,
+        has_message_card: item.has_message_card || false, // 🔥 保留小卡資訊
+        items: item.items || []
+      }))
+
       // 除錯輸出（確認資料結構）
       console.log('✅ 結帳成功，orderResult 結構:', {
         success: orderResult.value.success,
@@ -540,38 +568,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
         orderIds: orderResult.value.data?.order_ids,
         totalOrders: orderResult.value.data?.total_orders,
         totalMealCount: orderResult.value.data?.total_meal_count,
-        finalTotal: orderResult.value.data?.final_total
+        finalTotal: orderResult.value.data?.final_total,
+        selectedCartItemsCount: orderResult.value.selectedCartItems?.length
       })
-
-      // 特別檢查訂單編號格式
-      if (orderResult.value.data?.order_numbers && Array.isArray(orderResult.value.data.order_numbers)) {
-        orderResult.value.data.order_numbers.forEach((num, index) => {
-          const numStr = String(num)
-          console.log(`訂單編號 ${index + 1}: ${numStr} (長度: ${numStr.length})`)
-
-          // 解析時間+ID格式
-          if (numStr.length === 12) {
-            const year = 2000 + parseInt(numStr.substring(0, 2))
-            const month = parseInt(numStr.substring(2, 4))
-            const day = parseInt(numStr.substring(4, 6))
-            const hour = parseInt(numStr.substring(6, 8))
-            const minute = parseInt(numStr.substring(8, 10))
-            const id = parseInt(numStr.substring(10, 12))
-
-          }
-        })
-      }
-
-      // 🔥 新增：保存購物車資訊到訂單結果中（用於完成頁面顯示）
-      orderResult.value.selectedCartItems = selectedCartItems.value.map(item => ({
-        cart_id: item.cart_id,
-        plan_type: item.plan_type,
-        display_title: item.plan_type,
-        title: item.plan_type,
-        total_amount: item.total_amount,
-        total_meal_count: item.total_meal_count,
-        items: item.items || []
-      }))
 
       // 重要：重新載入購物車資料
       await cartStore.fetchCartItemsFromBackend()
@@ -617,7 +616,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     try {
       const cartStore = useCartStore()
       console.log('🔄 結帳後重新載入購物車...')
-      await cartStore.fetchCart()
+      await cartStore.fetchCartItemsFromBackend()
       console.log('✅ 購物車數據已更新')
     } catch (error) {
       console.error('❌ 重新載入購物車失敗:', error)
@@ -742,6 +741,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     selectedTotalAmount,
     selectedTotalMeals,
     shippingFee,
+    totalDeliveryDays, // 🔥 新增：用於顯示
     finalTotalAmount,
     canProceedToNextStep,
     isStep2Valid,
