@@ -284,7 +284,7 @@ onMounted(() => {
   height: auto;
   margin-right: 50px;
   // margin-right: 20px;
-
+cursor: pointer;
   object-fit: contain;
   border-radius: 8px;
 }
