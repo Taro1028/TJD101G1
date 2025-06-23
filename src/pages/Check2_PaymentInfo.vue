@@ -233,10 +233,21 @@ const submitOrder = async () => {
       consignee_info: checkoutStore.consigneeInfo.isSameAsOrderer 
         ? checkoutStore.ordererInfo 
         : checkoutStore.consigneeInfo,
-      // shipping_fee: checkoutStore.shippingFee
+      
+      meal_amount: checkoutStore.selectedTotalAmount,     // 便當金額
+      shipping_fee: checkoutStore.shippingFee,            // 運費
+      total_amount: checkoutStore.finalTotalAmount        // 總金額(含運費)
     }
 
+    console.log('💰 傳送到 checkout.php 的金額資料:', {
+      便當金額: orderData.meal_amount,
+      運費: orderData.shipping_fee,
+      總金額: orderData.total_amount,
+      計算確認: orderData.meal_amount + orderData.shipping_fee === orderData.total_amount
+    })
+
     // console.log('📦 訂單資料:', orderData)
+    const env = import.meta.env.VITE_API_URL || 'http://localhost'
     const checkoutResponse = await fetch(`${env}/tjd101/g1/php/checkout.php`, {
       method: 'POST',
       headers: {

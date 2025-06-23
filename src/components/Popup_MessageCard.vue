@@ -100,7 +100,7 @@ function goMessage() {
 
 h3{
     margin: 0;
-    font-size: $font_h3;
+    font-size: 2rem;
 }
 
 h5{
