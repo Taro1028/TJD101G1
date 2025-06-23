@@ -43,7 +43,7 @@ const memberHeaders = [
   { key: "EMERGENCY_CONTACTS_NAME", label: "備用聯絡人姓名" },
   { key: "EMERGENCY_CONTACTS_PHONE", label: "備用聯絡人手機" },
   { key: "NOTE", label: "會員備註" },
-  { key: "AVATAR", label: "會員頭貼" },
+  // { key: "AVATAR", label: "會員頭貼" },
   { key: "actionsmember", label: "操作" },
 ];
 const productHeaders = [
@@ -82,8 +82,8 @@ const consigneesHeaders = [
   { key: "M_ID", label: "會員ID" },
   { key: "C_NAME", label: "收貨人姓名" },
   { key: "C_ADD", label: "收貨人地址" },
-  { key: "C_CONTACTS_PHONE", label: "收貨人市內電話" },
-  { key: "C_TELEPHONE", label: "收貨人手機" },
+  { key: "C_CONTACTS_PHONE", label: "收貨人手機" },
+  { key: "C_TELEPHONE", label: "收貨人市內電話" },
   { key: "C_CONTACTS_NAME", label: "送餐安全聯絡人姓名" },
   { key: "C_CONTACTS_PHONE", label: "送餐安全聯絡人手機" },
   { key: "C_NOTE", label: "備註" },

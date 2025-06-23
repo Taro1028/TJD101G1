@@ -606,7 +606,9 @@ onMounted(() => {
   background-color: $primary_600;
   color: white;
 }
-
+.page-item.previous .page-link:hover{
+  background-color: $primary_400;
+}
 .page-item.next .page-link {
   background-color: $primary_600;
   color: white;
@@ -642,7 +644,11 @@ onMounted(() => {
   background-color: $primary_600;
   color: #fff;
 }
-page-item disabled{
-  
+.page-link.page-info{
+  background-color: $primary_100;
+  margin-top: 10px;
+  margin-right: 5px;
+  border:$primary_400;
 }
+
 </style>
