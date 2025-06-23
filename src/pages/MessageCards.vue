@@ -2,7 +2,7 @@
 import FrontLayout from '@/layouts/FrontLayout.vue'
 import Gotop from "../components/Gotop.vue"
 
-import { ref, reactive, nextTick, onMounted } from 'vue'
+import { ref, reactive, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useOrderStore } from '@/stores/orderStore'
@@ -44,6 +44,14 @@ const addedStickers = ref([])
 const draggedSticker = ref(null)
 const previewArea = ref(null)
 const isDragging = ref(false)
+
+// 手機裝置檢測和編輯模式
+const isMobile = ref(false)
+const selectedSticker = ref(null)
+const showEditMenu = ref(false)
+const editMenuPosition = ref({ x: 0, y: 0 })
+const longPressTimer = ref(null)
+const LONG_PRESS_DURATION = 800 // 長按時間(毫秒)
 
 // 截圖功能
 const isCapturing = ref(false)
@@ -187,7 +195,127 @@ function handleStickerDoubleClick(sticker) {
 
 // 單點擊處理
 function handleStickerClick(event, sticker) {
+  // 桌面版：阻止事件冒泡但不做其他處理
+  if (!isMobile.value) {
+    event.stopPropagation()
+    return
+  }
+  
+  // 手機版：由觸控事件處理，這裡不做處理
+}
+
+// 觸控開始處理
+function handleTouchStart(event, sticker) {
+  if (!isMobile.value) return
+  
+  event.preventDefault()
   event.stopPropagation()
+  
+  // 如果貼紙已經處於拖曳模式，直接進行拖曳
+  if (sticker.isDragging) {
+    startMobileTouchDrag(event, sticker)
+    return
+  }
+  
+  // 記錄觸控開始的時間和位置
+  const touch = event.touches[0]
+  sticker.touchStartTime = Date.now()
+  sticker.touchStartX = touch.clientX
+  sticker.touchStartY = touch.clientY
+  sticker.hasMoved = false
+  
+  // 長按計時器
+  longPressTimer.value = setTimeout(() => {
+    // 長按直接刪除
+    removeMobileSticker(sticker)
+    longPressTimer.value = null
+  }, LONG_PRESS_DURATION)
+}
+
+// 觸控結束處理
+function handleTouchEnd(event, sticker) {
+  if (!isMobile.value) return
+  
+  event.preventDefault()
+  
+  // 清除長按計時器
+  if (longPressTimer.value) {
+    clearTimeout(longPressTimer.value)
+    longPressTimer.value = null
+  }
+  
+  // 如果正在拖曳模式，結束拖曳
+  if (sticker.isDragging) {
+    sticker.isDragging = false
+    isDragging.value = false
+    delete sticker.offsetX
+    delete sticker.offsetY
+    return
+  }
+  
+  // 如果沒有移動且時間短於長按時間，認為是點擊
+  const touchDuration = Date.now() - sticker.touchStartTime
+  if (!sticker.hasMoved && touchDuration < LONG_PRESS_DURATION) {
+    showStickerEditMenu(sticker, event.changedTouches[0])
+  }
+  
+  // 清理臨時屬性
+  delete sticker.touchStartTime
+  delete sticker.touchStartX
+  delete sticker.touchStartY
+  delete sticker.hasMoved
+}
+
+
+// 開始手機觸控拖曳
+function startMobileTouchDrag(event, sticker) {
+  const touch = event.touches[0]
+  const rect = previewArea.value.getBoundingClientRect()
+  
+  // 計算觸控點相對於貼紙的偏移
+  sticker.offsetX = touch.clientX - rect.left - sticker.x
+  sticker.offsetY = touch.clientY - rect.top - sticker.y
+}
+
+
+// 觸控移動處理
+function handleTouchMove(event, sticker) {
+  if (!isMobile.value) return
+  
+  event.preventDefault()
+  
+  // 如果正在拖曳模式，進行拖曳
+  if (sticker.isDragging) {
+    const touch = event.touches[0]
+    const rect = previewArea.value.getBoundingClientRect()
+    
+    const newX = touch.clientX - rect.left - sticker.offsetX
+    const newY = touch.clientY - rect.top - sticker.offsetY
+    
+    const maxX = rect.width - 60
+    const maxY = rect.height - 60
+    
+    sticker.x = Math.max(0, Math.min(newX, maxX))
+    sticker.y = Math.max(0, Math.min(newY, maxY))
+    return
+  }
+  
+  // 檢查是否有移動（用於判斷是點擊還是拖曳）
+  const touch = event.touches[0]
+  const moveDistance = Math.sqrt(
+    Math.pow(touch.clientX - sticker.touchStartX, 2) + 
+    Math.pow(touch.clientY - sticker.touchStartY, 2)
+  )
+  
+  if (moveDistance > 10) { // 移動超過10px認為是拖曳
+    sticker.hasMoved = true
+    
+    // 清除長按計時器
+    if (longPressTimer.value) {
+      clearTimeout(longPressTimer.value)
+      longPressTimer.value = null
+    }
+  }
 }
 
 // 選擇顏色
@@ -198,6 +326,74 @@ function selectColor(color) {
 // 插入關心小語
 function insertCareWord(word) {
   messageText.value = word
+}
+
+// 檢測是否為手機裝置
+function checkIsMobile() {
+  isMobile.value = window.innerWidth <= 767 || 'ontouchstart' in window
+}
+
+// 手機模式：顯示編輯選單
+// 修正編輯選單位置計算
+function showStickerEditMenu(sticker, touch) {
+  selectedSticker.value = sticker
+  const rect = previewArea.value.getBoundingClientRect()
+  const menuWidth = 120
+  const menuHeight = 100
+  
+  // 使用觸控點位置，如果是 touch 事件
+  let clientX, clientY
+  if (touch.clientX !== undefined) {
+    clientX = touch.clientX
+    clientY = touch.clientY
+  } else {
+    // 如果沒有觸控資訊，使用貼紙中心位置
+    clientX = rect.left + sticker.x + 30 // 貼紙寬度的一半
+    clientY = rect.top + sticker.y + 30
+  }
+  
+  let x = clientX - rect.left
+  let y = clientY - rect.top
+  
+  // 防止選單超出邊界
+  if (x + menuWidth > rect.width) {
+    x = rect.width - menuWidth - 10
+  }
+  if (y + menuHeight > rect.height) {
+    y = rect.height - menuHeight - 10
+  }
+  
+  editMenuPosition.value = { x, y }
+  showEditMenu.value = true
+}
+
+// 手機模式：隱藏編輯選單
+function hideEditMenu() {
+  showEditMenu.value = false
+  selectedSticker.value = null
+}
+
+// 手機模式：開始拖曳選中的貼紙
+function startMobileDrag(sticker) {
+  if (!isMobile.value) return
+  hideEditMenu()
+  sticker.isDragging = true
+  isDragging.value = true
+  
+  // 自動觸發觸控拖曳模式
+  nextTick(() => {
+    // 貼紙進入拖曳狀態，等待用戶觸控移動
+    console.log('貼紙進入拖曳模式，請觸控移動')
+  })
+}
+
+// 手機模式：移除選中的貼紙
+function removeMobileSticker(sticker) {
+  const index = addedStickers.value.findIndex(s => s.id === sticker.id)
+  if (index !== -1) {
+    addedStickers.value.splice(index, 1)
+  }
+  hideEditMenu()
 }
 
 // 截圖功能函數
@@ -235,7 +431,7 @@ async function captureCard() {
   }
 }
 
-// 【簡化版】測試用的 saveCardState 函數（移除訂單ID）
+
 async function saveCardState() {
   // 檢查是否有內容需要儲存
   if (!messageText.value.trim() && addedStickers.value.length === 0) {
@@ -392,6 +588,28 @@ async function goNext() {
   }
 }
 
+// 生命週期函數
+onMounted(() => {
+  checkIsMobile()
+  window.addEventListener('resize', checkIsMobile)
+  // 手機模式：點擊預覽區域隱藏編輯選單
+  if (previewArea.value) {
+    previewArea.value.addEventListener('click', (event) => {
+      if (isMobile.value && event.target === previewArea.value) {
+        hideEditMenu()
+      }
+    })
+  }
+})
+
+// 清理事件監聽器
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkIsMobile)
+  if (longPressTimer.value) {
+    clearTimeout(longPressTimer.value)
+  }
+})
+
 </script>
 
 <template>
@@ -445,23 +663,46 @@ async function goNext() {
                         <div v-if="messageText" class="message-text">{{ messageText }}</div>
                         
                         <div v-for="sticker in addedStickers" :key="sticker.id"
-                             class="draggable-sticker"
-                             :class="{ 'dragging': sticker.isDragging }"
-                             :style="{ 
-                               left: sticker.x + 'px', 
-                               top: sticker.y + 'px',
-                               opacity: sticker.isDragging ? 0.7 : 1
-                             }"
-                             @mousedown="startDrag($event, sticker)"
-                             @click="handleStickerClick($event, sticker)"
-                             @dblclick="handleStickerDoubleClick(sticker)"
-                             title="雙擊可移除貼紙">
-                            <img :src="sticker.src" :alt="sticker.alt">
+                          class="draggable-sticker"
+                          :class="{ 'dragging': sticker.isDragging, 'selected': selectedSticker?.id === sticker.id }"
+                          :style="{ 
+                            left: sticker.x + 'px', 
+                            top: sticker.y + 'px',
+                            opacity: sticker.isDragging ? 0.7 : 1
+                          }"
+                          @mousedown="!isMobile ? startDrag($event, sticker) : null"
+                          @click="handleStickerClick($event, sticker)"
+                          @dblclick="!isMobile ? handleStickerDoubleClick(sticker) : null"
+                          @touchstart="handleTouchStart($event, sticker)"
+                          @touchmove="handleTouchMove($event, sticker)"
+                          @touchend="handleTouchEnd($event, sticker)"
+                          :title="isMobile ? '點擊編輯，長按刪除' : '雙擊可移除貼紙'">
+                          <img :src="sticker.src" :alt="sticker.alt">
                         </div>
+
+                      <!-- 手機編輯選單 -->
+                      <div v-if="showEditMenu && isMobile" 
+                          class="mobile-edit-menu"
+                          :style="{
+                            left: editMenuPosition.x + 'px',
+                            top: editMenuPosition.y + 'px'
+                          }">
+                          <button @click="startMobileDrag(selectedSticker)" class="menu-btn move-btn">
+                              📱 移動
+                          </button>
+                          <button @click="removeMobileSticker(selectedSticker)" class="menu-btn delete-btn">
+                              🗑️ 刪除
+                          </button>
+                      </div>
                     </div>
                     
                     <div class="operation-tips">
-                        <small>💡 提示：單擊貼紙出現，拖曳貼紙可調整位置，雙擊貼紙可移除</small>
+                      <small v-if="isMobile">
+                          💡 提示：點擊貼紙編輯，長按直接刪除
+                      </small>
+                      <small v-else>
+                          💡 提示：單擊貼紙出現，拖曳貼紙可調整位置，雙擊貼紙可移除
+                      </small>
                     </div>
                     
                     <div class="type_area">
@@ -490,8 +731,8 @@ async function goNext() {
         padding: 0; 
         background-color: $primary_50;
         background-repeat: repeat;
-        overflow-x: hidden;
     }
+
     .contenter{
         max-width: 1200px;
         margin: 40px auto;
@@ -505,7 +746,7 @@ async function goNext() {
         text-align: start;
         margin-top: 40px; 
         margin-left: 20%;
-        min-width: 1200px;
+        max-width: 1200px;
     }
 
     h4{
@@ -785,6 +1026,46 @@ async function goNext() {
     border-radius: 2px;
 }
 
+// 手機編輯選單樣式
+.mobile-edit-menu {
+    position: absolute;
+    background: white;
+    border: 2px solid $primary_400;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.menu-btn {
+    padding: 12px 16px;
+    border: none;
+    background: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.menu-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.move-btn:hover {
+    background-color: rgba(207, 102, 16, 0.1);
+}
+
+.delete-btn:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+// 選中狀態樣式
+.draggable-sticker.selected {
+    border: 2px solid $primary_400;
+    box-shadow: 0 0 10px rgba(207, 102, 16, 0.3);
+}
 
 // 1024px-1439px 桌機/大平板
 @media (max-width: 1439px) {
@@ -833,8 +1114,24 @@ async function goNext() {
     }
 }
 
-// 480px-767px 手機橫向
+// 手機裝置樣式 (767px以下)
 @media (max-width: 767px) {
+   
+    .operation-tips small {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    // 編輯選單在手機上更大更好點擊
+    .mobile-edit-menu {
+        min-width: 120px;
+    }
+    
+    .menu-btn {
+        padding: 16px 20px;
+        font-size: 16px;
+    }
+
     .wrapper {
         padding: 0 15px;
     }
@@ -883,6 +1180,30 @@ async function goNext() {
     .btn {
         padding: 12px;
     }
+
+    .draggable-sticker {
+      cursor: pointer;
+      touch-action: none; // 防止默認觸控行為
+      -webkit-touch-callout: none; // 防止長按選單
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+  }
+
+  .draggable-sticker.dragging {
+      z-index: 100;
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      cursor: grabbing;
+      opacity: 0.8 !important;
+  }
+
+  .preview {
+      touch-action: none; // 防止預覽區域的觸控滾動
+      overflow: hidden;
+  }
+
 }
 
 // 320px-479px 手機直立
