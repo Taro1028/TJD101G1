@@ -22,16 +22,26 @@
             />
           </div>
 
-          <div class="signup_form_component">
+          <div class="signup_form_component" :class="{ 'password-error': !passwordValidation.isValid && password }">
             <label for="password">密碼</label>
-            <input
-              type="password"
-              name="password"
-              id="PASSWORD"
-              class="signup_password"
-              placeholder="8-16個英數組成"
-              v-model="password"
-            />
+            <div class="password-input-container">
+              <input
+                type="password"
+                name="password"
+                id="PASSWORD"
+                class="signup_password"
+                :class="{ 'error': !passwordValidation.isValid && password }"
+                placeholder="8-16個英數組成"
+                v-model="password"
+                @input="validatePassword"
+              />
+              <span class="error-icon" v-show="!passwordValidation.isValid && password">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+              </span>
+            </div>
+            <span class="error-message" v-show="!passwordValidation.isValid && password">
+              {{ passwordValidation.errorMessage }}
+            </span>
           </div>
 
           <div>
@@ -65,17 +75,16 @@
                   alt="line-signup"
                 />
               </button>
-              <!-- <a href="#"
-                ><img
-                  src="../assets/images/Member/Line_color.svg"
-                  alt="line-signup"
-                  aria-label="使用 Line 登入" 
-                  @click="handleLineLogin"
-              /></a> -->
             </div>
           </div>
 
-          <button type="submit" class="signup_submit" @click="handleLogin">
+          <button 
+            type="submit" 
+            class="signup_submit" 
+            @click="handleLogin"
+            :disabled="!canSubmit"
+            :class="{ 'disabled': !canSubmit }"
+          >
             登入
           </button>
         </div>
@@ -88,8 +97,9 @@
     </div>
   </div>
 </template>
+
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, watch } from "vue";
 import { useMemberStore } from "../stores/MemberStore";
 import { useModalStore } from "../stores/ModalStore";
 import { useRouter } from "vue-router";
@@ -102,7 +112,71 @@ const router = useRouter();
 const email = ref("");
 const password = ref("");
 const env = import.meta.env.VITE_API_URL;
-// const env = "";
+
+// 密碼驗證狀態
+const passwordValidation = ref({
+  isValid: true,
+  errorMessage: ""
+});
+
+// 密碼格式驗證函數
+const validatePassword = () => {
+  const passwordValue = password.value;
+  
+  if (!passwordValue) {
+    passwordValidation.value = {
+      isValid: true,
+      errorMessage: ""
+    };
+    return;
+  }
+
+  // 檢查長度 (8-16位)
+  if (passwordValue.length < 8 || passwordValue.length > 16) {
+    passwordValidation.value = {
+      isValid: false,
+      errorMessage: "密碼長度必須為8-16位"
+    };
+    return;
+  }
+
+  // 檢查是否只包含英文字母和數字
+  const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+  if (!alphanumericRegex.test(passwordValue)) {
+    passwordValidation.value = {
+      isValid: false,
+      errorMessage: "密碼只能包含英文字母和數字"
+    };
+    return;
+  }
+
+  // 檢查是否至少包含一個字母和一個數字
+  const hasLetter = /[a-zA-Z]/.test(passwordValue);
+  const hasNumber = /[0-9]/.test(passwordValue);
+  
+  if (!hasLetter || !hasNumber) {
+    passwordValidation.value = {
+      isValid: false,
+      errorMessage: "密碼必須同時包含英文字母和數字"
+    };
+    return;
+  }
+
+  // 所有檢查通過
+  passwordValidation.value = {
+    isValid: true,
+    errorMessage: ""
+  };
+};
+
+// 計算是否可以提交表單
+const canSubmit = computed(() => {
+  return email.value && password.value && passwordValidation.value.isValid;
+});
+
+// 監聽密碼變化，自動驗證
+watch(password, validatePassword);
+
 // 登入處理函數
 const handleLogin = async () => {
   // 驗證輸入
@@ -113,6 +187,12 @@ const handleLogin = async () => {
 
   if (!password.value) {
     alert("請輸入使用者密碼");
+    return;
+  }
+
+  // 檢查密碼格式
+  if (!passwordValidation.value.isValid) {
+    alert("密碼格式不正確：" + passwordValidation.value.errorMessage);
     return;
   }
 
@@ -167,32 +247,29 @@ const handleLogin = async () => {
 };
 
 function handleLineLogin() {
-  const lineClientId = import.meta.env.VITE_LINE_CLIENT_ID; // 您的 LINE Channel ID
-  const lineRedirectUri = import.meta.env.VITE_LINE_REDIRECT_URI; // 您的回調 URL
-  const lineAuthState = "your_random_state_string"; // 為了安全，請生成一個隨機的 state 字串
-  // const lineScope = 'profile openid email'; // 請求的權限，例如 profile, openid, email
-  const lineScope = "profile openid"; // 請求的權限，例如 profile, openid
+  const lineClientId = import.meta.env.VITE_LINE_CLIENT_ID;
+  const lineRedirectUri = import.meta.env.VITE_LINE_REDIRECT_URI;
+  const lineAuthState = "your_random_state_string";
+  const lineScope = "profile openid";
 
-  // 將 state 存儲起來，以便回調時驗證
   localStorage.setItem("line_auth_state", lineAuthState);
 
   const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${lineClientId}&redirect_uri=${encodeURIComponent(
     lineRedirectUri
   )}&state=${lineAuthState}&scope=${lineScope}`;
 
-  console.log("Line Auth URL:", lineAuthUrl); // 為了除錯，您可以打印出這個 URL 看看是否正確
-
+  console.log("Line Auth URL:", lineAuthUrl);
   window.location.href = lineAuthUrl;
 }
 
 function loginWithGoogle() {
   google.accounts.id.initialize({
     client_id:
-      "1010508992557-rlnbp3o2h7327jmco3726c6qei92s0et.apps.googleusercontent.com", // 🔸請換成你自己的
+      "1010508992557-rlnbp3o2h7327jmco3726c6qei92s0et.apps.googleusercontent.com",
     callback: handleCredentialResponse,
   });
 
-  google.accounts.id.prompt(); // 顯示 Google 登入彈窗
+  google.accounts.id.prompt();
 }
 
 function handleCredentialResponse(response) {
@@ -204,7 +281,6 @@ function handleCredentialResponse(response) {
     .then((res) => res.json())
     .then((result) => {
       if (result.success) {
-        // alert(`登入成功，歡迎 ${result.M_NAME}`);
         console.log(result);
         if (result.blacklisted) {
           alert("會員已停權");
@@ -231,7 +307,6 @@ function handleCredentialResponse(response) {
           // 跳轉到指定頁面
           router.push(redirectPath);
         }
-        // 你可以接著把登入資料儲存到 Pinia、sessionStorage 等
       } else {
         alert("登入失敗：" + result.message);
       }
@@ -293,6 +368,7 @@ a {
   margin-top: $spacing_2;
   margin-bottom: $spacing_3;
 }
+
 .signup_content {
   display: flex;
   flex-direction: column;
@@ -320,49 +396,92 @@ a {
 }
 
 /* signup_form_component 樣式 */
-.signup_form_component label {
+.signup_form_component {
+  &.password-error {
+    .password-input-container {
+      border-color: $danger_500;
+    }
+  }
+
+  label {
+    display: block;
+    line-height: 1.4;
+    color: $neutral_black;
+    margin-bottom: $spacing_2;
+  }
+
+  input {
+    width: 100%;
+    height: 48px;
+    padding: 12px 16px;
+    background-color: $neutral_white;
+    border: 1px solid $neutral_300;
+    border-radius: 12px;
+    color: $neutral_black;
+    box-sizing: border-box;
+
+    &.error {
+      border-color: $danger_500;
+      box-shadow: 0 0 0 2px rgba(229, 67, 67, 0.2);
+    }
+
+    &::placeholder {
+      color: $neutral_300;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $primary_400;
+      box-shadow: 0 0 0 2px rgba(241, 180, 46, 0.2);
+    }
+  }
+}
+
+/* 密碼輸入容器 */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .error-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $danger_500;
+    font-size: 16px;
+    z-index: 2;
+  }
+}
+
+/* 錯誤訊息樣式 */
+.error-message {
   display: block;
+  color: $danger_500;
+  font-size: 0.875rem;
+  margin-top: 4px;
   line-height: 1.4;
-  color: $neutral_black;
-  margin-bottom: $spacing_2;
-}
-
-.signup_form_component input {
-  width: 100%;
-  height: 48px;
-  padding: 12px 16px;
-  background-color: $neutral_white;
-  border: 1px solid $neutral_300;
-  border-radius: 12px;
-  color: $neutral_black;
-  box-sizing: border-box;
-}
-
-.signup_form_component input::placeholder {
-  color: $neutral_300;
-}
-
-.signup_form_component input:focus {
-  outline: none;
-  border-color: $primary_400;
-  box-shadow: 0 0 0 2px rgba(241, 180, 46, 0.2);
 }
 
 .forgot-password {
   color: $neutral_300;
 }
+
 a.signup_link {
   color: $point_700;
 }
+
 /* 快速註冊區塊 */
 .fast_signup {
   padding: 48px 28px 16px 28px;
   margin: 0 auto;
   text-align: center;
+
+  p {
+    margin-bottom: $spacing_2;
+  }
 }
-.fast_signup p {
-  margin-bottom: $spacing_2;
-}
+
 .social_links {
   display: flex;
   gap: $spacing_2;
@@ -381,6 +500,16 @@ a.signup_link {
   align-items: center;
   text-align: center;
   border: none;
+
+  &.disabled {
+    background-color: $neutral_300;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &:not(.disabled):hover {
+    background-color: $primary_950;
+  }
 }
 
 .right-section {
@@ -405,6 +534,7 @@ a.signup_link {
   padding: 0;
   cursor: pointer;
 }
+
 // 響應式設計
 @media (max-width: 768px) {
   .content-wrapper {
@@ -415,6 +545,7 @@ a.signup_link {
     display: none;
   }
 }
+
 @media (max-width: 375px) {
   .page-container {
     min-height: 100vh;
