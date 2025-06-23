@@ -1206,7 +1206,7 @@ onBeforeUnmount(() => {
 
 }
 
-// 320px-479px 手機直立
+// 479px 手機直立
 @media (max-width: 479px) {
     h1 {
         font-size: 24px;
@@ -1247,6 +1247,136 @@ onBeforeUnmount(() => {
     textarea {
         font-size: 0.9rem;
         padding: 10px;
+    }
+}
+// 376px以下 超小尺寸手機裝置
+@media (max-width: 376px) {
+    .wrapper {
+        padding: 0 8px;
+    }
+    
+    .contenter {
+        gap: 15px;
+        margin: 8px auto;
+        padding: 0 5px;
+    }
+    
+    h1 {
+        font-size: 20px;
+        margin-top: 12px;
+        margin-left: 1%;
+        text-align: center;
+    }
+    
+    .left-layout h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+        text-align: center;
+    }
+    
+    .color_list, .sticker_list {
+        gap: 4px;
+        justify-content: center;
+    }
+    
+    .color_list li, .sticker_list li {
+        padding: 2px;
+    }
+    
+    .sticker_list img {
+        width: calc(25px * 1.5); // 37.5px
+    }
+    
+    .color_list img {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .statement {
+        margin-top: 12px;
+    }
+    
+    .statement p {
+        font-size: 12px;
+        line-height: 1.6;
+        padding: 6px 8px;
+        margin-bottom: 6px;
+    }
+    
+    .preview {
+        height: 130px;
+        padding: 0.6rem;
+        margin-bottom: 8px;
+    }
+    
+    .preview p {
+        font-size: 0.8rem;
+        width: calc(100% - 24px);
+    }
+    
+    .message-text {
+        font-size: 0.8rem;
+        padding: 15px;
+        width: calc(100% - 24px);
+    }
+    
+    .draggable-sticker img {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .operation-tips small {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+    
+    .type_area {
+        margin-bottom: 10px;
+    }
+    
+    textarea {
+        font-size: 0.8rem;
+        padding: 8px;
+        min-height: 80px;
+    }
+    
+    textarea::placeholder {
+        font-size: 0.8rem;
+    }
+    
+    .button-area {
+        gap: 8px;
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+        width: 100%;
+    }
+    
+    // 手機編輯選單優化
+    .mobile-edit-menu {
+        min-width: 100px;
+        font-size: 12px;
+    }
+    
+    .menu-btn {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+    
+    // 確保小尺寸觸控體驗
+    .draggable-sticker {
+        min-width: 45px;
+        min-height: 45px;
+        touch-action: manipulation;
+    }
+    
+    .care_words {
+        max-height: 120px;
+        overflow-y: auto;
     }
 }
 
