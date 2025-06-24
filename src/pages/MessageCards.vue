@@ -1183,8 +1183,8 @@ onBeforeUnmount(() => {
 
     .draggable-sticker {
       cursor: pointer;
-      touch-action: none; // 防止默認觸控行為
-      -webkit-touch-callout: none; // 防止長按選單
+      touch-action: none; 
+      -webkit-touch-callout: none;
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
@@ -1200,7 +1200,7 @@ onBeforeUnmount(() => {
   }
 
   .preview {
-      touch-action: none; // 防止預覽區域的觸控滾動
+      touch-action: none; 
       overflow: hidden;
   }
 
@@ -1208,176 +1208,238 @@ onBeforeUnmount(() => {
 
 // 479px 手機直立
 @media (max-width: 479px) {
-    h1 {
-        font-size: 24px;
-        margin-top: 15px;
+    .wrapper {
+        min-height: auto; 
+        display: flex;
+        flex-direction: column;
     }
+    
     
     .contenter {
-        gap: 20px;
-        margin: 10px auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-height: none; 
     }
     
-    .left-layout h4 {
-        font-size: 1.2rem;
+    .left-layout {
+        flex-shrink: 0; 
     }
     
-    .color_list, .sticker_list {
-        gap: 6px;
+    .right-layout {
+        flex: 1;
+        min-height: 0; 
+        display: flex;
+        flex-direction: column;
     }
     
-    .sticker_list img {
-        width: calc(30px * 1.5);
-    }
-    
-    .statement p {
-        font-size: 14px;
-        line-height: 1.8;
-    }
-    
-    .preview {
-        height: 150px;
-        padding: 0.8rem;
-    }
-    
-    .preview p {
-        font-size: 0.9rem;
+    .type_area {
+        flex: 1; 
+        display: flex;
+        flex-direction: column;
     }
     
     textarea {
-        font-size: 0.9rem;
-        padding: 10px;
+        flex: 1;
+        resize: none; 
+        min-height: 60px; 
     }
 }
 // 376px以下 超小尺寸手機裝置
 @media (max-width: 376px) {
     .wrapper {
         padding: 0 8px;
+        min-height: auto; 
+        background-size: contain; 
     }
     
     .contenter {
-        gap: 15px;
-        margin: 8px auto;
+        gap: 12px; 
+        margin: 8px auto 16px; 
         padding: 0 5px;
+        max-width: calc(100vw - 16px);
     }
     
     h1 {
-        font-size: 20px;
-        margin-top: 12px;
+        font-size: 18px; 
+        margin-top: 8px; 
+        margin-bottom: 12px; 
         margin-left: 1%;
         text-align: center;
     }
     
     .left-layout h4 {
-        font-size: 1.1rem;
-        margin-bottom: 0.8rem;
+        font-size: 1rem; 
+        margin-bottom: 0.6rem; 
         text-align: center;
     }
     
     .color_list, .sticker_list {
-        gap: 4px;
+        gap: 3px; 
         justify-content: center;
     }
     
     .color_list li, .sticker_list li {
-        padding: 2px;
+        padding: 1px;
     }
     
     .sticker_list img {
-        width: calc(25px * 1.5); // 37.5px
+        width: calc(22px * 1.5); 
     }
     
     .color_list img {
-        width: 30px;
-        height: 30px;
+        width: 25px; 
+        height: 25px;
     }
     
     .statement {
-        margin-top: 12px;
+        margin-top: 8px; 
     }
     
     .statement p {
-        font-size: 12px;
-        line-height: 1.6;
-        padding: 6px 8px;
-        margin-bottom: 6px;
+        font-size: 11px;
+        line-height: 1.4; 
+        padding: 4px 6px; 
+        margin-bottom: 4px; 
     }
     
     .preview {
-        height: 130px;
-        padding: 0.6rem;
-        margin-bottom: 8px;
+        height: 110px; 
+        padding: 0.4rem; 
+        margin-bottom: 6px;
     }
     
     .preview p {
-        font-size: 0.8rem;
-        width: calc(100% - 24px);
+        font-size: 0.7rem; 
+        width: calc(100% - 16px); 
     }
     
     .message-text {
-        font-size: 0.8rem;
-        padding: 15px;
-        width: calc(100% - 24px);
+        font-size: 0.7rem; 
+        padding: 10px; 
+        width: calc(100% - 16px); 
+        line-height: 1.3; 
     }
     
     .draggable-sticker img {
-        width: 45px;
-        height: 45px;
+        width: 35px; 
+        height: 35px;
     }
     
     .operation-tips small {
-        padding: 4px 8px;
-        font-size: 10px;
+        padding: 3px 6px; 
+        font-size: 9px; 
     }
     
     .type_area {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     
     textarea {
-        font-size: 0.8rem;
-        padding: 8px;
-        min-height: 80px;
+        font-size: 0.7rem; 
+        padding: 6px;
+        min-height: 60px; 
     }
     
     textarea::placeholder {
-        font-size: 0.8rem;
-    }
+        font-size: 0.7rem; 
     
     .button-area {
-        gap: 8px;
+        gap: 6px; 
         flex-direction: column;
         width: 100%;
+        margin-top: 8px; 
     }
     
     .btn {
-        padding: 10px 15px;
-        font-size: 0.9rem;
+        padding: 8px 12px; 
+        font-size: 0.8rem;
         width: 100%;
     }
     
-    // 手機編輯選單優化
+    // 🔧 手機編輯選單優化
     .mobile-edit-menu {
-        min-width: 100px;
-        font-size: 12px;
+        min-width: 90px; 
+        font-size: 11px;
     }
     
     .menu-btn {
-        padding: 12px 15px;
-        font-size: 14px;
+        padding: 10px 12px; 
+        font-size: 12px; 
     }
     
-    // 確保小尺寸觸控體驗
+    // 🔧 確保小尺寸觸控體驗
     .draggable-sticker {
-        min-width: 45px;
-        min-height: 45px;
+        min-width: 35px; 
+        min-height: 35px;
         touch-action: manipulation;
     }
     
     .care_words {
-        max-height: 120px;
+        max-height: 100px; 
         overflow-y: auto;
     }
+    
+    // 🔧 新增：確保整體不超出視窗
+    .left-layout, .right-layout {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    // 🔧 新增：調整關心小語區域
+    .care_words {
+        .statement p {
+            overflow-wrap: break-word; 
+            word-break: break-word;
+        }
+    }
 }
-
+// 🔧 針對極小螢幕 (320px) 的額外優化
+@media (max-width: 320px) {
+    .wrapper {
+        padding: 0 4px;
+    }
+    
+    .contenter {
+        margin: 4px auto 8px;
+        gap: 8px;
+    }
+    
+    h1 {
+        font-size: 16px;
+        margin-top: 4px;
+        margin-bottom: 8px;
+    }
+    
+    .preview {
+        height: 90px;
+        padding: 0.3rem;
+    }
+    
+    .sticker_list img {
+        width: calc(18px * 1.5); // 27px
+    }
+    
+    .color_list img {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .draggable-sticker img {
+        width: 28px;
+        height: 28px;
+    }
+    
+    textarea {
+        min-height: 50px;
+        padding: 4px;
+        font-size: 0.65rem;
+    }
+    
+    .btn {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+}
+}
 </style>
