@@ -31,6 +31,7 @@ const formTitle = ref("");
 const tableHeaders = ref([]); //下面watch
 const memberHeaders = [
   { key: "ID", label: "ID編號" },
+  { key: "LOGINTYPE", label: "登入類別" },
   { key: "M_NAME", label: "會員名稱" },
   { key: "NICKNAME", label: "暱稱" },
   { key: "GENDER", label: "會員性別" },

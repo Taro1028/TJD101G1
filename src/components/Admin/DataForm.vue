@@ -243,11 +243,16 @@ async function getdata() {
     if (response.ok) {
       const result = await response.json();
       console.log("載入成功:", result);
-      localBodys.value = result.members;
-      // localBodys.value = result.members.map((row) => ({
-      //   ...row,
-      //   AVATAR: `data:image/png;base64,${row.AVATAR}`, // ← 加 MIME 類型
-      // }));
+      // localBodys.value = result.members;
+      localBodys.value = result.members.map((row) => ({
+        ...row,
+        LOGINTYPE: row.GOOGLE_ID
+          ? "Google"
+          : row.LINE_ID
+          ? "LINE"
+          : "一般帳號",
+        //  AVATAR: `data:image/png;base64,${row.AVATAR}`, // ← 加 MIME 類型
+      }));
     }
   } catch (error) {
     console.error("錯誤發生:", error);
@@ -606,7 +611,7 @@ onMounted(() => {
   background-color: $primary_600;
   color: white;
 }
-.page-item.previous .page-link:hover{
+.page-item.previous .page-link:hover {
   background-color: $primary_400;
 }
 .page-item.next .page-link {
@@ -627,11 +632,11 @@ onMounted(() => {
 .pagination .page-link {
   /* 讓元素本身變成 flex 容器 */
   display: flex;
-  align-items: center;   // 垂直置中
+  align-items: center; // 垂直置中
   justify-content: center; // 水平置中
 
   /* 建議順手把高度定死，或讓 line-height 一致，避免不同瀏覽器差異 */
-  height: 30px;   // 與 .out button 相同高度
+  height: 30px; // 與 .out button 相同高度
   padding: 0 12px; // 保留左右內距
 }
 
@@ -644,11 +649,10 @@ onMounted(() => {
   background-color: $primary_600;
   color: #fff;
 }
-.page-link.page-info{
+.page-link.page-info {
   background-color: $primary_100;
   margin-top: 10px;
   margin-right: 5px;
-  border:$primary_400;
+  border: $primary_400;
 }
-
 </style>
