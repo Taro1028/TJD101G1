@@ -238,24 +238,7 @@ const handleSubmit = async () => {
           <router-link to="/Login" class="longin-link"
             >已經有帳號？點我登入</router-link
           >
-
-          <!-- 快速註冊區塊 -->
-          <div class="fast_signup">
-            <p>快速註冊</p>
-            <div class="social_links">
-              <a href="#"
-                ><img
-                  src="../assets/images/Member/Google_color.svg"
-                  alt="google-signup"
-              /></a>
-              <a href="#"
-                ><img
-                  src="../assets/images/Member/Line_color.svg"
-                  alt="line-signup"
-              /></a>
-            </div>
-          </div>
-
+         
           <button type="submit" class="signup_submit">建立</button>
         </form>
       </div>
