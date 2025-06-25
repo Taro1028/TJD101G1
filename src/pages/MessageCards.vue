@@ -1245,6 +1245,225 @@ onBeforeUnmount(() => {
         min-height: 60px; 
     }
 }
+
+// 420px-440px iPhone 14 Pro 橫軸修正
+@media (max-width: 440px) and (min-width: 420px) {
+    .wrapper {
+        padding: 0 8px; // 減少左右 padding
+        overflow-x: hidden; // 確保不會橫向溢出
+        width: 100vw; // 確保不超過視窗寬度
+        box-sizing: border-box;
+    }
+    
+    .contenter {
+        margin: 12px auto;
+        padding: 0 4px; // 進一步減少內邊距
+        gap: 15px;
+        max-width: calc(100vw - 16px); // 確保不超過視窗寬度
+    }
+    
+    h1 {
+        font-size: 20px;
+        margin-left: 0;
+        margin-top: 12px;
+        margin-bottom: 15px;
+        text-align: center;
+        padding: 0 8px;
+        box-sizing: border-box;
+    }
+    
+    .left-layout, .right-layout {
+        width: 100%;
+        padding: 4px;
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    .left-layout h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+        text-align: center;
+    }
+    
+    // 顏色和貼紙區域優化
+    .color_list, .sticker_list {
+        gap: 6px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 0 4px;
+    }
+    
+    .color_list img {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .sticker_list img {
+        width: calc(26px * 1.5); // 39px
+    }
+    
+    .color_list li, .sticker_list li {
+        padding: 2px;
+        margin: 1px;
+    }
+    
+    // 關心小語區域
+    .care_words {
+        max-height: 120px;
+        overflow-y: auto;
+    }
+    
+    .statement {
+        margin-top: 10px;
+        padding: 0 4px;
+    }
+    
+    .statement p {
+        font-size: 12px;
+        line-height: 1.5;
+        padding: 6px 8px;
+        margin-bottom: 6px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    // 預覽區域優化
+    .preview {
+        height: 130px;
+        padding: 0.5rem;
+        margin-bottom: 8px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    
+    .preview p {
+        font-size: 0.8rem;
+        width: calc(100% - 20px);
+    }
+    
+    .message-text {
+        font-size: 0.8rem;
+        padding: 12px;
+        width: calc(100% - 20px);
+        line-height: 1.4;
+    }
+    
+    // 貼紙元件
+    .draggable-sticker {
+        min-width: 38px;
+        min-height: 38px;
+    }
+    
+    .draggable-sticker img {
+        width: 38px;
+        height: 38px;
+    }
+    
+    // 操作提示
+    .operation-tips small {
+        padding: 4px 8px;
+        font-size: 10px;
+        display: block;
+        margin: 0 auto;
+        max-width: calc(100% - 16px);
+        text-align: center;
+    }
+    
+    // 文字輸入區域
+    .type_area {
+        margin-bottom: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    textarea {
+        font-size: 0.8rem;
+        padding: 8px;
+        min-height: 70px;
+        width: 100%;
+        box-sizing: border-box;
+        resize: none;
+    }
+    
+    textarea::placeholder {
+        font-size: 0.8rem;
+    }
+    
+    // 按鈕區域
+    .button-area {
+        gap: 8px;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+        width: 100%;
+        box-sizing: border-box;
+        white-space: nowrap;
+    }
+    
+    // 手機編輯選單
+    .mobile-edit-menu {
+        min-width: 100px;
+        max-width: calc(100vw - 40px);
+    }
+    
+    .menu-btn {
+        padding: 12px 16px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+}
+
+// 440px 以下的額外保護措施
+@media (max-width: 440px) {
+    * {
+        box-sizing: border-box;
+    }
+    
+    .wrapper {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+    
+    .contenter {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    // 確保所有子元素都不會超出容器
+    .left-layout, .right-layout {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    .color_list, .sticker_list {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    .preview {
+        max-width: 100%;
+        overflow: hidden;
+    }
+    
+    .type_area {
+        max-width: 100%;
+    }
+    
+    textarea {
+        max-width: 100%;
+    }
+    
+    .button-area {
+        max-width: 100%;
+    }
+}
 // 376px以下 超小尺寸手機裝置
 @media (max-width: 376px) {
     .wrapper {
