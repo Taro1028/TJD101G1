@@ -26,7 +26,7 @@
 - 資料存取：JSON 與 MySQL
 - 程式環境與工具：SCSS / Pinia / Github / Workbench
 - 版控：Git
-- 套件應用： Swiper / Bootstrap / Flatpickr /  Leaflet
+- 套件應用： Swiper / Bootstrap / Flatpickr / vue-easy-lightbox / html2canvas /  Leaflet
 - 開發工具：Figma / VS Code / Node.js / XAMPP
 
 ## 📂 資料結構
@@ -43,6 +43,7 @@ TJD101/
 │   ├── layouts/           # 前台與後台的版型
 │   ├── pages/             # Vue 頁面（含 admin 後台）
 │   ├── router/            # Vue Router 設定檔
+│   ├── services/          # 與 API 溝通的服務函式
 │   ├── stores/            # Pinia 狀態管理檔案
 │   ├── utils/             # 工具函式
 │   └── Main.vue           # 主入口元件

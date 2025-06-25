@@ -81,7 +81,7 @@ const toggleCartPopup = async () => {
     router.push("/Login");
     return;
   }
-  
+
   try {
     // 如果購物車還沒有資料，先載入
     if (!cartStore.cartGroups || cartStore.cartGroups.length === 0) {
@@ -134,7 +134,7 @@ const handleClickOutside = (event) => {
     !event.target.closest(".nav-wrapper") &&
     !event.target.closest(".hamburger");
 
-    // 點擊外部關閉購物車彈窗
+  // 點擊外部關閉購物車彈窗
   const clickedOutsideCart =
     showCartPopup.value &&
     !event.target.closest(".cart-item") &&
@@ -157,11 +157,11 @@ const checkIsMobile = () => {
   isMobile.value = window.innerWidth <= 820;
 };
 
-onMounted(async() => {
+onMounted(async () => {
   isMounted.value = true;
   checkIsMobile();
   memberStore.loadFromsessionStorage();
-  
+
   // 如果已登入，載入購物車資料
   if (memberStore.id) {
     try {
@@ -187,80 +187,45 @@ onBeforeUnmount(() => {
       <img src="../assets/images/Logo_S.svg" alt="logo_s" class="logo" />
     </router-link>
 
-    <button
-      class="hamburger"
-      :class="{ active: isMobileMenuOpen }"
-      @click="toggleMobileMenu"
-    >
+    <div class="hamburger" :class="{ active: isMobileMenuOpen }" @click="toggleMobileMenu" role="button">
       <span></span><span></span><span></span>
-    </button>
+    </div>
 
-    <div
-      v-if="isMobileMenuOpen"
-      class="mobile-backdrop"
-      @click="closeMobileMenu"
-    ></div>
+    <div v-if="isMobileMenuOpen" class="mobile-backdrop" @click="closeMobileMenu"></div>
 
-    <nav
-      class="nav-wrapper"
-      :class="{ open: isMobileMenuOpen }"
-      v-show="!isMobile || isMobileMenuOpen"
-    >
+    <nav class="nav-wrapper" :class="{ open: isMobileMenuOpen }" v-show="!isMobile || isMobileMenuOpen">
       <ul class="header_nav">
         <!-- 主要導航項目 -->
         <li class="nav-item">
-          <router-link
-            to="/LunchBox"
-            :class="{ active: route.path === '/LunchBox' }"
-          >
+          <router-link to="/LunchBox" :class="{ active: route.path === '/LunchBox' }">
             餐盒介紹
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link
-            to="/Order/Select"
-            :class="{ active: route.path === '/Order/Select' }"
-          >
+          <router-link to="/Order/Select" :class="{ active: route.path === '/Order/Select' }">
             預約訂餐
           </router-link>
         </li>
         <li class="nav-item dropdown" ref="aboutDropdownRef">
           <div>
-            <a
-              href="javascript:void(0)"
-              @click.stop="toggleAboutDropdown"
-              :class="{ active: route.path.startsWith('/About') }"
-            >
+            <a href="javascript:void(0)" @click.stop="toggleAboutDropdown"
+              :class="{ active: route.path.startsWith('/About') }">
               關於我們
             </a>
             <ul v-if="showAboutDropdown" class="dropdown-menu">
               <li>
-                <router-link
-                  to="/About"
-                  :class="{ active: route.path === '/About' }"
-                  >理念及目標</router-link
-                >
+                <router-link to="/About" :class="{ active: route.path === '/About' }">理念及目標</router-link>
               </li>
               <li>
-                <router-link
-                  to="/About/SmallFarmer"
-                  :class="{ active: route.path === '/About/SmallFarmer' }"
-                  >配合小農</router-link
-                >
+                <router-link to="/About/SmallFarmer"
+                  :class="{ active: route.path === '/About/SmallFarmer' }">配合小農</router-link>
               </li>
               <li>
-                <router-link
-                  to="/About/Cooperation"
-                  :class="{ active: route.path === '/About/Cooperation' }"
-                  >合作夥伴</router-link
-                >
+                <router-link to="/About/Cooperation"
+                  :class="{ active: route.path === '/About/Cooperation' }">合作夥伴</router-link>
               </li>
               <li>
-                <router-link
-                  to="/About/News"
-                  :class="{ active: route.path === '/About/News' }"
-                  >最新消息</router-link
-                >
+                <router-link to="/About/News" :class="{ active: route.path === '/About/News' }">最新消息</router-link>
               </li>
             </ul>
           </div>
@@ -269,9 +234,7 @@ onBeforeUnmount(() => {
 
       <ul class="header_nav_right">
         <li v-if="!isLoggedIn" class="nav-item">
-          <router-link to="/Login" :class="{ active: route.path === '/Login' }"
-            >登入/註冊</router-link
-          >
+          <router-link to="/Login" :class="{ active: route.path === '/Login' }">登入/註冊</router-link>
         </li>
         <template v-else>
           <li class="nav-item dropdown member-dropdown" ref="memberDropdownRef">
@@ -281,19 +244,10 @@ onBeforeUnmount(() => {
               </a>
               <ul v-if="showMemberDropdown" class="dropdown-menu member-menu">
                 <li>
-                  <router-link
-                    to="/MemberCenter"
-                    :class="{ active: route.path === '/MemberCenter' }"
-                    >會員中心</router-link
-                  >
+                  <router-link to="/MemberCenter" :class="{ active: route.path === '/MemberCenter' }">會員中心</router-link>
                 </li>
                 <li>
-                  <a
-                    href="javascript:void(0)"
-                    @click="handleLogout"
-                    class="logout-btn"
-                    >登出</a
-                  >
+                  <a href="javascript:void(0)" @click="handleLogout" class="logout-btn">登出</a>
                 </li>
               </ul>
             </div>
@@ -399,8 +353,8 @@ header a img {
 }
 
 .cart-item {
-  position: relative; 
-  
+  position: relative;
+
   .cart-link {
     position: relative;
     display: flex;
@@ -410,12 +364,12 @@ header a img {
     text-decoration: none;
     cursor: pointer;
     line-height: 60px;
-    
+
     &:hover {
       color: $primary_600;
     }
   }
-  
+
   i {
     margin-right: 20px;
   }
@@ -438,7 +392,7 @@ header a img {
   line-height: 1;
   min-width: 20px;
   z-index: 1;
-  
+
   // 當數字超過2位數時調整樣式
   &:has-text {
     border-radius: 10px;
@@ -510,6 +464,7 @@ header a img {
 
 .hamburger {
   width: 40px;
+  min-width: 40px;
   height: 24px;
   display: none;
   flex-direction: column;
@@ -518,24 +473,61 @@ header a img {
   border: none;
   cursor: pointer;
   z-index: 1001;
+  position: relative;
+  padding: 0;
 
   span {
     display: block;
     width: 100%;
     height: 4px;
-    background: $neutral_black;
+    // background: $neutral_black;
     border-radius: 2px;
-    transition: all 0.3s ease;
+    position: relative;
+    transition: transform .3s .3s ease;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: $neutral_black;
+      display: block;
+      transition: transform 0.3s ease;
+
+    }
   }
 
   &.active span:nth-child(1) {
-    transform: rotate(-45deg) translate(-9px, 3px);
+    transform: translate(0px, 10px);
+
+    transition: transform .3s ease;
+
+    &::before {
+
+
+      transform: rotate(45deg);
+      transition: transform 0.3s .3s ease;
+    }
+
+
   }
+
   &.active span:nth-child(2) {
     opacity: 0;
+    transition: opacity 0s .3s;
   }
+
   &.active span:nth-child(3) {
-    transform: rotate(45deg) translate(-9px, -4px);
+
+    transition: transform .3s ease;
+    transform: translate(0px, -10px);
+
+    &::before {
+      transform: rotate(-45deg);
+      transition: transform 0.3s .3s ease;
+    }
   }
 }
 
@@ -644,6 +636,7 @@ header a img {
   .nav-item .dropdown li a {
     margin: 0 auto;
   }
+
   .cart-item i {
     margin-right: 0px;
   }
@@ -652,7 +645,7 @@ header a img {
     i {
       margin-right: 0px;
     }
-    
+
     .cart-badge {
       right: -8px;
     }

@@ -63,7 +63,7 @@ onMounted(() => {
   }).addTo(map);
 
   const defaultStyle = {
-    color: '#fbedca',
+    color: '#f1b42e',
     weight: 1,
     fillOpacity: 0.4
   };

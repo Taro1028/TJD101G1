@@ -25,8 +25,8 @@ const upperImages = [
 ]
 
 const lowerImages = [
-  image10,image11, image12, image13, 
-  image14,image15, image16, image17,
+  image10, image11, image12, image13,
+  image14, image15, image16, image17,
   image18
 ]
 </script>
@@ -60,7 +60,7 @@ const lowerImages = [
   margin: 48px 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  /* gap: 16px; */
 }
 
 .marquee-row {
@@ -71,64 +71,93 @@ const lowerImages = [
 
 .marquee-track {
   display: flex;
-  gap: 16px;
+  /* gap: 16px; */
   width: fit-content;
   animation: scroll-left 20s linear infinite;
+
+  @media screen and (max-width: 800px) {
+    animation: scroll-left-mobile 20s linear infinite;
+
+  }
 }
 
 .marquee-right .marquee-track {
   animation: scroll-right 20s linear infinite;
+
+  @media screen and (max-width: 800px) {
+    animation: scroll-right-mobile 20s linear infinite;
+
+  }
 }
 
 .marquee-slide {
-  width: 160px;
+  /* width: 160px; */
+  width: 11.1111111%;
+  padding: 8px;
+  box-sizing: border-box;
+
   /* margin-right: 16px; */
   flex-shrink: 0;
+
+  @media screen and (max-width: 800px) {
+    width: 33.33333%;
+    padding: 2px;
+  }
 }
+
+
 
 img {
   width: 100%;
-  height: 160px;
+  /* height: 160px; */
+  aspect-ratio: 1/1;
   object-fit: cover;
   border-radius: 8px;
   display: block;
+  box-sizing: border-box;
+
+
+
+
 }
 
 @keyframes scroll-left {
   0% {
     transform: translateX(0%);
   }
+
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
 }
 
 @keyframes scroll-right {
   0% {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(0%);
   }
 }
 
-@media screen and (max-width: 800px) {
-  .marquee-slide {
-    width: 80px;
+@keyframes scroll-left-mobile {
+  0% {
+    transform: translateX(0%);
   }
 
-  img {
-    height: 80px;
+  100% {
+    transform: translateX(-300%);
   }
 }
 
-@media screen and (max-width: 800px) {
-  .marquee-slide {
-    width: 80px;
+@keyframes scroll-right-mobile {
+  0% {
+    transform: translateX(-300%);
   }
 
-  img {
-    height: 80px;
+  100% {
+    transform: translateX(0%);
   }
 }
 </style>

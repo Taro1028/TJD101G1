@@ -26,6 +26,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"), // @ 符號：直接指向到 src 資料夾
     },
   },
+  server: {
+    host: '0.0.0.0'
+  }
   // server: {
   //   //本機測試專用
   //   proxy: {

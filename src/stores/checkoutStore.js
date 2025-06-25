@@ -414,7 +414,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         throw new Error('請選擇要結帳的項目')
       }
 
-      // 🔥 修正：多重方式取得會員ID
+      // 多重方式取得會員ID
       let memberId = null
 
       // 方法1: 從 memberStore.memberId (getter)
@@ -448,7 +448,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         throw new Error('會員ID無效，請重新登入')
       }
 
-      // 🔥 準備訂單資料 - 確保傳送正確的金額資料到後端
+      // 準備訂單資料 - 確保傳送正確的金額資料到後端
       const orderData = {
         m_id: parseInt(memberId), // 確保是整數
         cart_ids: selectedCartIds.value,
@@ -457,7 +457,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
         invoice_info: invoiceInfo.value,
         payment_method: paymentInfo.value.method,
         
-        // 🔥 重要：分別傳送便當金額和運費
+        // 重要：分別傳送便當金額和運費
         meal_amount: selectedTotalAmount.value,    // 只有便當的金額
         shipping_fee: shippingFee.value,           // 運費
         total_amount: finalTotalAmount.value       // 便當 + 運費 = 最終總額
@@ -523,9 +523,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
           order_numbers: result.data.order_numbers,
           orders: result.data.orders,
           total_orders: result.data.total_orders,
-          meal_amount: result.data.meal_amount,        // 🔥 新增：便當金額
-          shipping_fee: result.data.shipping_fee,      // 🔥 運費
-          total_amount: result.data.total_amount,      // 🔥 總金額(含運費)
+          meal_amount: result.data.meal_amount,        // 便當金額
+          shipping_fee: result.data.shipping_fee,      // 運費
+          total_amount: result.data.total_amount,      // 總金額(含運費)
           total_meal_count: result.data.total_meal_count,
           final_total: result.data.final_total,
           consignee_info: result.data.consignee_info,
@@ -545,15 +545,15 @@ export const useCheckoutStore = defineStore('checkout', () => {
         final_total: result.data.final_total
       }
 
-      // 🔥 新增：保存購物車資訊到訂單結果中（用於完成頁面顯示）
+      // 保存購物車資訊到訂單結果中（用於完成頁面顯示）
       orderResult.value.selectedCartItems = selectedCartItems.value.map(item => ({
         cart_id: item.cart_id,
         plan_type: item.plan_type,
-        display_title: item.display_title || item.plan_type, // 🔥 保留 display_title
+        display_title: item.display_title || item.plan_type, 
         title: item.plan_type,
         total_amount: item.total_amount,
         total_meal_count: item.total_meal_count,
-        has_message_card: item.has_message_card || false, // 🔥 保留小卡資訊
+        has_message_card: item.has_message_card || false, // 保留小卡資訊
         items: item.items || []
       }))
 
@@ -591,10 +591,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
 
       // 詳細錯誤資訊
       if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
-        console.error('💡 這是 JSON 解析錯誤，通常是因為:')
-        console.error('   1. PHP 檔案包含額外的輸出（echo, var_dump, 測試程式碼）')
-        console.error('   2. PHP 語法錯誤')
-        console.error('   3. 伺服器錯誤頁面')
+        console.error('💡 這是 JSON 解析錯誤')
         console.error('請檢查 PHP 檔案是否只輸出純 JSON')
       }
 
@@ -741,7 +738,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     selectedTotalAmount,
     selectedTotalMeals,
     shippingFee,
-    totalDeliveryDays, // 🔥 新增：用於顯示
+    totalDeliveryDays,
     finalTotalAmount,
     canProceedToNextStep,
     isStep2Valid,
