@@ -76,7 +76,7 @@ export const useMemberStore = defineStore("member", {
   actions: {
     // 設定會員資料（登入時呼叫）
     setMember(member) {
-      console.log("member", member);
+      // console.log("member", member);
 
       // 檢查登入是否成功
       if (member.success) {
@@ -111,14 +111,14 @@ export const useMemberStore = defineStore("member", {
 
         // 儲存到 sessionStorage
         this.saveTosessionStorage();
-        console.log("會員資料設定成功:", this.memberName);
+        // console.log("會員資料設定成功:", this.memberName);
       } else {
         console.error("登入失敗，未收到正確的會員資料");
       }
-      console.log(
-        `會員 ${this.name} 登入成功，頭像狀態:`,
-        this.avatar ? "自訂頭像" : "預設頭像"
-      );
+      // console.log(
+      //   `會員 ${this.name} 登入成功，頭像狀態:`,
+      //   this.avatar ? "自訂頭像" : "預設頭像"
+      // );
     },
 
     // ✨ 修正：更新頭像方法（完全響應式）
@@ -140,7 +140,7 @@ export const useMemberStore = defineStore("member", {
       // 同步更新會員資料的 sessionStorage
       this.saveTosessionStorage();
 
-      console.log(`會員 ${this.id} 的頭像已更新並永久儲存`);
+      // console.log(`會員 ${this.id} 的頭像已更新並永久儲存`);
 
       // ✨ 新增：設定登入狀態
       this.isLoggedIn = true;
@@ -177,7 +177,7 @@ export const useMemberStore = defineStore("member", {
 
       this.saveTosessionStorage();
 
-      console.log(`會員 ${this.id} 的頭像已重置為預設`);
+      // console.log(`會員 ${this.id} 的頭像已重置為預設`);
 
       // 這裡之後可以加入 API 呼叫，刪除伺服器上的頭像
       // 例如：await this.deleteAvatarFromServer();
@@ -253,7 +253,7 @@ export const useMemberStore = defineStore("member", {
       // 清除 sessionStorage 中的會員資料，但保留頭像儲存
       this.clearsessionStorage();
 
-      console.log("會員已登出，頭像儲存保留");
+      // console.log("會員已登出，頭像儲存保留");
     },
 
     // ✨ 修正：儲存到 sessionStorage
@@ -323,7 +323,7 @@ export const useMemberStore = defineStore("member", {
             const savedAvatar = this.memberAvatars[memberData.id];
             this.avatar = savedAvatar || memberData.avatar;
 
-            console.log(`從 sessionStorage 恢復會員 ${this.name} 的資料`);
+            // console.log(`從 sessionStorage 恢復會員 ${this.name} 的資料`);
             return true;
           }
         }
@@ -350,7 +350,7 @@ export const useMemberStore = defineStore("member", {
         sessionStorage.removeItem("memberData");
         sessionStorage.removeItem("memberAvatars");
         this.memberAvatars = {};
-        console.log("所有會員資料已清除（包含頭像儲存）");
+        // console.log("所有會員資料已清除（包含頭像儲存）");
       } catch (error) {
         console.error("清除所有資料失敗:", error);
       }

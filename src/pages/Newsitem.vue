@@ -50,7 +50,7 @@ const loadNewsDetail = async () => {
     // 設定內容段落 (已按 SORT_ORDER 排序)
     newsContents.value = response.data.contents || []
 
-    console.log('載入新聞詳情成功:', newsDetail.value.TITLE)
+    // console.log('載入新聞詳情成功:', newsDetail.value.TITLE)
 
   } catch (err) {
     console.error('載入新聞詳情失敗:', err)

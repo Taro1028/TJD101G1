@@ -15,11 +15,11 @@ const router = useRouter()
 
 // 點擊大頭照區域觸發檔案選擇
 const handleAvatarClick = () => {
-    console.log('Avatar clicked!');
-    console.log('avatarInput.value:', avatarInput.value);
+    // console.log('Avatar clicked!');
+    // console.log('avatarInput.value:', avatarInput.value);
     
     if (avatarInput.value) {
-        console.log('Triggering file input click');
+        // console.log('Triggering file input click');
         avatarInput.value.click();
     } else {
         console.error('avatarInput ref is null');
@@ -30,7 +30,7 @@ const handleAvatarClick = () => {
 const handleFileChange = (event) => {
     const file = event.target.files[0];
     
-    console.log('File selected:', file); // 調試用
+    // console.log('File selected:', file); // 調試用
     
     if (!file) {
         console.log('No file selected');
@@ -40,7 +40,7 @@ const handleFileChange = (event) => {
     // 檢查檔案類型
     if (!file.type.startsWith('image/')) {
         alert('請選擇圖片檔案');
-        console.log('Invalid file type:', file.type);
+        // console.log('Invalid file type:', file.type);
         return;
     }
     
@@ -51,7 +51,7 @@ const handleFileChange = (event) => {
         return;
     }
     
-    console.log('File validation passed, reading file...');
+    // console.log('File validation passed, reading file...');
     
     // 使用 FileReader 讀取檔案
     const reader = new FileReader();
@@ -115,7 +115,7 @@ const handleLogout = () => {
 // 分頁處理函數
 const handlePageChange = async (page) => {
     try {
-        console.log('🔄 切換到頁面:', page)
+        // console.log('🔄 切換到頁面:', page)
         await myCardsStore.goToPage(page)
     } catch (error) {
         console.error('❌ 切換頁面失敗:', error)
@@ -212,9 +212,9 @@ const pageButtons = computed(() => {
 // 初始化
 onMounted(async () => {
     try {
-        console.log('🚀 MyCards 組件初始化...')
+        // console.log('🚀 MyCards 組件初始化...')
         await myCardsStore.initialize()
-        console.log('✅ 小卡載入完成:', myCardsStore.cards.length, '張')
+        // console.log('✅ 小卡載入完成:', myCardsStore.cards.length, '張')
     } catch (error) {
         console.error('❌ 小卡載入失敗:', error)
     }

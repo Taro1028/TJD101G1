@@ -111,8 +111,8 @@ export const useRecipientsStore = defineStore('recipients', () => {
       const env = import.meta.env.VITE_API_URL || 'http://localhost'
       const apiUrl = `${env}/tjd101/g1/php/getRecipients.php?member_id=${memberId}`
       
-      console.log('🔍 載入收件人資料，API URL:', apiUrl)
-      console.log('🆔 會員ID:', memberId)
+      // console.log('🔍 載入收件人資料，API URL:', apiUrl)
+      // console.log('🆔 會員ID:', memberId)
 
       const response = await fetch(apiUrl)
       
@@ -121,7 +121,7 @@ export const useRecipientsStore = defineStore('recipients', () => {
       }
 
       const result = await response.json()
-      console.log('📋 API 回傳結果:', result)
+      // console.log('📋 API 回傳結果:', result)
 
       if (!result.success) {
         throw new Error(result.message || '載入收件人資料失敗')
@@ -143,12 +143,12 @@ export const useRecipientsStore = defineStore('recipients', () => {
         setRecipient('recipient3', data.recipient3)
       }
 
-      console.log('✅ 收件人資料載入完成')
-      console.log('📊 載入的資料:', {
-        recipient1: data.recipient1 || '無資料',
-        recipient2: data.recipient2 || '無資料', 
-        recipient3: data.recipient3 || '無資料'
-      })
+      // console.log('✅ 收件人資料載入完成')
+      // console.log('📊 載入的資料:', {
+      //   recipient1: data.recipient1 || '無資料',
+      //   recipient2: data.recipient2 || '無資料', 
+      //   recipient3: data.recipient3 || '無資料'
+      // })
 
     } catch (error) {
       console.error('❌ 載入收件人資料失敗:', error)
@@ -169,9 +169,9 @@ export const useRecipientsStore = defineStore('recipients', () => {
       const env = import.meta.env.VITE_API_URL || 'http://localhost'
       const apiUrl = `${env}/tjd101/g1/php/saveRecipient.php`
       
-      console.log('💾 儲存收件人資料，API URL:', apiUrl)
-      console.log('🆔 會員ID:', memberId)
-      console.log('📝 收件人資料:', recipientData)
+      // console.log('💾 儲存收件人資料，API URL:', apiUrl)
+      // console.log('🆔 會員ID:', memberId)
+      // console.log('📝 收件人資料:', recipientData)
 
       // 準備要傳送的資料
       const saveData = {
@@ -199,7 +199,7 @@ export const useRecipientsStore = defineStore('recipients', () => {
       }
 
       const result = await response.json()
-      console.log('📋 API 儲存結果:', result)
+      // console.log('📋 API 儲存結果:', result)
 
       if (!result.success) {
         throw new Error(result.message || '儲存收件人資料失敗')
@@ -208,10 +208,10 @@ export const useRecipientsStore = defineStore('recipients', () => {
       // 如果是新增，更新本地的 ID
       if (result.data && result.data.action === 'insert') {
         recipients[recipientKey].id = result.data.id
-        console.log('✅ 新增成功，更新 ID:', result.data.id)
+        // console.log('✅ 新增成功，更新 ID:', result.data.id)
       }
 
-      console.log('✅ 收件人資料儲存成功')
+      // console.log('✅ 收件人資料儲存成功')
       return result
 
     } catch (error) {

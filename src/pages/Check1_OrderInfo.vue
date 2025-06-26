@@ -171,9 +171,9 @@ const removeCartItem = async (cartId, planType) => {
 }
 
 // 返回編輯（導向點餐頁面）
-const goBackToOrder = () => {
-  router.push('/Order/Select')
-}
+// const goBackToOrder = () => {
+//   router.push('/Order/Select')
+// }
 
 // 檢查是否可以繼續
 const canProceed = computed(() => {
@@ -299,7 +299,7 @@ const goNext = () => {
                         <h6 class="price">${{ formatPrice(item.dailyTotalAmount) }}</h6>
                       </div>
                     </div>
-                    <button class="edit_btn" @click="goBackToOrder">回點餐編輯頁</button>
+                   <!-- <button class="edit_btn" @click="goBackToOrder">回點餐編輯頁</button> -->
                   </div>
                 </div>
               </div>
@@ -606,7 +606,7 @@ button{
   color:  $neutral_700;
 }
 
-.edit_btn{
+/*.edit_btn{
   align-self: end;
   background-color: $neutral_300;
   color: $neutral_700;
@@ -619,7 +619,7 @@ button{
   background-color: transparent;
   color: $neutral_black;
   }
-}
+}*/
 
 // 結帳項目
 .payment{

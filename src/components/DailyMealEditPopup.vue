@@ -49,30 +49,26 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'update-meal']);
 
-// !!! 修正點 1: 統一變數名稱為 localSelectedSideDishGroup !!!
+//  統一變數名稱為 localSelectedSideDishGroup
 const localMainCourse = ref(null);
-const localSelectedSideDishGroup = ref(null); // 現在儲存副菜組合物件
+const localSelectedSideDishGroup = ref(null); // 副菜組合物件
 
 // 從 store 獲取所有可能的主菜 (物件陣列)
 const possibleMainDishesBasedOnTypes = computed(() => planCustomStore.possibleMainDishesBasedOnTypes);
-// 從 store 獲取所有已選的副菜組合 (物件陣列)
-// selectedSideDishGroups 現在就是副菜組合物件的陣列了
 const selectedSideDishGroups = computed(() => planCustomStore.selectedSideDishGroups);
 
-// 不再需要 availableSideDishOptions，因為 selectedSideDishGroups 已經是物件了
-// const availableSideDishOptions = computed(() => planCustomStore.availableSideDishOptions);
 
 
 // 監聽 props.dayMeal 的變化來初始化 local 狀態
 watch(() => props.dayMeal, (newVal) => {
-  console.log('DailyMealEditPopup: dayMeal prop changed:', newVal);
+  // console.log('DailyMealEditPopup: dayMeal prop changed:', newVal);
   if (newVal) {
     // 複製物件以確保響應性獨立且不會直接修改 props
     localMainCourse.value = newVal.mainCourse ? { ...newVal.mainCourse } : null;
     localSelectedSideDishGroup.value = newVal.sideDishes ? { ...newVal.sideDishes } : null;
 
-    console.log('DailyMealEditPopup: localMainCourse after watch:', localMainCourse.value);
-    console.log('DailyMealEditPopup: localSelectedSideDishGroup after watch:', localSelectedSideDishGroup.value);
+    // console.log('DailyMealEditPopup: localMainCourse after watch:', localMainCourse.value);
+    // console.log('DailyMealEditPopup: localSelectedSideDishGroup after watch:', localSelectedSideDishGroup.value);
   } else {
     console.warn('DailyMealEditPopup: dayMeal prop is null or undefined.');
     localMainCourse.value = null;
@@ -100,38 +96,38 @@ const saveChanges = () => {
 };
 
 const openMainCoursePicker = () => {
-  console.log('--- 開始偵錯主菜隨機選擇 (DailyMealEditPopup) ---');
-  console.log('來自 store 的 possibleMainDishesBasedOnTypes.value:', possibleMainDishesBasedOnTypes.value);
+  // console.log('--- 開始偵錯主菜隨機選擇 (DailyMealEditPopup) ---');
+  // console.log('來自 store 的 possibleMainDishesBasedOnTypes.value:', possibleMainDishesBasedOnTypes.value);
 
   if (!possibleMainDishesBasedOnTypes.value || possibleMainDishesBasedOnTypes.value.length === 0) {
     alert('無可選主菜，請確認是否已選擇主菜類型並產生菜單！');
-    console.warn('possibleMainDishesBasedOnTypes 為空或未定義:', possibleMainDishesBasedOnTypes.value);
+    // console.warn('possibleMainDishesBasedOnTypes 為空或未定義:', possibleMainDishesBasedOnTypes.value);
     return;
   }
   const randomIndex = Math.floor(Math.random() * possibleMainDishesBasedOnTypes.value.length);
   // 複製物件以確保響應性獨立
   localMainCourse.value = { ...possibleMainDishesBasedOnTypes.value[randomIndex] };
-  console.log('新主菜物件:', localMainCourse.value);
+  // console.log('新主菜物件:', localMainCourse.value);
 };
 
 const openSideDishPicker = () => {
-  console.log('--- 開始偵錯副菜隨機選擇 (DailyMealEditPopup) ---');
+  // console.log('--- 開始偵錯副菜隨機選擇 (DailyMealEditPopup) ---');
   // selectedSideDishGroups 現在已經是副菜組合物件的陣列了
-  console.log('來自 store 的 selectedSideDishGroups.value (選中的副菜組合物件):', selectedSideDishGroups.value);
+  // console.log('來自 store 的 selectedSideDishGroups.value (選中的副菜組合物件):', selectedSideDishGroups.value);
 
   // 確保 selectedSideDishGroups.value 有值
   if (!selectedSideDishGroups.value || selectedSideDishGroups.value.length === 0) {
     alert('無可選副菜組合，請先回到 Step 2 選擇副菜組合！');
-    console.warn('selectedSideDishGroups 為空或未定義:', selectedSideDishGroups.value);
+    // console.warn('selectedSideDishGroups 為空或未定義:', selectedSideDishGroups.value);
     return;
   }
 
-  // !!! 修正點 2: 移除混淆的第二套邏輯，只保留正確的隨機選擇副菜組合物件的邏輯 !!!
+  // 隨機選擇副菜組合物件
   const randomIndex = Math.floor(Math.random() * selectedSideDishGroups.value.length);
   // 隨機選取的是一個副菜組合物件，並複製物件以確保響應性獨立
   localSelectedSideDishGroup.value = { ...selectedSideDishGroups.value[randomIndex] };
 
-  console.log('新副菜組合物件:', localSelectedSideDishGroup.value);
+  // console.log('新副菜組合物件:', localSelectedSideDishGroup.value);
 };
 </script>
 <style scoped lang="scss">
@@ -149,6 +145,10 @@ const openSideDishPicker = () => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  @media screen and (max-width: 550px){
+    right: 72px;
+  }
 }
 
 .header{

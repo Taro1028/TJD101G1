@@ -81,10 +81,10 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
 
   // Step 3: 初始化每天的餐盒內容（隨機生成）
   function initializeCustomMealsByDate() {
-    console.log('--- 進入 PlanCustomStore initializeCustomMealsByDate 函式 ---');
-    console.log('日期範圍:', deliveryDates.value);
-    console.log('已選主菜類型:', selectedMainCourseTypes.value);
-    console.log('已選副菜組合索引:', selectedSideDishGroups.value);
+    // console.log('--- 進入 PlanCustomStore initializeCustomMealsByDate 函式 ---');
+    // console.log('日期範圍:', deliveryDates.value);
+    // console.log('已選主菜類型:', selectedMainCourseTypes.value);
+    // console.log('已選副菜組合索引:', selectedSideDishGroups.value);
 
     // 檢查關鍵數據是否齊全
     if (!deliveryDates.value.length || selectedMainCourseTypes.value.length !== 2 || selectedSideDishGroups.value.length !== 5) {
@@ -142,7 +142,7 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
       });
     });
     customMealsByDate.value = meals;
-    console.log('customMealsByDate 成功初始化:', customMealsByDate.value);
+    // console.log('customMealsByDate 成功初始化:', customMealsByDate.value);
   }
 
   // Step 3: 增加餐盒數量
@@ -188,7 +188,7 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
           id: d.id, name: d.name, price: d.price, category: d.category
         }))
       };
-      console.log(`更新了 ${date} 的餐盒內容:`, customMealsByDate.value[index]);
+      // console.log(`更新了 ${date} 的餐盒內容:`, customMealsByDate.value[index]);
     }
   }
 
@@ -241,18 +241,17 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
       });
 
       // === 除錯資訊 ===
-      console.log('=== 自由搭配 - 準備傳送的資料 ===');
-      console.log('orderItems:', JSON.stringify(orderItems, null, 2));
+      // console.log('=== 自由搭配 - 準備傳送的資料 ===');
+      // console.log('orderItems:', JSON.stringify(orderItems, null, 2));
       if (messageCardId) {
-        console.log('包含留言小卡 ID:', messageCardId);
+        // console.log('包含留言小卡 ID:', messageCardId);
       }
-      console.log('================================');
 
       // 傳入 messageCardId 參數
       const cartStore = useCartStore();
       const result = await cartStore.addOrderToBackendAndLocalCart(orderItems, messageCardId);
 
-      console.log('自由搭配餐點已成功加入購物車');
+      // console.log('自由搭配餐點已成功加入購物車');
       return result; // 回傳結果，包含 cart_id 等資訊
     } catch (error) {
       console.error('新增自由搭配餐點到購物車失敗:', error);
@@ -260,13 +259,13 @@ export const usePlanCustomStore = defineStore('planCustom', () => {
     }
   }
 
-  // 可選：重置整個 planCustomStore 狀態的方法
+  // 重置整個 planCustomStore 狀態的方法
   function resetPlanCustomState() {
     selectedMainCourseTypes.value = [];
     selectedSideDishGroups.value = [];
     customMealsByDate.value = [];
     // 其他需要重置的狀態
-    console.log('PlanCustomStore 狀態已重置。');
+    // console.log('PlanCustomStore 狀態已重置。');
   }
 
   return {

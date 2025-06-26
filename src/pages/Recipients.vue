@@ -19,7 +19,7 @@
     // 按鈕切換處理函數
     const switchTab = (tabName) => {
         activeTab.value = tabName
-        console.log('切換到分頁:', tabName)
+        // console.log('切換到分頁:', tabName)
     }
 
     // 電話欄位驗證狀態
@@ -46,11 +46,11 @@ const phoneValidation = reactive({
 
     // 點擊大頭照區域觸發檔案選擇
     const handleAvatarClick = () => {
-    console.log('Avatar clicked!');
-    console.log('avatarInput.value:', avatarInput.value);
+    // console.log('Avatar clicked!');
+    // console.log('avatarInput.value:', avatarInput.value);
     
     if (avatarInput.value) {
-        console.log('Triggering file input click');
+        // console.log('Triggering file input click');
         avatarInput.value.click();
     } else {
         console.error('avatarInput ref is null');
@@ -61,7 +61,7 @@ const phoneValidation = reactive({
     const handleFileChange = (event) => {
     const file = event.target.files[0];
     
-      console.log('File selected:', file); 
+    //   console.log('File selected:', file); 
     
     if (!file) {
         console.log('No file selected');
@@ -71,7 +71,7 @@ const phoneValidation = reactive({
     // 檢查檔案類型
     if (!file.type.startsWith('image/')) {
         alert('請選擇圖片檔案');
-        console.log('Invalid file type:', file.type);
+        // console.log('Invalid file type:', file.type);
         return;
     }
     
@@ -82,7 +82,7 @@ const phoneValidation = reactive({
         return;
     }
     
-    console.log('File validation passed, reading file...');
+    // console.log('File validation passed, reading file...');
     
     // 使用 FileReader 讀取檔案
     const reader = new FileReader();
@@ -182,7 +182,7 @@ const phoneValidation = reactive({
                 return
             }
 
-            console.log('準備儲存收件人資料:', activeTab.value, currentRecipientData)
+            // console.log('準備儲存收件人資料:', activeTab.value, currentRecipientData)
 
             // 調用 API 儲存資料
             const result = await recipientsStore.saveRecipientToAPI(

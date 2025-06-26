@@ -115,11 +115,11 @@ const validateConfirmPassword = () => {
 
 // 點擊大頭照區域觸發檔案選擇
 const handleAvatarClick = () => {
-  console.log("Avatar clicked!");
-  console.log("avatarInput.value:", avatarInput.value);
+  // console.log("Avatar clicked!");
+  // console.log("avatarInput.value:", avatarInput.value);
 
   if (avatarInput.value) {
-    console.log("Triggering file input click");
+    // console.log("Triggering file input click");
     avatarInput.value.click();
   } else {
     console.error("avatarInput ref is null");
@@ -130,7 +130,7 @@ const handleAvatarClick = () => {
 const handleFileChange = (event) => {
   const file = event.target.files[0];
 
-  console.log("File selected:", file); // 調試用
+  // console.log("File selected:", file); // 調試用
 
   if (!file) {
     console.log("No file selected");
@@ -140,7 +140,7 @@ const handleFileChange = (event) => {
   // 檢查檔案類型
   if (!file.type.startsWith("image/")) {
     alert("請選擇圖片檔案");
-    console.log("Invalid file type:", file.type);
+    // console.log("Invalid file type:", file.type);
     return;
   }
 
@@ -151,16 +151,16 @@ const handleFileChange = (event) => {
     return;
   }
 
-  console.log("File validation passed, reading file...");
+  // console.log("File validation passed, reading file...");
 
   // 使用 FileReader 讀取檔案
   const reader = new FileReader();
 
   reader.onload = (e) => {
-    console.log("File read successfully");
+    // console.log("File read successfully");
     //直接更新到 memberStore，不再使用本地狀態
     memberStore.updateAvatar(e.target.result);
-    console.log("Avatar updated to memberStore");
+    // console.log("Avatar updated to memberStore");
   };
 
   reader.onerror = () => {
@@ -242,11 +242,11 @@ async function update() {
       }),
     });
 
-    console.log("response", response);
+    // console.log("response", response);
 
     if (response.ok) {
       const result = await response.json();
-      console.log("更新成功:", result);
+      // console.log("更新成功:", result);
 
       // 檢查後端回傳是否真的成功
       if (result.success === true || result.status === "success") {
@@ -292,7 +292,7 @@ onMounted(() => {
   ifo.emergency_contacts_phone = memberStore.contactsPhone;
   ifo.note = memberStore.note;
   ifo.avatar = memberStore.avatar;
-  console.log(ifo);
+  // console.log(ifo);
 });
 </script>
 <template>

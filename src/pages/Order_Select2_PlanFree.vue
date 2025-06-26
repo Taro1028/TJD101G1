@@ -17,11 +17,11 @@ onMounted(() => {
     // 從 Pinia store 恢復上次的選擇
     // 使用結構賦值確保是值的複製，避免響應式代理問題
     localSelectedSideDishGroups.value = [...planCustomStore.selectedSideDishGroups];
-    console.log('Order_Select2_PlanFree mounted, restored selected side dish groups:', localSelectedSideDishGroups.value);
+    // console.log('Order_Select2_PlanFree mounted, restored selected side dish groups:', localSelectedSideDishGroups.value);
 
     // 可以在這裡加入驗證，如果 Step 1 的主菜沒有選，就導回 Step 1
     if (planCustomStore.selectedMainCourseTypes.length !== 2) {
-      console.warn('Step 1 main course types not selected. Redirecting to Step 1.');
+    //   console.warn('Step 1 main course types not selected. Redirecting to Step 1.');
       router.replace('/Order/PlanFree/Step1'); // 強制用戶從 Step 1 開始
     }
 })
@@ -49,7 +49,7 @@ function toggleDish(item) {
     }
     // 同步更新 Pinia Store 中的 selectedSideDishGroups
     planCustomStore.setSelectedSideDishGroups(localSelectedSideDishGroups.value); // <-- 傳遞物件陣列
-    console.log('Pinia store selectedSideDishGroups updated:', [...planCustomStore.selectedSideDishGroups]);
+    // console.log('Pinia store selectedSideDishGroups updated:', [...planCustomStore.selectedSideDishGroups]);
 }
 
 
@@ -77,7 +77,7 @@ function goNext() {
     // 在進入 Step 3 (確認菜單) 之前，初始化每天的餐盒內容
     // 這裡會根據 Step 1 和 Step 2 的選擇隨機生成菜單
     planCustomStore.initializeCustomMealsByDate(); 
-    router.push('/Order/Select3_PlanFree'); // 確保路徑正確
+    router.push('/Order/Loading');
 }
 
 // 上一步邏輯 (返回 Step 1)

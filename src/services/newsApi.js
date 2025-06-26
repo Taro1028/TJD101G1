@@ -6,7 +6,7 @@ const API_BASE = '/tjd101/g1/php'
 const apiRequest = async (url, options = {}) => {
   const fullUrl = `${env}${API_BASE}${url}`
 
-  console.log('🔗 發送請求到:', fullUrl)
+  // console.log('🔗 發送請求到:', fullUrl)
 
   try {
     const response = await fetch(fullUrl, {
@@ -17,8 +17,8 @@ const apiRequest = async (url, options = {}) => {
       ...options
     })
 
-    console.log('📡 回應狀態:', response.status, response.statusText)
-    console.log('📋 回應標頭:', [...response.headers.entries()])
+    // console.log('📡 回應狀態:', response.status, response.statusText)
+    // console.log('📋 回應標頭:', [...response.headers.entries()])
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
@@ -26,8 +26,8 @@ const apiRequest = async (url, options = {}) => {
 
     // 先取得原始文字
     const rawText = await response.text()
-    console.log('📄 原始回應前100字元:', rawText.substring(0, 100))
-    console.log('📄 原始回應後100字元:', rawText.substring(Math.max(0, rawText.length - 100)))
+    // console.log('📄 原始回應前100字元:', rawText.substring(0, 100))
+    // console.log('📄 原始回應後100字元:', rawText.substring(Math.max(0, rawText.length - 100)))
 
     // 檢查是否包含 HTML
     if (rawText.includes('<!DOCTYPE') || rawText.includes('<html')) {
@@ -39,7 +39,7 @@ const apiRequest = async (url, options = {}) => {
     let data
     try {
       data = JSON.parse(rawText)
-      console.log('✅ JSON 解析成功')
+      // console.log('✅ JSON 解析成功')
     } catch (jsonError) {
       console.error('❌ JSON 解析失敗:', jsonError.message)
       console.error('📄 完整回應內容:', rawText)
@@ -51,7 +51,7 @@ const apiRequest = async (url, options = {}) => {
       throw new Error(data.message || '請求失敗')
     }
 
-    console.log('📦 最終資料:', data)
+    // console.log('📦 最終資料:', data)
     return { data }
 
   } catch (error) {
@@ -71,20 +71,20 @@ const buildQueryString = (params) => {
   })
 
   const queryString = queryParams.toString()
-  console.log('🔍 查詢參數:', queryString)
+  // console.log('🔍 查詢參數:', queryString)
   return queryString
 }
 
 export const newsApi = {
   // 測試連線
   test: async () => {
-    console.log('🧪 執行連線測試...')
+    // console.log('🧪 執行連線測試...')
     return apiRequest('/test_response.php')
   },
 
   // 獲取特定標籤的新聞 (News.vue 需要)
   getNewsByTag: async (tag, limit = 10) => {
-    console.log('📰 載入分類新聞:', { tag, limit })
+    // console.log('📰 載入分類新聞:', { tag, limit })
     const queryString = buildQueryString({ tag, limit })
     const response = await apiRequest(`/news_by_tag.php?${queryString}`)
 
@@ -108,7 +108,7 @@ export const newsApi = {
 
     // 獲取單篇新聞詳情 (Newsitem.vue 需要)
     getNewsDetail: async (id) => {
-      console.log('📄 載入新聞詳情:', { id })
+      // console.log('📄 載入新聞詳情:', { id })
       const queryString = buildQueryString({ id })
       return apiRequest(`/news_detail.php?${queryString}`)
     }

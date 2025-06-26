@@ -383,7 +383,7 @@ function startMobileDrag(sticker) {
   // 自動觸發觸控拖曳模式
   nextTick(() => {
     // 貼紙進入拖曳狀態，等待用戶觸控移動
-    console.log('貼紙進入拖曳模式，請觸控移動')
+    // console.log('貼紙進入拖曳模式，請觸控移動')
   })
 }
 
@@ -441,7 +441,7 @@ async function saveCardState() {
   }
 
   try {
-    console.log('開始儲存卡片...')
+    // console.log('開始儲存卡片...')
     
     // 截圖
     const imageBlob = await captureCard()
@@ -450,7 +450,7 @@ async function saveCardState() {
       throw new Error('截圖失敗')
     }
     
-    console.log('截圖成功，檔案大小:', imageBlob.size, 'bytes')
+    // console.log('截圖成功，檔案大小:', imageBlob.size, 'bytes')
 
     // 準備要送到後端的資料
     const formData = new FormData()
@@ -466,20 +466,20 @@ async function saveCardState() {
       }))
     }
     
-    console.log('卡片資料:', cardData)
+    // console.log('卡片資料:', cardData)
     
     formData.append('cardData', JSON.stringify(cardData))
     formData.append('cardImage', imageBlob, `card_${Date.now()}.png`)
 
     // 發送到後端 API
-    console.log('發送請求到 PHP...')
+    // console.log('發送請求到 PHP...')
     const env = import.meta.env.VITE_API_URL || 'http://localhost'
     const response = await fetch(env+'/tjd101/g1/php/save-message-card.php', {
       method: 'POST',
       body: formData
     })
 
-    console.log('回應狀態:', response.status)
+    // console.log('回應狀態:', response.status)
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -488,14 +488,14 @@ async function saveCardState() {
     }
 
     const result = await response.json()
-    console.log('後端回應:', result)
+    // console.log('後端回應:', result)
     
     if (!result.success) {
       throw new Error(result.error || '儲存失敗')
     }
 
     // 成功處理
-    console.log('卡片儲存成功:', result)
+    // console.log('卡片儲存成功:', result)
     return result.cardId // 回傳卡片ID
 
     // 儲存回傳的資料到 localStorage（可選）
@@ -530,7 +530,7 @@ async function saveCardState() {
 async function finishMessage() {
   try {
     // Step 1: 儲存留言小卡
-    console.log('Step 1: 儲存留言小卡...')
+    // console.log('Step 1: 儲存留言小卡...')
     const cardId = await saveCardState()
     
     if (!cardId) {
@@ -540,7 +540,7 @@ async function finishMessage() {
 
     // Step 2: 根據 query 參數決定調用哪個 store 加入購物車
     const planType = router.currentRoute.value.query.planType
-    console.log('Step 2: 準備加入購物車，方案類型:', planType)
+    // console.log('Step 2: 準備加入購物車，方案類型:', planType)
     
     let cartResult = null
     
@@ -557,7 +557,7 @@ async function finishMessage() {
     }
 
     // Step 3: 成功完成，導向購物車頁面
-    console.log('✅ 所有步驟完成，導向購物車頁面')
+    // console.log('✅ 所有步驟完成，導向購物車頁面')
     alert('留言小卡已成功加入訂單！')
     router.push('/Order/AddCart')
 
@@ -571,7 +571,7 @@ async function finishMessage() {
 async function goNext() {
   try {
     const planType = router.currentRoute.value.query.planType
-    console.log('不留言，直接加入購物車，方案類型:', planType)
+    // console.log('不留言，直接加入購物車，方案類型:', planType)
     
     if (planType === '為你搭配') {
       await orderStore.addPlanForYouToCart()

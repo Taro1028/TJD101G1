@@ -65,18 +65,18 @@ const loadHomeNews = async () => {
       list: listNews
     }
 
-    console.log('首頁新聞載入成功:', {
-      封面新聞: coverNews?.TITLE,
-      封面分類: getNewsCategory(coverNews),
-      是否精選: coverNews?.IS_FEATURED == 1, 
-      列表新聞數量: listNews.length,
-      總精選新聞數量: featuredNews.length,
-      各分類精選數量: {
-        焦點計畫: focusResponse.data.filter(n => n.IS_FEATURED == 1).length,
-        深度專題: depthResponse.data.filter(n => n.IS_FEATURED == 1).length,
-        誰來午餐: lunchResponse.data.filter(n => n.IS_FEATURED == 1).length
-      }
-    })
+    // console.log('首頁新聞載入成功:', {
+    //   封面新聞: coverNews?.TITLE,
+    //   封面分類: getNewsCategory(coverNews),
+    //   是否精選: coverNews?.IS_FEATURED == 1, 
+    //   列表新聞數量: listNews.length,
+    //   總精選新聞數量: featuredNews.length,
+    //   各分類精選數量: {
+    //     焦點計畫: focusResponse.data.filter(n => n.IS_FEATURED == 1).length,
+    //     深度專題: depthResponse.data.filter(n => n.IS_FEATURED == 1).length,
+    //     誰來午餐: lunchResponse.data.filter(n => n.IS_FEATURED == 1).length
+    //   }
+    // })
 
   } catch (err) {
     console.error('載入首頁新聞失敗:', err)

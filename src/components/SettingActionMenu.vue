@@ -1,8 +1,8 @@
 <template>
   <div class="action-menu">
-    <div class="menu-item" @click="handleMoveOrder">
+    <!-- <div class="menu-item" @click="handleMoveOrder">
       <i class="bi bi-list"></i> 移動菜單順序
-    </div>
+    </div> -->
     <div class="menu-item" @click="handleEditContent">
       <i class="bi bi-pencil"></i> 編輯菜單內容
     </div>
@@ -14,10 +14,10 @@ import { defineEmits } from 'vue';
 
 const emit = defineEmits(['move-order', 'edit-content', 'close']);
 
-const handleMoveOrder = () => {
-  emit('move-order');
-  emit('close'); // 點擊後關閉菜單
-};
+// const handleMoveOrder = () => {
+//   emit('move-order');
+//   emit('close'); // 點擊後關閉菜單
+// };
 
 const handleEditContent = () => {
   emit('edit-content');
@@ -26,7 +26,6 @@ const handleEditContent = () => {
 </script>
 
 <style scoped lang="scss">
-// 樣式同之前提供的 DailyMenuActionMenu.vue，只是名稱變了
 .action-menu {
   position: absolute;
   background-color: white;

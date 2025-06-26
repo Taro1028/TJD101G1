@@ -20,7 +20,7 @@ const emit = defineEmits(['close']);
 
 // 當用戶選擇「不用，謝謝」時
 async function goNext() {
-  console.log(`點擊「不用，謝謝」：準備將 ${props.planType} 訂單資料加入購物車`);
+  // console.log(`點擊「不用，謝謝」：準備將 ${props.planType} 訂單資料加入購物車`);
   
   try {
     if (props.planType === '為你搭配') {
@@ -42,7 +42,7 @@ async function goNext() {
 
 // 當用戶選擇「我要留言」時
 function goMessage() {
-  console.log(`點擊「我要留言」：導向留言卡頁面 (${props.planType})`);
+  // console.log(`點擊「我要留言」：導向留言卡頁面 (${props.planType})`);
   
   // 關閉彈窗
   emit('close');

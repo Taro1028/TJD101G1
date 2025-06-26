@@ -309,14 +309,14 @@ router.beforeEach(async (to, from, next) => {
   const modalStore = useModalStore();
   const adminMemberStore = useAdminMemberStore();
 
-  // 🔥 新增：檢查完整 URL 和參數
-  console.log("🔍 完整除錯資訊:");
-  console.log("  window.location.href:", window.location.href);
-  console.log("  window.location.hash:", window.location.hash);
-  console.log("  document.referrer:", document.referrer);
-  console.log("  to.fullPath:", to.fullPath);
-  console.log("  to.path:", to.path);
-  console.log("  to.name:", to.name);
+  // 檢查完整 URL 和參數
+  // console.log("🔍 完整除錯資訊:");
+  // console.log("  window.location.href:", window.location.href);
+  // console.log("  window.location.hash:", window.location.hash);
+  // console.log("  document.referrer:", document.referrer);
+  // console.log("  to.fullPath:", to.fullPath);
+  // console.log("  to.path:", to.path);
+  // console.log("  to.name:", to.name);
 
   // 🔥 修正：檢查實際的路由路徑
   let actualPath = to.path;
@@ -347,18 +347,18 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  console.log("🔍 實際路徑:", actualPath);
+  // console.log("🔍 實際路徑:", actualPath);
 
   // 🔥 檢查是否來自綠界且要去完成頁面
   if (
     document.referrer.includes("ecpay.com.tw") &&
     actualPath === "/Check_Complete"
   ) {
-    console.log("🎯 檢測到來自綠界的跳轉到完成頁面！");
+    // console.log("🎯 檢測到來自綠界的跳轉到完成頁面！");
 
     // 強制導航到完成頁面
     if (to.path !== "/Check_Complete") {
-      console.log("🔧 強制導航到完成頁面");
+      // console.log("🔧 強制導航到完成頁面");
       next("/Check_Complete");
       return;
     }
@@ -369,17 +369,17 @@ router.beforeEach(async (to, from, next) => {
     console.log("  載入 sessionStorage 結果: 失敗");
     memberStore.logout();
   } else {
-    console.log("  載入 sessionStorage 結果: 成功");
+    // console.log("  載入 sessionStorage 結果: 成功");
   }
 
-  // 🔥 修正：使用 actualPath 來檢查路由權限
+  // 使用 actualPath 來檢查路由權限
   const targetRoute = routes.find((route) => route.path === actualPath);
   const requiresAuth =
     targetRoute?.meta?.requiredLogin || to.meta.requiredLogin;
 
-  console.log("路由守衛檢查 - 實際目標頁面:", actualPath);
-  console.log("需要登入:", requiresAuth);
-  console.log("是否已認證:", memberStore.isAuthenticated);
+  // console.log("路由守衛檢查 - 實際目標頁面:", actualPath);
+  // console.log("需要登入:", requiresAuth);
+  // console.log("是否已認證:", memberStore.isAuthenticated);
 
   // 如果需要登入但使用者未登入
   if (requiresAuth && !memberStore.isAuthenticated) {
@@ -393,11 +393,11 @@ router.beforeEach(async (to, from, next) => {
     next(false);
     return;
   } else if (to.path === "/Login" && memberStore.isAuthenticated) {
-    console.log("已登入，跳轉到會員中心");
+    // console.log("已登入，跳轉到會員中心");
     next("/MemberCenter");
     return;
   } else {
-    console.log("✅ 正常進入頁面:", actualPath);
+    // console.log("✅ 正常進入頁面:", actualPath);
     next();
     return;
   }

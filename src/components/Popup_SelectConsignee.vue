@@ -35,7 +35,7 @@ const loadConsignees = async () => {
       throw new Error('無會員ID')
     }
     
-    console.log('🔍 載入常用收貨人，會員ID:', memberStore.memberId)
+    // console.log('🔍 載入常用收貨人，會員ID:', memberStore.memberId)
     
     const baseUrl = env.endsWith('/') ? env : env + '/'
     const apiUrl = `${baseUrl}tjd101/g1/php/getConsignees.php?member_id=${memberStore.memberId}`
@@ -54,16 +54,16 @@ const loadConsignees = async () => {
     
     consignees.value = result.data || []
     
-    console.log('✅ 常用收貨人載入完成:')
-    console.log('- 資料筆數:', consignees.value.length)
-    console.log('- 資料內容:', consignees.value)
+    // console.log('✅ 常用收貨人載入完成:')
+    // console.log('- 資料筆數:', consignees.value.length)
+    // console.log('- 資料內容:', consignees.value)
     
     // 預設選中第一個收貨人
     if (consignees.value.length > 0) {
       selectedConsigneeId.value = consignees.value[0].ID
-      console.log('- 預設選中收貨人ID:', selectedConsigneeId.value)
+      // console.log('- 預設選中收貨人ID:', selectedConsigneeId.value)
     } else {
-      console.log('- 沒有收貨人資料，顯示空狀態')
+      // console.log('- 沒有收貨人資料，顯示空狀態')
     }
     
   } catch (error) {
@@ -111,7 +111,7 @@ const deleteConsignee = async (consigneeId) => {
     // 重新載入列表
     await loadConsignees()
     
-    console.log('✅ 收貨人刪除成功')
+    // console.log('✅ 收貨人刪除成功')
     
   } catch (error) {
     console.error('❌ 刪除收貨人失敗:', error)
@@ -170,7 +170,7 @@ const saveNewConsignee = async () => {
     }
     showAddForm.value = false
     
-    console.log('✅ 收貨人新增成功')
+    // console.log('✅ 收貨人新增成功')
     
   } catch (error) {
     console.error('❌ 新增收貨人失敗:', error)

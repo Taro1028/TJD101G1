@@ -155,14 +155,14 @@ export const useCheckoutStore = defineStore('checkout', () => {
     const result = ordererValid && consigneeValid && invoiceValid
     
     // 🔥 新增：調試輸出
-    console.log('Step2 驗證結果:', {
-      ordererValid,
-      consigneeValid, 
-      invoiceValid,
-      result,
-      ordererInfo: ordererInfo.value,
-      consigneeInfo: consigneeInfo.value
-    })
+    // console.log('Step2 驗證結果:', {
+    //   ordererValid,
+    //   consigneeValid, 
+    //   invoiceValid,
+    //   result,
+    //   ordererInfo: ordererInfo.value,
+    //   consigneeInfo: consigneeInfo.value
+    // })
     
     return result
   })
@@ -172,47 +172,46 @@ export const useCheckoutStore = defineStore('checkout', () => {
   // 添加調試方法 - 用於檢查數據結構
   const debugCartData = () => {
     const cartStore = useCartStore()
-    console.log('=== 購物車調試資訊 ===')
-    console.log('cartGroups:', cartStore.cartGroups)
-    console.log('selectedCartIds:', selectedCartIds.value)
-    console.log('selectedCartItems:', selectedCartItems.value)
-    console.log('selectedTotalMeals:', selectedTotalMeals.value)
-    console.log('selectedTotalAmount:', selectedTotalAmount.value)
-    console.log('shippingFee:', shippingFee.value)
-    console.log('finalTotalAmount:', finalTotalAmount.value)
+    // console.log('=== 購物車調試資訊 ===')
+    // console.log('cartGroups:', cartStore.cartGroups)
+    // console.log('selectedCartIds:', selectedCartIds.value)
+    // console.log('selectedCartItems:', selectedCartItems.value)
+    // console.log('selectedTotalMeals:', selectedTotalMeals.value)
+    // console.log('selectedTotalAmount:', selectedTotalAmount.value)
+    // console.log('shippingFee:', shippingFee.value)
+    // console.log('finalTotalAmount:', finalTotalAmount.value)
 
     // 詳細檢查每個選中的項目
     selectedCartItems.value.forEach((group, index) => {
-      console.log(`Group ${index + 1}:`, {
-        cart_id: group.cart_id,
-        items: group.items,
-        total_amount: group.total_amount,
-        total_meal_count: group.total_meal_count,
-        total_days: group.total_days
-      })
+      // console.log(`Group ${index + 1}:`, {
+      //   cart_id: group.cart_id,
+      //   items: group.items,
+      //   total_amount: group.total_amount,
+      //   total_meal_count: group.total_meal_count,
+      //   total_days: group.total_days
+      // })
 
       if (group.items) {
         group.items.forEach((item, itemIndex) => {
-          console.log(`  Item ${itemIndex + 1}:`, {
-            quantity: item.quantity,
-            dailyTotalAmount: item.dailyTotalAmount
-          })
+          // console.log(`  Item ${itemIndex + 1}:`, {
+          //   quantity: item.quantity,
+          //   dailyTotalAmount: item.dailyTotalAmount
+          // })
         })
       }
     })
-    console.log('==================')
   }
 
   // 會員資料調試方法
   const debugMemberData = () => {
     const memberStore = useMemberStore()
-    console.log('=== 會員資料調試資訊 ===')
-    console.log('memberStore.isAuthenticated:', memberStore.isAuthenticated)
-    console.log('memberStore.memberId:', memberStore.memberId)
-    console.log('memberStore.id:', memberStore.id)
-    console.log('memberStore.member:', memberStore.member)
-    console.log('SessionStorage memberData:', sessionStorage.getItem('memberData'))
-    console.log('========================')
+    // console.log('=== 會員資料調試資訊 ===')
+    // console.log('memberStore.isAuthenticated:', memberStore.isAuthenticated)
+    // console.log('memberStore.memberId:', memberStore.memberId)
+    // console.log('memberStore.id:', memberStore.id)
+    // console.log('memberStore.member:', memberStore.member)
+    // console.log('SessionStorage memberData:', sessionStorage.getItem('memberData'))
+    // console.log('========================')
   }
 
   // 設定當前步驟
@@ -240,7 +239,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const setSelectedCartIds = (cartIds) => {
     selectedCartIds.value = [...cartIds]
     // 調試輸出
-    console.log('設定選中項目:', cartIds)
+    // console.log('設定選中項目:', cartIds)
     debugCartData()
   }
 
@@ -252,7 +251,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     } else {
       selectedCartIds.value.push(cartId)
     }
-    console.log('切換選擇狀態:', cartId, '當前選中:', selectedCartIds.value)
+    // console.log('切換選擇狀態:', cartId, '當前選中:', selectedCartIds.value)
   }
 
   // 全選/取消全選購物車項目
@@ -265,7 +264,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
     } else {
       selectedCartIds.value = [...allCartIds]
     }
-    console.log('全選切換後:', selectedCartIds.value)
+    // console.log('全選切換後:', selectedCartIds.value)
   }
 
   // 載入會員資料到訂購人資訊
@@ -294,8 +293,8 @@ export const useCheckoutStore = defineStore('checkout', () => {
         address: memberStore.member.ADDRESS || ''
       }
 
-      console.log('✅ 會員資料載入完成:', ordererInfo.value)
-      console.log('原始會員資料:', memberStore.member)
+      // console.log('✅ 會員資料載入完成:', ordererInfo.value)
+      // console.log('原始會員資料:', memberStore.member)
     } catch (error) {
       console.error('載入會員資料失敗:', error)
       // 如果載入失敗，設定空值避免錯誤
@@ -354,7 +353,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       const baseUrl = env.endsWith('/') ? env : env + '/'
       const apiUrl = `${baseUrl}tjd101/g1/php/getConsignees.php?member_id=${memberId}`
 
-      console.log('🔍 載入常用收貨人列表，API URL:', apiUrl)
+      // console.log('🔍 載入常用收貨人列表，API URL:', apiUrl)
 
       const response = await fetch(apiUrl)
 
@@ -463,12 +462,12 @@ export const useCheckoutStore = defineStore('checkout', () => {
         total_amount: finalTotalAmount.value       // 便當 + 運費 = 最終總額
       }
 
-      console.log('💰 金額資料檢查:', {
-        便當金額: orderData.meal_amount,
-        運費: orderData.shipping_fee,
-        總金額: orderData.total_amount,
-        計算確認: orderData.meal_amount + orderData.shipping_fee === orderData.total_amount
-      })
+      // console.log('💰 金額資料檢查:', {
+      //   便當金額: orderData.meal_amount,
+      //   運費: orderData.shipping_fee,
+      //   總金額: orderData.total_amount,
+      //   計算確認: orderData.meal_amount + orderData.shipping_fee === orderData.total_amount
+      // })
 
       // 調用結帳 API
       const env = import.meta.env.VITE_API_URL
@@ -558,19 +557,19 @@ export const useCheckoutStore = defineStore('checkout', () => {
       }))
 
       // 除錯輸出（確認資料結構）
-      console.log('✅ 結帳成功，orderResult 結構:', {
-        success: orderResult.value.success,
-        hasData: !!orderResult.value.data,
-        orderNumbers: orderResult.value.data?.order_numbers,
-        orderNumbersType: typeof orderResult.value.data?.order_numbers,
-        orderNumbersLength: orderResult.value.data?.order_numbers?.length,
-        firstOrderNumber: orderResult.value.data?.order_numbers?.[0],
-        orderIds: orderResult.value.data?.order_ids,
-        totalOrders: orderResult.value.data?.total_orders,
-        totalMealCount: orderResult.value.data?.total_meal_count,
-        finalTotal: orderResult.value.data?.final_total,
-        selectedCartItemsCount: orderResult.value.selectedCartItems?.length
-      })
+      // console.log('✅ 結帳成功，orderResult 結構:', {
+      //   success: orderResult.value.success,
+      //   hasData: !!orderResult.value.data,
+      //   orderNumbers: orderResult.value.data?.order_numbers,
+      //   orderNumbersType: typeof orderResult.value.data?.order_numbers,
+      //   orderNumbersLength: orderResult.value.data?.order_numbers?.length,
+      //   firstOrderNumber: orderResult.value.data?.order_numbers?.[0],
+      //   orderIds: orderResult.value.data?.order_ids,
+      //   totalOrders: orderResult.value.data?.total_orders,
+      //   totalMealCount: orderResult.value.data?.total_meal_count,
+      //   finalTotal: orderResult.value.data?.final_total,
+      //   selectedCartItemsCount: orderResult.value.selectedCartItems?.length
+      // })
 
       // 重要：重新載入購物車資料
       await cartStore.fetchCartItemsFromBackend()
@@ -612,9 +611,9 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const refreshCartAfterCheckout = async () => {
     try {
       const cartStore = useCartStore()
-      console.log('🔄 結帳後重新載入購物車...')
+      // console.log('🔄 結帳後重新載入購物車...')
       await cartStore.fetchCartItemsFromBackend()
-      console.log('✅ 購物車數據已更新')
+      // console.log('✅ 購物車數據已更新')
     } catch (error) {
       console.error('❌ 重新載入購物車失敗:', error)
     }
@@ -663,14 +662,14 @@ export const useCheckoutStore = defineStore('checkout', () => {
     savedConsignees.value = []
     isSubmitting.value = false
 
-    console.log('🔄 結帳流程已重置')
+    // console.log('🔄 結帳流程已重置')
   }
 
   // 處理結帳成功後的跳轉
   const handleCheckoutComplete = async (redirectToOrders = true) => {
     try {
-      // 可以在這裡加入額外的後處理邏輯
-      console.log('✅ 結帳完成後處理...')
+      // 額外的處理邏輯
+      // console.log('✅ 結帳完成後處理...')
 
       if (redirectToOrders) {
         // 這裡可以使用 router 跳轉到訂單頁面
@@ -688,7 +687,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const saveOrderToSession = (orderResult) => {
     try {
       sessionStorage.setItem('orderResult', JSON.stringify(orderResult))
-      console.log('✅ 訂單資料已儲存到 sessionStorage')
+      // console.log('✅ 訂單資料已儲存到 sessionStorage')
     } catch (error) {
       console.error('儲存訂單資料失敗:', error)
     }
@@ -700,7 +699,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
       const saved = sessionStorage.getItem('orderResult')
       if (saved) {
         orderResult.value = JSON.parse(saved)
-        console.log('✅ 從 sessionStorage 恢復訂單資料')
+        // console.log('✅ 從 sessionStorage 恢復訂單資料')
         return true
       }
     } catch (error) {
@@ -713,7 +712,7 @@ export const useCheckoutStore = defineStore('checkout', () => {
   const clearOrderFromSession = () => {
     try {
       sessionStorage.removeItem('orderResult')
-      console.log('✅ 已清除 sessionStorage 訂單資料')
+      // console.log('✅ 已清除 sessionStorage 訂單資料')
     } catch (error) {
       console.error('清除訂單資料失敗:', error)
     }

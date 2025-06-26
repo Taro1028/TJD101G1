@@ -23,8 +23,8 @@ const getImageUrl = (fileName) => {
 onMounted(() => {
     document.body.classList.add('custom-bg')
     // 在這裡呼叫 orderStore 的初始化函式
-    console.log('Order_PlanForyou.vue: onMounted 鉤子執行，呼叫 orderStore.initializeOrderDates()');
-    orderStore.initializeOrderDates(); // <-- 加入這行！
+    // console.log('Order_PlanForyou.vue: onMounted 鉤子執行，呼叫 orderStore.initializeOrderDates()');
+    orderStore.initializeOrderDates(); 
     
 })
 onUnmounted(() => {

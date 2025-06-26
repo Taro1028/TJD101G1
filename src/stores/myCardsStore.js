@@ -163,7 +163,7 @@ export const useMyCardsStore = defineStore('myCards', () => {
         throw new Error('無效的會員ID')
       }
 
-      console.log('🔍 載入小卡清單，會員ID:', targetMemberId, '頁面:', page)
+      // console.log('🔍 載入小卡清單，會員ID:', targetMemberId, '頁面:', page)
 
       const apiUrl = `${apiBaseUrl.value}/get_member_cards.php?m_id=${targetMemberId}&page=${page}`
       
@@ -194,12 +194,12 @@ export const useMyCardsStore = defineStore('myCards', () => {
       totalItems.value = responseData.pagination?.total_items || 0
       perPage.value = responseData.pagination?.per_page || 6
 
-      console.log('✅ 小卡載入成功:', {
-        小卡數量: cards.value.length,
-        當前頁面: currentPage.value,
-        總頁數: totalPages.value,
-        總小卡數: totalItems.value
-      })
+      // console.log('✅ 小卡載入成功:', {
+      //   小卡數量: cards.value.length,
+      //   當前頁面: currentPage.value,
+      //   總頁數: totalPages.value,
+      //   總小卡數: totalItems.value
+      // })
 
       return responseData
 
@@ -255,7 +255,7 @@ export const useMyCardsStore = defineStore('myCards', () => {
   // 初始化小卡資料
   const initialize = async (memberId = null) => {
     try {
-      console.log('🚀 初始化小卡 Store...')
+      // console.log('🚀 初始化小卡 Store...')
       await fetchCards(1, memberId)
     } catch (error) {
       console.error('❌ 初始化小卡 Store 失敗:', error)

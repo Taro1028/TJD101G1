@@ -91,11 +91,7 @@ const handleRetry = () => {
     <template v-else-if="mainNews || displayNews.length > 0">
       <div class="news-container">
         <!-- 主要新聞（封面） -->
-        <div 
-          v-if="mainNews" 
-          class="main-news" 
-          @click="goToNewsDetail(mainNews.ID)"
-        >
+        <div v-if="mainNews" class="main-news" @click="goToNewsDetail(mainNews.ID)">
           <div class="newstag">{{ mode === 'home' ? '焦點' : '焦點' }}</div>
           <img :src="getImageUrl(mainNews.IMG)" :alt="mainNews.TITLE">
           <div class="block-overlay"></div>
@@ -104,12 +100,7 @@ const handleRetry = () => {
 
         <!-- 新聞列表 -->
         <div class="news-list">
-          <div 
-            v-for="news in displayNews" 
-            :key="news.ID"
-            @click="goToNewsDetail(news.ID)"
-            class="news-list-item"
-          >
+          <div v-for="news in displayNews" :key="news.ID" @click="goToNewsDetail(news.ID)" class="news-list-item">
             <div class="news-item">
               <h4 class="title">{{ news.TITLE }}</h4>
               <h6 class="content">{{ news.SUMMARY }}</h6>
@@ -134,10 +125,12 @@ const handleRetry = () => {
 }
 
 // 載入和錯誤狀態樣式
-.news-loading, .news-error, .no-news {
+.news-loading,
+.news-error,
+.no-news {
   text-align: center;
   padding: 40px 20px;
-  
+
   p {
     font-size: $font_h5;
     color: $neutral_700;
@@ -153,7 +146,7 @@ const handleRetry = () => {
   border-radius: 4px;
   cursor: pointer;
   transition: 0.3s ease;
-  
+
   &:hover {
     background-color: $primary_400;
   }
@@ -264,20 +257,20 @@ const handleRetry = () => {
 .news-block--home {
   .main-news {
     width: 480px;
-    
+
     img {
       width: 100%;
       max-height: 390px;
     }
   }
-  
+
   .news-list-item {
     border-bottom: 1px solid transparent;
     padding-bottom: 8px;
-    
+
     &:hover {
       border-bottom: 1px solid $neutral_300;
-      
+
       .title {
         color: $primary_600;
       }
@@ -294,10 +287,10 @@ const handleRetry = () => {
       margin: auto;
     }
   }
-  
+
   .news-list-item {
     padding-left: 28px;
-    
+
     &::before {
       content: "";
       position: absolute;
@@ -308,18 +301,18 @@ const handleRetry = () => {
       background-color: $primary_600;
       transition: 0.3s ease;
     }
-    
+
     &:hover {
       &::before {
         background-color: $primary_400;
       }
-      
+
       .title {
         color: $primary_600;
       }
     }
   }
-  
+
   .news-item {
     gap: 16px;
   }
@@ -330,6 +323,19 @@ const handleRetry = () => {
   .news-container {
     gap: 24px;
   }
+
+    .news-block--focus {
+
+    .main-news{
+      width: 48%;
+    }
+
+    .main-news img{
+      width: 100%;
+      object-fit:fill;
+      height: fit-content;
+    }
+  }
 }
 
 @media screen and (max-width: 1000px) {
@@ -337,6 +343,7 @@ const handleRetry = () => {
     flex-direction: column;
     gap: 48px;
   }
+
 }
 
 @media screen and (max-width: 900px) {
@@ -351,19 +358,19 @@ const handleRetry = () => {
       flex-direction: column;
       align-self: center;
     }
-    
+
     .main-news,
     .main-news img {
       width: 320px;
       height: auto;
     }
-    
+
     .newstag,
     .block-overlay,
     .main-news h4 {
       display: none;
     }
-    
+
     .title {
       font-size: $font_h5;
     }
@@ -375,7 +382,7 @@ const handleRetry = () => {
     .main-news {
       min-width: 320px;
     }
-    
+
     .block-overlay,
     .main-news h4 {
       display: none;

@@ -25,9 +25,9 @@ export const useOrderStore = defineStore('order', () => {
 
   // ***** initializeOrderDates 保持不變，因為它已經正確初始化 planForYouSelections 結構 *****
   function initializeOrderDates() {
-    console.log('--- 進入 OrderStore initializeOrderDates 函式 ---');
-    console.log('步驟 1: deliveryDates.value (從 getter 取得的值) 是:', deliveryDates.value);
-    console.log('步驟 2: foodData (從 LunchBoxItems.json 導入的資料) 是:', foodData);
+    // console.log('--- 進入 OrderStore initializeOrderDates 函式 ---');
+    // console.log('步驟 1: deliveryDates.value (從 getter 取得的值) 是:', deliveryDates.value);
+    // console.log('步驟 2: foodData (從 LunchBoxItems.json 導入的資料) 是:', foodData);
 
     if (!deliveryDates.value || deliveryDates.value.length === 0) {
       console.warn('OrderStore: deliveryDates 是空的，跳過 planForYouSelections 的初始化。');
@@ -52,7 +52,7 @@ export const useOrderStore = defineStore('order', () => {
           // 在這裡不需要添加 category，因為 LunchBoxItems.json 的頂層 item 就是一個套餐
         }))
       }));
-      console.log('步驟 3: planForYouSelections 成功初始化！目前的內容是:', planForYouSelections.value);
+      // console.log('步驟 3: planForYouSelections 成功初始化！目前的內容是:', planForYouSelections.value);
     } catch (error) {
       console.error('初始化 planForYouSelections 時發生錯誤:', error);
       planForYouSelections.value = [];
@@ -62,7 +62,7 @@ export const useOrderStore = defineStore('order', () => {
 
   function resetSelection() {
     planForYouSelections.value = [];
-    console.log('Main course selection reset.');
+    // console.log('Main course selection reset.');
   }
 
   function updateMealCount(date, mealName, newCount) {
@@ -167,10 +167,10 @@ export const useOrderStore = defineStore('order', () => {
       });
     }
 
-    console.log('orderStore: 準備發送訂單項目給 cartStore (為你搭配):', orderItems);
+    // console.log('orderStore: 準備發送訂單項目給 cartStore (為你搭配):', orderItems);
 
     if (messageCardId) {
-    console.log('包含留言小卡 ID:', messageCardId);
+    // console.log('包含留言小卡 ID:', messageCardId);
   }
 
     try {

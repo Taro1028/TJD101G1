@@ -45,12 +45,12 @@ const formatPrice = (price) => {
   const num = parseFloat(price)
   
   if (isNaN(num) || !isFinite(num)) {
-    console.warn('Invalid price value:', price)
+    // console.warn('Invalid price value:', price)
     return '0'
   }
   
   if (num > 999999999) {
-    console.warn('Price value too large:', num)
+    // console.warn('Price value too large:', num)
     return '999,999,999+'
   }
   
@@ -124,19 +124,19 @@ onMounted(async () => {
     document.body.style.paddingRight = `${scrollBarWidth}px`
     
     // 檢查 cartStore 是否正確載入
-    console.log('cartStore:', cartStore)
-    console.log('fetchCartItemsFromBackend 函數:', cartStore.fetchCartItemsFromBackend)
+    // console.log('cartStore:', cartStore)
+    // console.log('fetchCartItemsFromBackend 函數:', cartStore.fetchCartItemsFromBackend)
     
     // 獲取購物車資料
     if (typeof cartStore.fetchCartItemsFromBackend === 'function') {
       await cartStore.fetchCartItemsFromBackend()
       
       // 調試輸出
-      console.log('=== Drawer_Cart 調試資訊 ===')
-      console.log('cartStore.items:', cartStore.items)
-      console.log('cartGroups:', cartGroups.value)
-      console.log('totalAmount:', totalAmount.value)
-      console.log('========================')
+      // console.log('=== Drawer_Cart 調試資訊 ===')
+      // console.log('cartStore.items:', cartStore.items)
+      // console.log('cartGroups:', cartGroups.value)
+      // console.log('totalAmount:', totalAmount.value)
+      // console.log('========================')
     } else {
       console.error('fetchCartItemsFromBackend 不是一個函數')
     }

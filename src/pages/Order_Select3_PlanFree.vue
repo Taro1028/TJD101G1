@@ -36,7 +36,7 @@ function toggleSettingActionMenu() {
 function handleMoveOrder() {
     planCustomStore.setMenuMode('moveOrder'); // 設定全局模式為移動順序
     showSettingActionMenu.value = false; // 關閉浮動選單
-    console.log('進入移動菜單順序模式');
+    //console.log('進入移動菜單順序模式');
     // 這裡您可以啟動一個拖曳排序功能 (可能需要額外的庫，如 Vue.Draggable)
     // 或者簡化為僅顯示移動icon，實際排序通過另一個「儲存順序」按鈕觸發
 }
@@ -44,7 +44,7 @@ function handleMoveOrder() {
 function handleEditContent() {
     planCustomStore.setMenuMode('editContent'); // 設定全局模式為編輯內容
     showSettingActionMenu.value = false; // 關閉浮動選單
-    console.log('進入編輯菜單內容模式');
+   // console.log('進入編輯菜單內容模式');
     // 進入此模式後，每個 day-item 會顯示鉛筆 icon
 }
 
@@ -52,7 +52,7 @@ function handleEditContent() {
 function handleCompleteEdit() {
     planCustomStore.setMenuMode('quantity'); // 將模式重設回數量調整
     showSettingActionMenu.value = false;
-    console.log('完成編輯，回到數量調整模式');
+   // console.log('完成編輯，回到數量調整模式');
     // 如果有任何暫存的編輯狀態，也可以在這裡重置，例如拖曳排序的狀態
 }
 
@@ -76,11 +76,11 @@ function handleMealUpdate(updatedMeal) {
     closeDailyEditPopup();
 }
 
-// --- 生命週期鉤子 ---
+// --- 生命週期 ---
 // 背景圖
 onMounted(() => {
     document.body.classList.add('custom-bg')
-    console.log('Order_Select3_PlanFree.vue: onMounted 鉤子執行')
+  // console.log('Order_Select3_PlanFree.vue: onMounted 執行')
 
     // 在此步驟初始化每天的菜單
     // 只有在確保前一步的選擇都完成時才執行初始化

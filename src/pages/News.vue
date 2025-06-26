@@ -31,11 +31,11 @@ const loadNewsByCategory = async () => {
     depthNews.value = depthResponse.data
     lunchNews.value = lunchResponse.data
 
-    console.log('載入成功:', {
-      focus: focusResponse.data.length,
-      depth: depthResponse.data.length,
-      lunch: lunchResponse.data.length
-    })
+    // console.log('載入成功:', {
+    //   focus: focusResponse.data.length,
+    //   depth: depthResponse.data.length,
+    //   lunch: lunchResponse.data.length
+    // })
 
   } catch (err) {
     console.error('載入新聞失敗:', err)

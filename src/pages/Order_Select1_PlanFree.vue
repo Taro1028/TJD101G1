@@ -49,16 +49,16 @@ function toggleSelect(value) {
       localSelectedMeats.value.push(value);
     } else {
       // 如果已滿兩個，則提示
-      console.log('localSelectedMeats.value.length:', localSelectedMeats.value.length);
-      console.log('預期觸發 alert，已選:', [...localSelectedMeats.value]);
+    //   console.log('localSelectedMeats.value.length:', localSelectedMeats.value.length);
+    //   console.log('預期觸發 alert，已選:', [...localSelectedMeats.value]);
       alert('最多只能選擇 2 種主菜喔！');
       return; // 不更新 localSelectedMeats
     }
   }
-  console.log('點擊後 localSelectedMeats:', [...localSelectedMeats.value]);
+//   console.log('點擊後 localSelectedMeats:', [...localSelectedMeats.value]);
   // 每當 localSelectedMeats 變動時，同步更新 Pinia Store 中的 selectedMainCourseTypes
   planCustomStore.setSelectedMainCourseTypes(localSelectedMeats.value);
-  console.log('Pinia store updated:', [...planCustomStore.selectedMainCourseTypes]);
+//   console.log('Pinia store updated:', [...planCustomStore.selectedMainCourseTypes]);
 }
 
 // 判斷是否選中（UI 狀態）

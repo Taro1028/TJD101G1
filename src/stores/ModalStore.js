@@ -26,7 +26,7 @@ export const useModalStore = defineStore('modal', {
       this.showLoginPopup = true
       this.redirectPath = redirectTo
       this.loginMessage = message
-      console.log('顯示登入彈窗，重定向路徑:', redirectTo)
+      // console.log('顯示登入彈窗，重定向路徑:', redirectTo)
     },
     
     // 關閉登入彈窗
@@ -34,7 +34,7 @@ export const useModalStore = defineStore('modal', {
       this.showLoginPopup = false
       this.redirectPath = ''
       this.loginMessage = ''
-      console.log('關閉登入彈窗')
+      // console.log('關閉登入彈窗')
     },
     
     // 清除重定向路徑（登入成功後使用）
@@ -46,14 +46,14 @@ export const useModalStore = defineStore('modal', {
     openSuccessPopup(message = '操作成功！') {
       this.showSuccessPopup = true
       this.successMessage = message
-      console.log('顯示成功彈窗:', message)
+      // console.log('顯示成功彈窗:', message)
     },
 
     // 關閉成功彈窗
     closeSuccessPopup() {
       this.showSuccessPopup = false
       this.successMessage = ''
-      console.log('關閉成功彈窗')
+      // console.log('關閉成功彈窗')
     }
   }
 })
