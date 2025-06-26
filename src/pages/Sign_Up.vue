@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive,onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { useRouter } from "vue-router";
 import flatpickr from 'flatpickr'
 import 'flatpickr/dist/flatpickr.min.css'
@@ -25,6 +25,94 @@ const form = reactive({
   birthday: "",
 });
 
+const passwordValidation = ref({
+  isValid: true,
+  errorMessage: ""
+});
+
+const confirmPasswordValidation = ref({
+  isValid: true,
+  errorMessage: ""
+});
+
+// 密碼格式驗證函數
+const validatePassword = () => {
+  const passwordValue = form.password;
+  
+  if (!passwordValue) {
+    passwordValidation.value = {
+      isValid: true,
+      errorMessage: ""
+    };
+    return;
+  }
+
+  // 檢查長度 (8-16位)
+  if (passwordValue.length < 8 || passwordValue.length > 16) {
+    passwordValidation.value = {
+      isValid: false,
+      errorMessage: "密碼長度必須為8-16位"
+    };
+    return;
+  }
+
+  // 檢查是否只包含英文字母和數字
+  const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+  if (!alphanumericRegex.test(passwordValue)) {
+    passwordValidation.value = {
+      isValid: false,
+      errorMessage: "密碼只能包含英文字母和數字"
+    };
+    return;
+  }
+
+  // 檢查是否至少包含一個字母和一個數字
+  const hasLetter = /[a-zA-Z]/.test(passwordValue);
+  const hasNumber = /[0-9]/.test(passwordValue);
+  
+  if (!hasLetter || !hasNumber) {
+    passwordValidation.value = {
+      isValid: false,
+      errorMessage: "密碼必須同時包含英文字母和數字"
+    };
+    return;
+  }
+
+  // 所有檢查通過
+  passwordValidation.value = {
+    isValid: true,
+    errorMessage: ""
+  };
+};
+
+// 確認密碼驗證函數
+const validateConfirmPassword = () => {
+  if (!form.confirmPassword) {
+    confirmPasswordValidation.value = {
+      isValid: true,
+      errorMessage: ""
+    };
+    return;
+  }
+
+  if (form.password !== form.confirmPassword) {
+    confirmPasswordValidation.value = {
+      isValid: false,
+      errorMessage: "密碼與確認密碼不一致"
+    };
+  } else {
+    confirmPasswordValidation.value = {
+      isValid: true,
+      errorMessage: ""
+    };
+  }
+};
+
+// 監聽密碼變化，自動驗證
+watch(() => form.password, validatePassword);
+watch(() => form.confirmPassword, validateConfirmPassword);
+watch(() => form.password, validateConfirmPassword); 
+
     onMounted(() => {
     birthdayPicker = flatpickr(birthdayInput.value, {
       locale: Mandarin,
@@ -46,6 +134,16 @@ const form = reactive({
   })
 
 const handleSubmit = async () => {
+  if (!passwordValidation.value.isValid) {
+    alert("密碼格式不正確：" + passwordValidation.value.errorMessage);
+    return;
+  }
+
+  if (!confirmPasswordValidation.value.isValid) {
+    alert("確認密碼錯誤：" + confirmPasswordValidation.value.errorMessage);
+    return;
+  }
+
   if (
     !form.name ||
     !form.sex ||
@@ -58,10 +156,7 @@ const handleSubmit = async () => {
     alert("請填寫所有必填欄位");
     return;
   }
-  if (form.password !== form.confirmPassword) {
-    alert("密碼與確認密碼不一致");
-    return;
-  }
+
   try {
     console.log(JSON.stringify(form));
     const response = await fetch(env + "/tjd101/g1/php/sign_up.php", {
@@ -95,13 +190,6 @@ const handleSubmit = async () => {
         alert("註冊失敗，請重新輸入！");
       }
     }
-    //   const result = await response.json();
-    //   console.log("登入成功:", result);
-    //   // 這裡可以添加登入成功後的邏輯，例如跳轉頁面
-    // } else {
-    //   console.error("登入失敗:", response.statusText);
-    //   alert("登入失敗，請檢查您的帳號密碼");
-    // }
   } catch (error) {
     console.error("網路錯誤:", error);
     alert("網路連線錯誤，請稍後再試");
@@ -174,24 +262,42 @@ const handleSubmit = async () => {
             />
           </div>
 
-          <div class="signup_form_component">
+          <div class="signup_form_component" :class="{ 'password-error': !passwordValidation.isValid && form.password }">
             <label for="password">密碼</label>
-            <input
-              type="password"
-              id="password"
-              v-model="form.password"
-              placeholder="至少8-16個英數組成"
-            />
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="password"
+                v-model="form.password"
+                :class="{ 'error': !passwordValidation.isValid && form.password }"
+                placeholder="至少8-16個英數組成"
+              />
+              <span class="error-icon" v-show="!passwordValidation.isValid && form.password">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+              </span>
+            </div>
+            <span class="error-message" v-show="!passwordValidation.isValid && form.password">
+              {{ passwordValidation.errorMessage }}
+            </span>
           </div>
 
-          <div class="signup_form_component">
+          <div class="signup_form_component" :class="{ 'password-error': !confirmPasswordValidation.isValid && form.confirmPassword }">
             <label for="confirm_password">確認密碼</label>
-            <input
-              type="password"
-              id="confirm_password"
-              v-model="form.confirmPassword"
-              placeholder="請再次輸入密碼"
-            />
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="confirm_password"
+                v-model="form.confirmPassword"
+                :class="{ 'error': !confirmPasswordValidation.isValid && form.confirmPassword }"
+                placeholder="請再次輸入密碼"
+              />
+              <span class="error-icon" v-show="!confirmPasswordValidation.isValid && form.confirmPassword">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+              </span>
+            </div>
+            <span class="error-message" v-show="!confirmPasswordValidation.isValid && form.confirmPassword">
+              {{ confirmPasswordValidation.errorMessage }}
+            </span>
           </div>
 
           <div class="signup_form_component">
@@ -318,34 +424,46 @@ a {
   gap: $spacing_3;
 }
 
-/* signup_form_component 樣式 */
-.signup_form_component label {
-  display: block;
-  line-height: 1.4;
-  color: $neutral_black;
-  margin-bottom: $spacing_2;
-}
+.signup_form_component {
+  &.password-error {
+    input.error {
+      border-color: $danger_500;
+      box-shadow: 0 0 0 2px rgba(229, 67, 67, 0.2);
+    }
+  }
 
-.signup_form_component input {
-  width: 100%;
-  padding: 12px 16px;
-  background-color: $neutral_white;
-  border: 1px solid $neutral_300;
-  border-radius: 12px;
-  color: $neutral_black;
-  box-sizing: border-box;
-}
+  label {
+    display: block;
+    line-height: 1.4;
+    color: $neutral_black;
+    margin-bottom: $spacing_2;
+  }
 
-.signup_form_component input::placeholder {
-  color: $neutral_300;
-}
+  input {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: $neutral_white;
+    border: 1px solid $neutral_300;
+    border-radius: 12px;
+    color: $neutral_black;
+    box-sizing: border-box;
 
-.signup_form_component input:focus {
-  outline: none;
-  border-color: $primary_400;
-  box-shadow: 0 0 0 2px rgba(241, 180, 46, 0.2);
-}
+    &.error {
+      border-color: $danger_500;
+      box-shadow: 0 0 0 2px rgba(229, 67, 67, 0.2);
+    }
 
+    &::placeholder {
+      color: $neutral_300;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $primary_400;
+      box-shadow: 0 0 0 2px rgba(241, 180, 46, 0.2);
+    }
+  }
+}
 .longin-link {
   color: $point_700;
 }
@@ -410,6 +528,32 @@ a {
     object-position: center;
   }
 }
+/* 密碼輸入容器 */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .error-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $danger_500;
+    font-size: 16px;
+    z-index: 2;
+  }
+}
+
+/* 錯誤訊息樣式 */
+.error-message {
+  display: block;
+  color: $danger_500;
+  font-size: 0.875rem;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
 // 響應式設計
 @media (max-width: 768px) {
   .content-wrapper {
