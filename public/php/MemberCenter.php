@@ -18,8 +18,9 @@ try {
                 ADDRESS =:address,
                 EMAIL =:email,
                 PASSWORD =:password,
-                TELEPHONE =:telephone,
                 PHONE =:phone,
+                TELEPHONE =:telephone,
+                
                 EMERGENCY_CONTACTS_NAME =:ecn,
                 EMERGENCY_CONTACTS_PHONE =:ecp,
                 NOTE =:note,

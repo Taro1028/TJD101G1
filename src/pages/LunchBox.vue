@@ -14,13 +14,13 @@
     </div>
     <div class="outwrap">
       <section
-  v-for="(item, index) in totalProduct"
-  :key="index"
-  :ref="el => sectionRefs[index] = el"
-  class="meal-section"
->
-  <LunchBoxItem :content="item" :text="btext" />
-</section>
+        v-for="(item, index) in totalProduct"
+        :key="index"
+        :ref="(el) => (sectionRefs[index] = el)"
+        class="meal-section"
+      >
+        <LunchBoxItem :content="item" :text="btext" />
+      </section>
     </div>
     <Gotop></Gotop>
   </FrontLayout>
@@ -266,15 +266,12 @@ const totalProduct = ref([
   },
 ]);
 
-
-
 /** 點按按鈕時平滑捲動到對應區塊 */
 function scrollToSection(idx) {
-  const el = sectionRefs.value[idx]
-  el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const el = sectionRefs.value[idx];
+  // console.log(el);
+  el?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
-
-
 </script>
 
 <style scoped lang="scss">
