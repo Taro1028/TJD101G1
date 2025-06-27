@@ -96,6 +96,8 @@
       </div>
     </div>
   </div>
+  <!-- 登入失敗彈窗 -->
+  <Popup_LoginError />
 </template>
 
 <script setup>
@@ -103,10 +105,13 @@ import { ref, computed, watch } from "vue";
 import { useMemberStore } from "../stores/MemberStore";
 import { useModalStore } from "../stores/ModalStore";
 import { useRouter } from "vue-router";
+import { useLoginErrorStore } from "../stores/LoginErrorStore";
+import Popup_LoginError from '../components/Popup_LoginError.vue';
 
 const member = useMemberStore();
 const modalStore = useModalStore();
 const router = useRouter();
+const loginErrorStore = useLoginErrorStore();
 
 // 響應式數據
 const email = ref("");
@@ -210,35 +215,22 @@ const handleLogin = async () => {
 
     if (response.ok) {
       const result = await response.json();
-      console.log("登入成功:", result);
-      if (result.blacklisted) {
+      console.log("登入回應:", result);
+      
+      // 檢查後端回傳的 success 狀態
+      if (result.success === false) {
+        // 登入失敗，顯示錯誤彈窗
+        loginErrorStore.openLoginErrorPopup();
+      } else if (result.blacklisted) {
         alert("會員已停權");
       } else {
-        // 設定會員資料到 store
+        // 登入成功的處理...
         member.setMember(result);
-        console.log("會員 ID:", member.id);
-
-        // 🔔 優先檢查 ModalStore 的重定向路徑
-        let redirectPath = "/Home";
-
-        if (modalStore.hasRedirectPath) {
-          // 如果有彈窗設定的重定向路徑，使用它
-          redirectPath = modalStore.redirectPath;
-          modalStore.clearRedirectPath(); // 清除重定向路徑
-        } else {
-          // 否則檢查 URL query 參數
-          redirectPath = router.currentRoute.value.query.redirect || "/Home";
-        }
-
-        // 關閉登入彈窗（如果有開啟的話）
-        modalStore.closeLoginPopup();
-
-        // 跳轉到指定頁面
-        router.push(redirectPath);
+        // ... 其他成功邏輯
       }
     } else {
       console.error("登入失敗:", response.statusText);
-      alert("登入失敗，請檢查您的帳號密碼");
+      loginErrorStore.openLoginErrorPopup();
     }
   } catch (error) {
     console.error("網路錯誤:", error);
@@ -308,7 +300,7 @@ function handleCredentialResponse(response) {
           router.push(redirectPath);
         }
       } else {
-        alert("登入失敗：" + result.message);
+        loginErrorStore.openLoginErrorPopup("Google 登入失敗：" + result.message);
       }
     });
 }
