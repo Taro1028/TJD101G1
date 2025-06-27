@@ -28,7 +28,7 @@
             >
           </div>
 
-          <button type="submit" class="signup_submit">
+          <button type="submit" class="signup_submit" @click="handleForgotPassword">
             找回密碼
           </button>
         </div>
@@ -47,6 +47,11 @@ import { ref } from "vue";
 
 // 只保留email的響應式數據，用於v-model綁定
 const email = ref("");
+
+// 處理忘記密碼按鈕點擊事件
+const handleForgotPassword = () => {
+  alert("功能尚未開發，敬請期待！");
+};
 </script>
 
 <style scoped lang="scss">

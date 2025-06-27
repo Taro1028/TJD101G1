@@ -22,7 +22,6 @@ const ifo = reactive({
   birthday: "",
   address: "",
   email: "",
-  password: "",
   telephone: "",
   phone: "",
   emergency_contacts_name: "",
@@ -36,26 +35,6 @@ const phoneValidation = reactive({
   telephone: true,
   phone: true,
   emergency_contacts_phone: true,
-});
-
-// 密碼相關的響應式變數
-const passwordFields = reactive({
-  newPassword: "",
-  confirmPassword: "",
-});
-
-// 密碼可視性控制
-const passwordVisibility = reactive({
-  current: false,
-  new: false,
-  confirm: false,
-});
-
-// 密碼驗證狀態
-const passwordValidation = reactive({
-  newPasswordValid: true,
-  confirmPasswordValid: true,
-  newPasswordFormat: true,
 });
 
 // 數字驗證函數
@@ -73,45 +52,7 @@ const handlePhoneInput = (event, field) => {
   validatePhoneNumber(value, field);
 };
 
-// 切換密碼可視性
-const togglePasswordVisibility = (field) => {
-  passwordVisibility[field] = !passwordVisibility[field];
-};
 
-// 驗證新密碼
-const validateNewPassword = () => {
-  if (!passwordFields.newPassword) {
-    passwordValidation.newPasswordValid = true;
-    passwordValidation.newPasswordFormat = true;
-    return;
-  }
-
-  // 檢查新密碼是否與舊密碼不同
-  passwordValidation.newPasswordValid =
-    passwordFields.newPassword !== ifo.password;
-
-  // 檢查新密碼格式（8-16位英數字）
-  const passwordRegex = /^[a-zA-Z0-9]{8,16}$/;
-  passwordValidation.newPasswordFormat = passwordRegex.test(
-    passwordFields.newPassword
-  );
-
-  // 如果新密碼改變，重新驗證確認密碼
-  if (passwordFields.confirmPassword) {
-    validateConfirmPassword();
-  }
-};
-
-// 驗證確認密碼
-const validateConfirmPassword = () => {
-  if (!passwordFields.confirmPassword) {
-    passwordValidation.confirmPasswordValid = true;
-    return;
-  }
-
-  passwordValidation.confirmPasswordValid =
-    passwordFields.confirmPassword === passwordFields.newPassword;
-};
 
 // 點擊大頭照區域觸發檔案選擇
 const handleAvatarClick = () => {
@@ -195,21 +136,6 @@ const handleLogout = () => {
   }
 };
 async function update() {
-  // 密碼驗證邏輯
-  if (passwordFields.newPassword) {
-    validateNewPassword();
-    validateConfirmPassword();
-
-    if (
-      !passwordValidation.newPasswordValid ||
-      !passwordValidation.newPasswordFormat ||
-      !passwordValidation.confirmPasswordValid
-    ) {
-      alert("請檢查密碼輸入");
-      return;
-    }
-  }
-
   // 電話驗證
   if (
     !phoneValidation.telephone ||
@@ -230,7 +156,6 @@ async function update() {
         id: ifo.id,
         gender: ifo.gender,
         nickname: ifo.nickname,
-        password: passwordFields.newPassword || ifo.password,
         address: ifo.address,
         email: ifo.email,
         phone: ifo.phone,
@@ -252,14 +177,6 @@ async function update() {
       if (result.success === true || result.status === "success") {
         // 更新 memberStore
         memberStore.setMember(result.member);
-
-        // 如果有新密碼，清空密碼欄位
-        if (passwordFields.newPassword) {
-          passwordFields.newPassword = "";
-          passwordFields.confirmPassword = "";
-          // 更新本地的密碼資料
-          ifo.password = passwordFields.newPassword || ifo.password;
-        }
 
         // 顯示成功彈窗
         modalStore.openSuccessPopup("修改成功！");
@@ -285,7 +202,6 @@ onMounted(() => {
   ifo.birthday = memberStore.birthday;
   ifo.address = memberStore.address;
   ifo.email = memberStore.email;
-  ifo.password = memberStore.password;
   ifo.telephone = memberStore.telephone;
   ifo.phone = memberStore.phone;
   ifo.emergency_contacts_name = memberStore.contactsName;
@@ -419,134 +335,6 @@ onMounted(() => {
                   value=""
                   v-model="ifo.nickname"
                 />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">密碼</label>
-                <div class="password-input-container">
-                  <input
-                    :type="passwordVisibility.current ? 'text' : 'password'"
-                    class="form-input"
-                    placeholder="請輸入密碼"
-                    v-model="ifo.password"
-                  />
-                  <span
-                    class="password-toggle"
-                    @click="togglePasswordVisibility('current')"
-                  >
-                    <i
-                      :class="
-                        passwordVisibility.current
-                          ? 'bi bi-eye-fill'
-                          : 'bi bi-eye-slash-fill'
-                      "
-                    ></i>
-                  </span>
-                </div>
-              </div>
-
-              <div
-                class="form-group"
-                :class="{
-                  'password-error':
-                    !passwordValidation.newPasswordValid ||
-                    !passwordValidation.newPasswordFormat,
-                }"
-              >
-                <label class="form-label">新密碼</label>
-                <div class="password-input-container">
-                  <input
-                    :type="passwordVisibility.new ? 'text' : 'password'"
-                    class="form-input"
-                    :class="{
-                      error:
-                        !passwordValidation.newPasswordValid ||
-                        !passwordValidation.newPasswordFormat,
-                    }"
-                    placeholder="至少8-16個英數組成"
-                    v-model="passwordFields.newPassword"
-                    @input="validateNewPassword"
-                  />
-                  <span
-                    class="error-icon"
-                    v-show="
-                      !passwordValidation.newPasswordValid ||
-                      !passwordValidation.newPasswordFormat
-                    "
-                  >
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                  </span>
-                  <span
-                    class="password-toggle"
-                    @click="togglePasswordVisibility('new')"
-                  >
-                    <i
-                      :class="
-                        passwordVisibility.new
-                          ? 'bi bi-eye-fill'
-                          : 'bi bi-eye-slash-fill'
-                      "
-                    ></i>
-                  </span>
-                </div>
-                <span
-                  class="error-message"
-                  v-show="!passwordValidation.newPasswordValid"
-                >
-                  新密碼不能與舊密碼相同
-                </span>
-                <span
-                  class="error-message"
-                  v-show="
-                    !passwordValidation.newPasswordFormat &&
-                    passwordValidation.newPasswordValid
-                  "
-                >
-                  密碼必須為8-16位英數字組成
-                </span>
-              </div>
-
-              <div
-                class="form-group"
-                :class="{
-                  'password-error': !passwordValidation.confirmPasswordValid,
-                }"
-              >
-                <label class="form-label">確認新密碼</label>
-                <div class="password-input-container">
-                  <input
-                    :type="passwordVisibility.confirm ? 'text' : 'password'"
-                    class="form-input"
-                    :class="{ error: !passwordValidation.confirmPasswordValid }"
-                    placeholder="至少8-16個英數組成"
-                    v-model="passwordFields.confirmPassword"
-                    @input="validateConfirmPassword"
-                  />
-                  <span
-                    class="error-icon"
-                    v-show="!passwordValidation.confirmPasswordValid"
-                  >
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                  </span>
-                  <span
-                    class="password-toggle"
-                    @click="togglePasswordVisibility('confirm')"
-                  >
-                    <i
-                      :class="
-                        passwordVisibility.confirm
-                          ? 'bi bi-eye-fill'
-                          : 'bi bi-eye-slash-fill'
-                      "
-                    ></i>
-                  </span>
-                </div>
-                <span
-                  class="error-message"
-                  v-show="!passwordValidation.confirmPasswordValid"
-                >
-                  確認密碼與新密碼不相符
-                </span>
               </div>
 
               <div class="form-group">
@@ -964,26 +752,6 @@ img {
   color: #dc3545;
 }
 
-/* 密碼錯誤狀態的表單群組 */
-.form-group.password-error .form-label {
-  color: #dc3545;
-}
-
-/* 密碼輸入框的錯誤圖示位置調整 */
-.password-input-container .error-icon {
-  position: absolute;
-  right: 45px;
-  top: 12px;
-  color: #dc3545;
-  font-size: 16px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* 密碼切換按鈕在有錯誤圖示時的位置 */
-.password-input-container .password-toggle {
-  z-index: 2;
-}
 
 /* 表單文字顯示 */
 .form-text {
@@ -1029,20 +797,6 @@ img {
 
 .radio-group input[type="radio"] {
   margin-right: 5px;
-}
-
-/* 密碼輸入框容器 */
-.password-input-container {
-  position: relative;
-}
-
-/* 密碼顯示切換按鈕 */
-.password-toggle {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
 }
 
 /* 底部按鈕群組 */
