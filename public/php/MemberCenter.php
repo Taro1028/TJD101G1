@@ -17,7 +17,6 @@ try {
                 GENDER =:gender,
                 ADDRESS =:address,
                 EMAIL =:email,
-                PASSWORD =:password,
                 PHONE =:phone,
                 TELEPHONE =:telephone,
                 
@@ -32,7 +31,7 @@ try {
         $stmt->bindValue(':id', $memberCenter['id']);
         $stmt->bindValue(':gender', $memberCenter['gender']);
         $stmt->bindValue(':nickname', $memberCenter['nickname']);
-        $stmt->bindValue(':password', $memberCenter['password']);
+        // $stmt->bindValue(':password', $memberCenter['password']);
         $stmt->bindValue(':address', $memberCenter['address']);
         $stmt->bindValue(':email', $memberCenter['email']);
         $stmt->bindValue(':phone', $memberCenter['phone']);
