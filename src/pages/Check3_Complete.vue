@@ -6,7 +6,7 @@ import { useMemberStore } from '@/stores/MemberStore'
 import { useRouter } from 'vue-router'
 
 // 🔥 加入這行 - 在任何邏輯執行前就記錄
-console.log('🚀 Check3_Complete.vue 組件被載入！')
+// console.log('🚀 Check3_Complete.vue 組件被載入！')
 
 const checkoutStore = useCheckoutStore()
 const memberStore = useMemberStore()
@@ -16,9 +16,9 @@ onMounted(() => {
   console.log('🚀 Check3_Complete.vue onMounted 執行開始')
 
   // 🔥 新增：檢查 sessionStorage 內容
-  console.log('🔍 檢查 sessionStorage 內容:')
-  console.log('  orderResult:', sessionStorage.getItem('orderResult'))
-  console.log('  memberData:', sessionStorage.getItem('memberData'))
+  // console.log('🔍 檢查 sessionStorage 內容:')
+  // console.log('  orderResult:', sessionStorage.getItem('orderResult'))
+  // console.log('  memberData:', sessionStorage.getItem('memberData'))
 
   document.body.classList.add('custom-bg')
 
@@ -32,7 +32,7 @@ onMounted(() => {
       
       // 🔥 檢查是否來自綠界
       if (document.referrer.includes('ecpay.com.tw')) {
-        console.log('🎯 來自綠界但無訂單資料，顯示基本付款成功訊息')
+        // console.log('🎯 來自綠界但無訂單資料，顯示基本付款成功訊息')
         // 🔥 設定基本的成功資料
         checkoutStore.orderResult = {
           success: true,
@@ -49,24 +49,26 @@ onMounted(() => {
             order_time: new Date().toISOString()
           }
         }
-        console.log('🔥 設定基本付款成功資料')
+        // console.log('🔥 設定基本付款成功資料')
         return
       }
       
       // 如果不是來自綠界，導向訂單頁面
-      console.log('↩️ 非綠界跳轉且無訂單資料，導向訂單頁面')
+      // console.log('↩️ 非綠界跳轉且無訂單資料，導向訂單頁面')
       router.push('/Check_OrderInfo')
       return
-    }else{console.log('✅ 成功恢復訂單資料')}
+    }else{
+      // console.log('✅ 成功恢復訂單資料')
+    }
   }else{
-      console.log('✅ checkoutStore 中已有訂單資料')
+      // console.log('✅ checkoutStore 中已有訂單資料')
     }
   
   // 🔥 嘗試從 sessionStorage 恢復登入狀態
   if (!memberStore.isAuthenticated) {
     console.log('⚠️ 未登入，嘗試從 sessionStorage 恢復...')
     const loaded = memberStore.loadFromsessionStorage()
-    console.log('恢復結果:', loaded)
+    // console.log('恢復結果:', loaded)
     
     if (!loaded || !memberStore.isAuthenticated) {
       alert('登入狀態已失效，請重新登入')
@@ -82,7 +84,7 @@ onMounted(() => {
   //   return
   // }
   
-  console.log('✅ 訂單完成頁面載入 (EAT格式支援)', checkoutStore.orderResult)
+  // console.log('✅ 訂單完成頁面載入 (EAT格式支援)', checkoutStore.orderResult)
   
   // 🔥 詳細除錯 API 回傳結構 - 更新為 EAT 格式
   setTimeout(() => {
@@ -112,34 +114,34 @@ const calculateDaysBetween = (startDate, endDate) => {
 
 // 🔥 除錯函數 - 更新為 EAT 格式
 const debugOrderData = () => {
-  console.log('=== 訂單資料詳細除錯 (EAT格式) ===')
-  console.log('完整 orderResult:', JSON.stringify(orderResult.value, null, 2))
+  // console.log('=== 訂單資料詳細除錯 (EAT格式) ===')
+  // console.log('完整 orderResult:', JSON.stringify(orderResult.value, null, 2))
   
   const result = orderResult.value
   if (result?.data) {
-    console.log('✅ data 物件存在')
-    console.log('data.order_numbers:', result.data.order_numbers, '類型:', typeof result.data.order_numbers)
-    console.log('data.order_ids:', result.data.order_ids)
-    console.log('data.total_meal_count:', result.data.total_meal_count)
-    console.log('data.final_total:', result.data.final_total)
-    console.log('data.consignee_info:', result.data.consignee_info)
-    console.log('data.order_time:', result.data.order_time) // 🔥 新增
-    console.log('data.orders:', result.data.orders) // 🔥 新增
+    // console.log('✅ data 物件存在')
+    // console.log('data.order_numbers:', result.data.order_numbers, '類型:', typeof result.data.order_numbers)
+    // console.log('data.order_ids:', result.data.order_ids)
+    // console.log('data.total_meal_count:', result.data.total_meal_count)
+    // console.log('data.final_total:', result.data.final_total)
+    // console.log('data.consignee_info:', result.data.consignee_info)
+    // console.log('data.order_time:', result.data.order_time) 
+    // console.log('data.orders:', result.data.orders) 
     
     // 🔥 檢查購物車和訂單資料
-    console.log('🛒 checkoutStore.selectedCartItems:', checkoutStore.selectedCartItems)
+    // console.log('🛒 checkoutStore.selectedCartItems:', checkoutStore.selectedCartItems)
     
     // 🔥 檢查配送時間資料和訂單詳情
     if (result.data.orders && result.data.orders.length > 0) {
-      console.log('📦 訂單詳情:')
+      // console.log('📦 訂單詳情:')
       result.data.orders.forEach((order, index) => {
-        console.log(`  訂單 ${index + 1}:`)
-        console.log('    start_date:', order.start_date)
-        console.log('    end_date:', order.end_date)
-        console.log('    total_days:', order.total_days)
-        console.log('    🔥 plan_type:', order.plan_type) // 🔥 保留這個，可能有值
-        console.log('    total_amount:', order.total_amount)
-        // 🔥 移除這些 undefined 欄位的輸出：
+        // console.log(`  訂單 ${index + 1}:`)
+        // console.log('    start_date:', order.start_date)
+        // console.log('    end_date:', order.end_date)
+        // console.log('    total_days:', order.total_days)
+        // console.log('    plan_type:', order.plan_type) 
+        // console.log('    total_amount:', order.total_amount)
+        //  移除這些 undefined 欄位的輸出：
         // plan_name, meal_plan_name, combo_name, name, meal_count
       })
     }
@@ -147,7 +149,7 @@ const debugOrderData = () => {
     if (Array.isArray(result.data.order_numbers)) {
       result.data.order_numbers.forEach((num, index) => {
         const numStr = String(num)
-        console.log(`order_numbers[${index}]:`, numStr, '長度:', numStr.length)
+        // console.log(`order_numbers[${index}]:`, numStr, '長度:', numStr.length)
         
         // 🔥 解析 EAT 格式 (EAT + YYMMDD + 4位ID)
         if (numStr.startsWith('EAT') && numStr.length === 13) {
@@ -160,7 +162,7 @@ const debugOrderData = () => {
             const day = parseInt(dateStr.substring(4, 6))
             const orderId = parseInt(idStr)
             
-            console.log(`  解析 EAT 格式: ${year}-${month}-${day} 訂單ID:${orderId}`)
+            // console.log(`  解析 EAT 格式: ${year}-${month}-${day} 訂單ID:${orderId}`)
           } catch (e) {
             console.error('解析 EAT 格式失敗:', e)
           }
@@ -173,7 +175,7 @@ const debugOrderData = () => {
           const minute = parseInt(numStr.substring(8, 10))
           const id = parseInt(numStr.substring(10, 12))
           
-          console.log(`  解析舊格式: ${year}-${month}-${day} ${hour}:${minute} ID:${id}`)
+          // console.log(`  解析舊格式: ${year}-${month}-${day} ${hour}:${minute} ID:${id}`)
         } else {
           console.log(`  無法解析格式: ${numStr}`)
         }
@@ -182,7 +184,7 @@ const debugOrderData = () => {
   } else {
     console.log('❌ data 物件不存在')
   }
-  console.log('========================')
+
 }
 
 // 🔥 新增：EAT 格式驗證
@@ -193,20 +195,20 @@ const validateEATFormat = () => {
     orderNumbers.forEach((num, index) => {
       const numStr = String(num)
       
-      console.log(`驗證訂單編號 ${index + 1}: ${numStr}`)
+      // console.log(`驗證訂單編號 ${index + 1}: ${numStr}`)
       
       if (numStr.startsWith('EAT')) {
         if (numStr.length === 13) {
-          console.log('✅ EAT 格式正確')
+          // console.log('✅ EAT 格式正確')
           
           // 進一步驗證格式
           const dateStr = numStr.substring(3, 9)
           const idStr = numStr.substring(9, 13)
           
           if (/^\d{6}$/.test(dateStr) && /^\d{4}$/.test(idStr)) {
-            console.log('✅ 日期和ID格式正確')
-            console.log(`  日期部分: ${dateStr}`)
-            console.log(`  ID部分: ${idStr}`)
+            // console.log('✅ 日期和ID格式正確')
+            // console.log(`  日期部分: ${dateStr}`)
+            // console.log(`  ID部分: ${idStr}`)
           } else {
             console.log('❌ 日期或ID格式錯誤')
           }
@@ -214,7 +216,7 @@ const validateEATFormat = () => {
           console.log('❌ EAT 格式長度錯誤，應為13位')
         }
       } else {
-        console.log('⚠️ 非 EAT 格式，可能是舊格式')
+        // console.log('⚠️ 非 EAT 格式，可能是舊格式')
       }
     })
   }
@@ -241,24 +243,24 @@ const formatPrice = (price) => {
 
 // 🔥 修正：格式化訂單項目摘要 - 參考付款頁面邏輯
 const orderSummary = computed(() => {
-  console.log('🔍 計算訂單項目摘要...')
+  // console.log('🔍 計算訂單項目摘要...')
   
   // 🔥 方法1：優先使用 checkoutStore 中保留的購物車資料
   const selectedCartItems = checkoutStore.selectedCartItems
   if (selectedCartItems && selectedCartItems.length > 0) {
-    console.log('✅ 使用購物車資料 (selectedCartItems):', selectedCartItems)
+    // console.log('✅ 使用購物車資料 (selectedCartItems):', selectedCartItems)
     
     if (selectedCartItems.length === 1) {
       const item = selectedCartItems[0]
       const displayTitle = item.display_title || item.title || '餐盒訂單'
-      console.log('✅ 單項購物車項目:', displayTitle)
+      // console.log('✅ 單項購物車項目:', displayTitle)
       return displayTitle
     }
     
     const firstItem = selectedCartItems[0]
     const firstTitle = firstItem.display_title || firstItem.title || '餐盒訂單'
     const result = `${firstTitle} 等${selectedCartItems.length}項`
-    console.log('✅ 多項購物車摘要:', result)
+    // console.log('✅ 多項購物車摘要:', result)
     return result
   }
   
@@ -269,17 +271,17 @@ const orderSummary = computed(() => {
   if (orderCount === 0) return '無項目'
   
   if (!orders || !Array.isArray(orders) || orders.length === 0) {
-    console.log('⚠️ 無 orders 資料，使用預設格式')
+    // console.log('⚠️ 無 orders 資料，使用預設格式')
     return orderCount === 1 ? '餐盒訂單' : `餐盒訂單 等${orderCount}筆`
   }
   
-  console.log('📦 使用訂單資料 (備用):', orders)
+  // console.log('📦 使用訂單資料 (備用):', orders)
   
   // 單筆訂單：使用 plan_type
   if (orderCount === 1) {
     const firstOrder = orders[0]
     const planName = firstOrder.plan_type || '餐盒訂單'
-    console.log('✅ 單筆訂單方案名稱:', planName)
+    // console.log('✅ 單筆訂單方案名稱:', planName)
     return planName
   }
   
@@ -287,13 +289,13 @@ const orderSummary = computed(() => {
   const firstOrder = orders[0]
   const firstPlanName = firstOrder.plan_type || '餐盒訂單'
   const result = `${firstPlanName} 等${orderCount}筆`
-  console.log('✅ 多筆訂單摘要:', result)
+  // console.log('✅ 多筆訂單摘要:', result)
   return result
 })
 
 // 🔥 修正：格式化配送時間 - 從實際訂單資料取得並加上天數
 const deliveryPeriod = computed(() => {
-  console.log('🔍 計算配送時間...')
+  // console.log('🔍 計算配送時間...')
   
   // 從 orderResult 中的 orders 取得配送期間
   const orders = orderResult.value?.data?.orders
@@ -304,7 +306,7 @@ const deliveryPeriod = computed(() => {
     const endDate = firstOrder.end_date
     const totalDays = firstOrder.total_days
     
-    console.log('📦 找到訂單配送資料:', { startDate, endDate, totalDays })
+    // console.log('📦 找到訂單配送資料:', { startDate, endDate, totalDays })
     
     if (startDate && endDate) {
       // 使用實際的訂單配送日期
@@ -318,12 +320,12 @@ const deliveryPeriod = computed(() => {
       const days = totalDays || calculateDaysBetween(startDate, endDate)
       
       const result = `${formattedStart} — ${formattedEnd} 午間配送 共${days}日`
-      console.log('✅ 配送時間計算結果:', result)
+      // console.log('✅ 配送時間計算結果:', result)
       return result
     }
   }
   
-  console.log('⚠️ 無法取得訂單配送資料，使用預設邏輯')
+  // console.log('⚠️ 無法取得訂單配送資料，使用預設邏輯')
   
   // 備用方案：使用預設配送時間邏輯
   const today = new Date()
@@ -344,18 +346,18 @@ const deliveryPeriod = computed(() => {
 
 // 🔥 訂單編號處理 - 支援 EAT 格式
 const orderNumbers = computed(() => {
-  console.log('🔍 檢查 EAT 格式訂單編號...')
+  // console.log('🔍 檢查 EAT 格式訂單編號...')
   
   // 方法1: 從 API 回傳的 data.order_numbers 取得（最優先）
   if (orderResult.value?.data?.order_numbers && Array.isArray(orderResult.value.data.order_numbers)) {
     const numbers = orderResult.value.data.order_numbers
-    console.log('✅ 找到 data.order_numbers:', numbers)
+    // console.log('✅ 找到 data.order_numbers:', numbers)
     
     if (numbers.length === 0) return ''
     
     if (numbers.length === 1) {
       const orderNumber = String(numbers[0])
-      console.log('✅ 單一訂單編號:', orderNumber, '長度:', orderNumber.length)
+      // console.log('✅ 單一訂單編號:', orderNumber, '長度:', orderNumber.length)
       return orderNumber // 顯示完整編號，如：EAT2506180001
     }
     
@@ -367,7 +369,7 @@ const orderNumbers = computed(() => {
   // 方法2: 從頂層 order_numbers 取得
   if (orderResult.value?.order_numbers && Array.isArray(orderResult.value.order_numbers)) {
     const numbers = orderResult.value.order_numbers
-    console.log('✅ 找到頂層 order_numbers:', numbers)
+    // console.log('✅ 找到頂層 order_numbers:', numbers)
     
     if (numbers.length === 1) {
       return String(numbers[0])
@@ -378,7 +380,7 @@ const orderNumbers = computed(() => {
   // 🔥 備用方案：使用 order_ids（這會顯示 #ID 格式）
   if (orderResult.value?.data?.order_ids && Array.isArray(orderResult.value.data.order_ids)) {
     const ids = orderResult.value.data.order_ids
-    console.log('⚠️ 只找到 order_ids，使用備用格式:', ids)
+    // console.log('⚠️ 只找到 order_ids，使用備用格式:', ids)
     
     if (ids.length === 1) {
       return `#${ids[0]}`
@@ -407,7 +409,7 @@ const getOrderPlanName = (index) => {
   if (selectedCartItems && selectedCartItems.length > index) {
     const item = selectedCartItems[index]
     const displayTitle = item.display_title || item.title || '餐盒訂單'
-    console.log(`✅ 購物車項目 ${index + 1} 名稱:`, displayTitle)
+    // console.log(`✅ 購物車項目 ${index + 1} 名稱:`, displayTitle)
     return displayTitle
   }
   
@@ -419,20 +421,20 @@ const getOrderPlanName = (index) => {
   
   const order = orders[index]
   const planName = order.plan_type || '餐盒訂單'
-  console.log(`✅ 訂單 ${index + 1} 方案名稱:`, planName)
+  // console.log(`✅ 訂單 ${index + 1} 方案名稱:`, planName)
   return planName
 }
 
 // 🔥 修正：從 API 回傳時間解析完整時間（包含時分秒）
 const orderCreatedTime = computed(() => {
-  console.log('🔍 解析訂單時間...')
+  // console.log('🔍 解析訂單時間...')
   
   // 🔥 優先使用 API 回傳的完整時間
   if (orderResult.value?.data?.order_time) {
     try {
       // API 回傳格式：2025-06-18 14:30:25
       const apiTime = orderResult.value.data.order_time
-      console.log('✅ 找到 API 時間:', apiTime)
+      // console.log('✅ 找到 API 時間:', apiTime)
       
       const date = new Date(apiTime)
       
@@ -446,7 +448,7 @@ const orderCreatedTime = computed(() => {
           second: '2-digit',
           hour12: false
         })
-        console.log('✅ 格式化後的時間:', formatted)
+        // console.log('✅ 格式化後的時間:', formatted)
         return formatted
       }
     } catch (e) {
@@ -459,7 +461,7 @@ const orderCreatedTime = computed(() => {
   
   if (orderNumbersArray && orderNumbersArray.length > 0) {
     const orderNumber = String(orderNumbersArray[0])
-    console.log('🔍 嘗試從訂單編號解析時間:', orderNumber)
+    // console.log('🔍 嘗試從訂單編號解析時間:', orderNumber)
     
     // 🔥 解析 EAT 格式：EAT + YYMMDD + 4位ID
     if (orderNumber.startsWith('EAT') && orderNumber.length === 13) {
@@ -479,7 +481,7 @@ const orderCreatedTime = computed(() => {
             month: '2-digit',
             day: '2-digit'
           })
-          console.log('✅ 從 EAT 格式解析的日期:', formatted)
+          // console.log('✅ 從 EAT 格式解析的日期:', formatted)
           return formatted
         }
       } catch (e) {
@@ -506,7 +508,7 @@ const orderCreatedTime = computed(() => {
             minute: '2-digit',
             hour12: false
           })
-          console.log('✅ 從舊格式解析的時間:', formatted)
+          // console.log('✅ 從舊格式解析的時間:', formatted)
           return formatted
         }
       } catch (e) {
@@ -531,7 +533,7 @@ const orderCreatedTime = computed(() => {
 // 查看訂單功能
 const viewOrder = () => {
   const orderNumbers = orderResult.value?.data?.order_numbers || orderResult.value?.order_numbers
-  console.log('查看 EAT 格式訂單:', orderNumbers)
+  // console.log('查看 EAT 格式訂單:', orderNumbers)
   router.push(`/MemberCenter/MyOrders`)
 }
 
