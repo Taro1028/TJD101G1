@@ -224,9 +224,27 @@ const handleLogin = async () => {
       } else if (result.blacklisted) {
         alert("會員已停權");
       } else {
-        // 登入成功的處理...
+        // 設定會員資料到 store
         member.setMember(result);
-        // ... 其他成功邏輯
+        console.log("會員 ID:", member.id);
+
+        // 🔔 優先檢查 ModalStore 的重定向路徑
+        let redirectPath = "/Home";
+
+        if (modalStore.hasRedirectPath) {
+          // 如果有彈窗設定的重定向路徑，使用它
+          redirectPath = modalStore.redirectPath;
+          modalStore.clearRedirectPath(); // 清除重定向路徑
+        } else {
+          // 否則檢查 URL query 參數
+          redirectPath = router.currentRoute.value.query.redirect || "/Home";
+        }
+
+        // 關閉登入彈窗（如果有開啟的話）
+        modalStore.closeLoginPopup();
+
+        // 跳轉到指定頁面
+        router.push(redirectPath);
       }
     } else {
       console.error("登入失敗:", response.statusText);
